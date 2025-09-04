@@ -1,35 +1,25 @@
 package com.grabtutor.grabtutor.entity;
 
-import com.grabtutor.grabtutor.enums.UserStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "users")
+@Table(name = "posts")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    @Column(unique = true)
-    String username;
-    String password;
-    LocalDate dob;
-    @Email
-    String email;
-    String phoneNumber;
-    boolean isActive;
-    UserStatus userStatus = UserStatus.NORMAL;
+    String imageUrl;
+    String description;
+    boolean isDeleted = false;
     LocalDate createdAt = LocalDate.now();
     LocalDate updatedAt = LocalDate.now();
-
-
 }
