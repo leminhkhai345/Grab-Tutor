@@ -1,8 +1,6 @@
 package com.grabtutor.grabtutor.entity;
 
-import com.grabtutor.grabtutor.enums.UserStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -10,28 +8,21 @@ import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
-@Table(name = "users")
+@Table(name = "roles")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Data
+@Getter
+@Setter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class User {
+@AllArgsConstructor
+public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    @Column(unique = true)
-    String username;
-    String password;
-    LocalDate dob;
-    @Email
-    String email;
-    String phoneNumber;
-    boolean isActive;
-    UserStatus userStatus = UserStatus.NORMAL;
+    String name;
+    String description;
     LocalDate createdAt = LocalDate.now();
     LocalDate updatedAt = LocalDate.now();
-
     @ManyToMany
-    Set<Role> roles;
+    Set<Permission> permissions;
 }
