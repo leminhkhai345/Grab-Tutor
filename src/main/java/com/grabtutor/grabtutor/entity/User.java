@@ -2,12 +2,16 @@ package com.grabtutor.grabtutor.entity;
 
 import com.grabtutor.grabtutor.enums.UserStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDate;
 import java.util.Set;
+import java.time.LocalDate;
+
+import java.util.List;
+
+import java.util.Set;
+
 
 @Entity
 @Table(name = "users")
@@ -24,13 +28,20 @@ public class User {
     String username;
     String password;
     LocalDate dob;
-    @Email
     String email;
     String phoneNumber;
     boolean isActive;
     UserStatus userStatus = UserStatus.NORMAL;
     LocalDate createdAt = LocalDate.now();
     LocalDate updatedAt = LocalDate.now();
+
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<Post> posts;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<Report> reports;
+
 
     @ManyToMany
     Set<Role> roles;

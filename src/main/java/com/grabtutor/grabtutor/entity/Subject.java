@@ -8,30 +8,23 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "posts")
+@Table(name = "subjects")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Post {
+public class Subject {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    String imageUrl;
-    String description;
-    boolean isDeleted = false;
+    String name;
     LocalDate createdAt = LocalDate.now();
     LocalDate updatedAt = LocalDate.now();
+    String description;
+    boolean isDeleted = false;
 
-    @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
-    User user;
+    @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<Post> posts;
 
-    @ManyToOne
-    @JoinColumn(name = "sujectId", nullable = false)
-    Subject subject;
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<Report> reports;
 }
