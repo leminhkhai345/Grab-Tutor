@@ -7,7 +7,11 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.util.Set;
 import java.time.LocalDate;
+
 import java.util.List;
+
+import java.util.Set;
+
 
 @Entity
 @Table(name = "users")
@@ -31,11 +35,13 @@ public class User {
     LocalDate createdAt = LocalDate.now();
     LocalDate updatedAt = LocalDate.now();
 
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<Post> posts;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<Report> reports;
+
 
     @ManyToMany
     Set<Role> roles;
