@@ -2,10 +2,10 @@ package com.grabtutor.grabtutor.entity;
 
 import com.grabtutor.grabtutor.enums.UserStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
+import java.util.Set;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -36,4 +36,7 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<Report> reports;
+
+    @ManyToMany
+    Set<Role> roles;
 }
