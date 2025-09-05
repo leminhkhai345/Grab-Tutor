@@ -2,8 +2,16 @@ spring:
   application:
     name: grabtutor
 
-    datasource:
-      url: jdbc:mysql://localhost:3306/grabtutor_db
-      username: root
-      password: 123456
-      driver-class-name: com.mysql.cj.jdbc.Driver
+  datasource:
+    url: jdbc:mysql://localhost:3306/grabtutor_db
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update   # tự động cập nhật CSDL khi entity thay đổi
+    show-sql: true        # in câu SQL ra console
+    properties:
+      hibernate:
+        format_sql: true  # format SQL cho dễ đọc
