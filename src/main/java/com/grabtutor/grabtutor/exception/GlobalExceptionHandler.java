@@ -13,7 +13,7 @@ public class GlobalExceptionHandler {
         ApiResponse response = new ApiResponse();
         response.setSuccess(false);
         response.setMessage(ex.getErrorCode().getMessage());
-        return ResponseEntity.badRequest().body(response);
+        return ResponseEntity.status(ex.getErrorCode().getHttpStatusCode()).body(response);
     }
 
 }

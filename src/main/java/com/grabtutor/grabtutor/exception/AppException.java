@@ -8,10 +8,13 @@ import org.springframework.http.HttpStatus;
 
 
 
-@RequiredArgsConstructor
 @Getter
 public class AppException extends RuntimeException {
     private final ErrorCode errorCode;
-    private final HttpStatus httpStatus;
+    public AppException(ErrorCode errorCode) {
+        super(errorCode.getMessage());
+        this.errorCode = errorCode;
+    }
+
 }
 
