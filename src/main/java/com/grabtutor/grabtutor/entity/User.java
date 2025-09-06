@@ -5,12 +5,14 @@ import jakarta.persistence.*;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+
 import java.util.Set;
 import java.time.LocalDate;
 
 import java.util.List;
 
-import java.util.Set;
+
 
 
 @Entity
@@ -30,11 +32,25 @@ public class User {
     LocalDate dob;
     String email;
     String phoneNumber;
-    boolean isActive;
+    @Builder.Default
+    boolean isActive = true;
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
     UserStatus userStatus = UserStatus.NORMAL;
-    LocalDate createdAt = LocalDate.now();
-    LocalDate updatedAt = LocalDate.now();
+    @Column(updatable = false)
+    LocalDate createdAt;
+    LocalDate updatedAt;
 
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDate.now();
+        updatedAt = LocalDate.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDate.now();
+    }
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<Post> posts;
