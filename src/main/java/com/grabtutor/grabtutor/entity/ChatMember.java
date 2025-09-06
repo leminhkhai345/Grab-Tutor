@@ -16,8 +16,6 @@ public class ChatMember {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    String chatBoxId;
-    String userId;
     @ManyToOne
     @JoinColumn(name = "chatBoxId", nullable = false)
     ChatBox chatBox;
