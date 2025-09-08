@@ -4,8 +4,6 @@ package com.grabtutor.grabtutor.exception;
 import lombok.Getter;
 
 
-
-
 @Getter
 public class AppException extends RuntimeException {
     private final ErrorCode errorCode;

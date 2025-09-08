@@ -25,7 +25,7 @@ public class UserController {
                 .build();
     }
 
-    @PostMapping("/id")
+    @PostMapping("/{id}")
     public ApiResponse<?> updateUser(@PathVariable String id, @RequestBody @Valid UserRequest userRequest){
         return ApiResponse.builder()
                 .message("User updated successfully")
@@ -40,6 +40,30 @@ public class UserController {
                 .data(userService.getUserById(id))
                 .build();
     }
+    @GetMapping("/simple")
+    public ApiResponse<?> getALlUsersSimple(){
+        return ApiResponse.builder()
+                .message("get all users simple successfully")
+                .data(userService.getAllUsers())
+                .build();
+    }
 
+    @DeleteMapping("/{id}")
+    public ApiResponse<?> deleteUser(@PathVariable String id){
+        userService.deleteUser(id);
+        return ApiResponse.builder()
+                .message("User deleted successfully")
+                .build();
+    }
+
+    @PostMapping("active/{id}")
+    public ApiResponse<?> changeActive(@PathVariable String id, @RequestParam boolean active){
+
+        String message = active ? "activated" : "deactivated";
+        return ApiResponse.builder()
+                .message("Change " + message + " successfully")
+                .data(userService.changeActive(id, active))
+                .build();
+    }
 
 }

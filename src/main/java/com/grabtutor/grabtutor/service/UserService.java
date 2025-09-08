@@ -55,4 +55,15 @@ public class UserService {
         userMapper.updateUserFromRequest(userRequest, user);
         return userMapper.toUserResponse(userRepository.save(user));
     }
+
+    public void deleteUser(String id){
+        User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        userRepository.delete(user);
+    }
+
+    public UserResponse changeActive(String id, boolean active){
+        User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        user.setActive(active);
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
 }
