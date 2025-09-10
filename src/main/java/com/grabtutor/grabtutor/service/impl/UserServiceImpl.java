@@ -10,6 +10,9 @@ import com.grabtutor.grabtutor.repository.UserRepository;
 import com.grabtutor.grabtutor.service.UserService;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +24,7 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepository;
     UserMapper userMapper;
 
+    @Override
     public UserResponse addUser(UserRequest userRequest){
         if(userRepository.existsByUsername(userRequest.getUsername())){
             throw new AppException(ErrorCode.USERNAME_ALREADY_EXISTS);
@@ -34,17 +38,13 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    public List<UserResponse> getAllUsers(){
-        List<User> users = userRepository.findAll();
-        return users.stream().map(userMapper::toUserResponse).toList();
-    }
-
+    @Override
     public UserResponse getUserById(String id){
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         return userMapper.toUserResponse(user);
     }
-
+    @Override
     public UserResponse updateUser(String id, UserRequest userRequest) {
         User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         if (!user.getUsername().equals(userRequest.getUsername()) && userRepository.existsByUsername(userRequest.getUsername())) {
@@ -56,15 +56,22 @@ public class UserServiceImpl implements UserService {
         userMapper.updateUserFromRequest(userRequest, user);
         return userMapper.toUserResponse(userRepository.save(user));
     }
-
+    @Override
     public void deleteUser(String id){
         User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         userRepository.delete(user);
     }
-
+    @Override
     public UserResponse changeActive(String id, boolean active){
         User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         user.setActive(active);
         return userMapper.toUserResponse(userRepository.save(user));
+    }
+
+    @Override
+    public List<UserResponse> getAllUsers(int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Page<User> users = userRepository.findAll(pageable);
+        return users.stream().map(userMapper::toUserResponse).toList();
     }
 }

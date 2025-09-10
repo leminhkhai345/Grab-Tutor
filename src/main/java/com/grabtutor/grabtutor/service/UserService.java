@@ -12,7 +12,6 @@ public interface UserService {
     public UserResponse addUser(UserRequest userRequest);
 
 
-    public List<UserResponse> getAllUsers();
     public UserResponse getUserById(String id);
 
     public UserResponse updateUser(String id, UserRequest userRequest);
@@ -20,4 +19,5 @@ public interface UserService {
     public void deleteUser(String id);
 
     public UserResponse changeActive(String id, boolean active);
+    public List<UserResponse> getAllUsers(int pageNo, int pageSize);
 }
