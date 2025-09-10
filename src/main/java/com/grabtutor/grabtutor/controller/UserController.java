@@ -2,7 +2,7 @@ package com.grabtutor.grabtutor.controller;
 
 import com.grabtutor.grabtutor.dto.request.UserRequest;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
-import com.grabtutor.grabtutor.service.UserService;
+import com.grabtutor.grabtutor.service.impl.UserServiceImpl;
 
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
-    UserService userService;
+    UserServiceImpl userService;
 
     @PostMapping
     public ApiResponse<?> createUser(@RequestBody @Valid UserRequest userRequest){
