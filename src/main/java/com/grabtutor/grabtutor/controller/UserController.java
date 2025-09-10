@@ -40,13 +40,15 @@ public class UserController {
                 .data(userService.getUserById(id))
                 .build();
     }
-    @GetMapping("/simple")
-    public ApiResponse<?> getALlUsersSimple(){
+    @GetMapping("/list")
+    public ApiResponse<?> getALlUsers(@RequestParam(defaultValue = "0") int pageNo,
+                                      @RequestParam(defaultValue = "10") int pageSize){
         return ApiResponse.builder()
                 .message("get all users simple successfully")
-                .data(userService.getAllUsers())
+                .data(userService.getAllUsers(pageNo, pageSize))
                 .build();
     }
+
 
     @DeleteMapping("/{id}")
     public ApiResponse<?> deleteUser(@PathVariable String id){
