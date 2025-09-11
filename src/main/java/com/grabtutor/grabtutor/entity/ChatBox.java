@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatBox {
+public class ChatBox{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
