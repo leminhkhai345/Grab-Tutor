@@ -20,9 +20,21 @@ public class Post {
     String id;
     String imageUrl;
     String description;
+    @Builder.Default
     boolean isDeleted = false;
-    LocalDate createdAt = LocalDate.now();
+    LocalDate createdAt;
     LocalDate updatedAt = LocalDate.now();
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDate.now();
+        updatedAt = LocalDate.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDate.now();
+    }
 
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)
