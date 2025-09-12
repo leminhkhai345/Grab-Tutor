@@ -46,24 +46,24 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     UserRepository userRepository;
     InvalidatedTokenRepository invalidatedTokenRepository;
     @NonFinal
-    @Value("${jwt.signerKey}")
+    @Value("${jwt.signer-key}")
     protected String SIGNER_KEY;
 
     @NonFinal
-    @Value("${jwt.validDuration}")
+    @Value("${jwt.valid-duration}")
     protected long VALID_DURATION;
 
     @NonFinal
-    @Value("${jwt.refreshableDuration}")
+    @Value("${jwt.refreshable-duration}")
     protected long REFRESHABLE_DURATION;
     @Override
-    public IntrospectResponse introspect(IntrospectRequest request) {
+    public IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException {
         var token = request.getToken();
         boolean isValid = true;
 
         try {
             verifyToken(token, false);
-        } catch (AppException | JOSEException | ParseException e) {
+        } catch (AppException e) {
             isValid = false;
         }
 
@@ -87,7 +87,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public AuthenticationResponse resfreshToken(RefreshRequest request) throws ParseException, JOSEException {
+    public AuthenticationResponse refreshToken(RefreshRequest request) throws ParseException, JOSEException {
         var signedJWT = verifyToken(request.getToken(), true);
 
         var jit = signedJWT.getJWTClaimsSet().getJWTID();
