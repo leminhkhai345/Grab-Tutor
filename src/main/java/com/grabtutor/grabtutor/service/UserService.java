@@ -1,23 +1,20 @@
 package com.grabtutor.grabtutor.service;
 
 import com.grabtutor.grabtutor.dto.request.UserRequest;
+import com.grabtutor.grabtutor.dto.response.PageResponse;
 import com.grabtutor.grabtutor.dto.response.UserResponse;
-import com.grabtutor.grabtutor.entity.User;
-import com.grabtutor.grabtutor.exception.AppException;
-import com.grabtutor.grabtutor.exception.ErrorCode;
 
-import java.util.List;
 
 public interface UserService {
-    public UserResponse addUser(UserRequest userRequest);
+    UserResponse addUser(UserRequest userRequest);
 
+    UserResponse getUserById(String id);
 
-    public UserResponse getUserById(String id);
+    UserResponse updateUser(String id, UserRequest userRequest);
 
-    public UserResponse updateUser(String id, UserRequest userRequest);
+    void deleteUser(String id);
 
-    public void deleteUser(String id);
+    UserResponse changeActive(String id, boolean active);
 
-    public UserResponse changeActive(String id, boolean active);
-    public List<UserResponse> getAllUsers(int pageNo, int pageSize);
+    PageResponse<?> getAllUsers(int pageNo, int pageSize, String... sortBy);
 }
