@@ -1,6 +1,7 @@
 package com.grabtutor.grabtutor.service.impl;
 
 import com.grabtutor.grabtutor.dto.request.UserRequest;
+import com.grabtutor.grabtutor.dto.response.PageResponse;
 import com.grabtutor.grabtutor.dto.response.UserResponse;
 import com.grabtutor.grabtutor.entity.User;
 import com.grabtutor.grabtutor.exception.AppException;
@@ -13,9 +14,13 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -69,9 +74,33 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserResponse> getAllUsers(int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
+    public PageResponse<?> getAllUsers(int pageNo, int pageSize, String ... sorts){
+
+        List<Sort.Order> orders = new ArrayList<>();
+        for(String sortBy : sorts){
+            // firstname:asc|desc
+            Pattern pattern = Pattern.compile("(\\w+?):(.*)");
+            Matcher matcher = pattern.matcher(sortBy);
+            if(matcher.find()){
+                if(matcher.group(3).equalsIgnoreCase("desc")){
+                    orders.add(new Sort.Order(Sort.Direction.DESC, matcher.group(1)));
+                } else {
+                    orders.add(new Sort.Order(Sort.Direction.ASC, matcher.group(1)));
+                }
+            }
+
+        }
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(orders));
         Page<User> users = userRepository.findAll(pageable);
-        return users.stream().map(userMapper::toUserResponse).toList();
+
+        return PageResponse.builder()
+                .pageNo(pageNo)
+                .pageSize(pageSize)
+                .totalPages(users.getTotalPages())
+                .items(users.stream().map(userMapper::toUserResponse).toList())
+                .build();
     }
+
+
 }

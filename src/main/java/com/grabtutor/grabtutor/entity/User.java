@@ -2,18 +2,11 @@ package com.grabtutor.grabtutor.entity;
 
 import com.grabtutor.grabtutor.enums.UserStatus;
 import jakarta.persistence.*;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-
 import java.util.Set;
 import java.time.LocalDate;
-
 import java.util.List;
-
-
-
 
 @Entity
 @Table(name = "users")
@@ -30,6 +23,7 @@ public class User {
     String username;
     String password;
     LocalDate dob;
+    @Column(unique = true)
     String email;
     String phoneNumber;
     @Builder.Default
@@ -37,8 +31,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     UserStatus userStatus = UserStatus.NORMAL;
-    @Column(updatable = false)
+    @Column(updatable = false, nullable = false)
     LocalDate createdAt;
+    @Column(nullable = false)
     LocalDate updatedAt;
 
     @PrePersist
@@ -57,7 +52,6 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<Report> reports;
-
 
     @ManyToMany
     Set<Role> roles;

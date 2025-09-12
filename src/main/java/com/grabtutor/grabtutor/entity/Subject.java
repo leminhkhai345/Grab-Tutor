@@ -19,10 +19,22 @@ public class Subject {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     String name;
-    LocalDate createdAt = LocalDate.now();
-    LocalDate updatedAt = LocalDate.now();
+    LocalDate createdAt;
+    LocalDate updatedAt;
     String description;
+    @Builder.Default
     boolean isDeleted = false;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDate.now();
+        updatedAt = LocalDate.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDate.now();
+    }
 
     @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<Post> posts;
