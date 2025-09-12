@@ -21,6 +21,6 @@ spring:
       hibernate:
         format_sql: true  # format SQL cho dễ đọc
 jwt:
-  signerKey: "Qk9WeWZxa0xEaEpUdWxzRk1sR1h5ZWlMV0RuY3NaRktyZ0tLY3VzaEZtQnhJckN1a2MzS1A3UjA9"
-  validDuration: 3600 # in second
-  refreshableDuration: 36000 # in seconds
+  signer-key: "Qk9WeWZxa0xEaEpUdWxzRk1sR1h5ZWlMV0RuY3NaRktyZ0tLY3VzaEZtQnhJckN1a2MzS1A3UjA9"
+  valid-duration: 3600 # in second
+  refreshable-duration: 36000 # in seconds

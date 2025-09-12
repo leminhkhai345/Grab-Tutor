@@ -13,9 +13,9 @@ import com.nimbusds.jwt.SignedJWT;
 import java.text.ParseException;
 
 public interface AuthenticationService {
-    IntrospectResponse introspect(IntrospectRequest introspectRequest);
+    IntrospectResponse introspect(IntrospectRequest introspectRequest) throws JOSEException, ParseException;
     AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest);
-    AuthenticationResponse resfreshToken(RefreshRequest authenticationRequest) throws ParseException, JOSEException;
+    AuthenticationResponse refreshToken(RefreshRequest authenticationRequest) throws ParseException, JOSEException;
     void logout(LogoutRequest logoutRequest);
     SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException;
     String generateToken(User user);
