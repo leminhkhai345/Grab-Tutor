@@ -2,6 +2,7 @@ package com.grabtutor.grabtutor.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +18,7 @@ public class UserRequest {
     @NotBlank(message = "username must be not blank")
     String username;
     @NotBlank(message = "password must be not blank")
+    @NotNull
     @Size(min = 5, message = "password must be at least 8 characters")
     String password;
     LocalDate dob;

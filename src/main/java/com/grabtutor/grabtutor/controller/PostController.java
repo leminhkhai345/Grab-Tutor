@@ -3,7 +3,6 @@ package com.grabtutor.grabtutor.controller;
 import com.grabtutor.grabtutor.dto.request.PostRequest;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
 import com.grabtutor.grabtutor.service.PostService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
