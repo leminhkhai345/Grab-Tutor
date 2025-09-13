@@ -15,6 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -28,6 +30,7 @@ import java.util.regex.Pattern;
 public class UserServiceImpl implements UserService {
     UserRepository userRepository;
     UserMapper userMapper;
+    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
     @Override
     public UserResponse addUser(UserRequest userRequest){
@@ -39,6 +42,8 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = userMapper.toUser(userRequest);
+
+        user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
@@ -59,6 +64,7 @@ public class UserServiceImpl implements UserService {
             throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
         userMapper.updateUserFromRequest(userRequest, user);
+        user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
         return userMapper.toUserResponse(userRepository.save(user));
     }
     @Override
