@@ -8,11 +8,14 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
     UserServiceImpl userService;
@@ -40,9 +43,13 @@ public class UserController {
                 .data(userService.getUserById(id))
                 .build();
     }
-    @GetMapping("/list")
+    @GetMapping
     public ApiResponse<?> getALlUsers(@RequestParam(defaultValue = "0") int pageNo,
                                       @RequestParam(defaultValue = "10") int pageSize){
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        log.info("Username: {}", authentication.getName());
+        authentication.getAuthorities().forEach(authority -> log.info(authority.getAuthority()));
+
         return ApiResponse.builder()
                 .message("get all users simple successfully")
                 .data(userService.getAllUsers(pageNo, pageSize))

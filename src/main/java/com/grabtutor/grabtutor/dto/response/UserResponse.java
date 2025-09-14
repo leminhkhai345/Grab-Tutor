@@ -1,11 +1,13 @@
 package com.grabtutor.grabtutor.dto.response;
 
+import com.grabtutor.grabtutor.entity.Role;
 import com.grabtutor.grabtutor.enums.UserStatus;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -23,4 +25,5 @@ public class UserResponse {
     UserStatus userStatus;
     LocalDate createdAt;
     LocalDate updatedAt;
+    Set<Role> roles;
 }
