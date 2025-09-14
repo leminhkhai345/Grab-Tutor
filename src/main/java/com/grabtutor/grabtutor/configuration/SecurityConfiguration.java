@@ -22,7 +22,7 @@ import org.springframework.web.filter.CorsFilter;
 @EnableMethodSecurity
 public class SecurityConfiguration {
     private final String[] PUBLIC_ENDPOINTS = {
-            "/users","/auth/token", "/auth/introspect", "/auth/logout", "/auth/refresh"
+            "/users", "/users/sendmail","/auth/token", "/auth/introspect", "/auth/logout", "/auth/refresh"
     };
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
