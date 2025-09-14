@@ -43,6 +43,15 @@ public class UserController {
                 .data(userService.getUserById(id))
                 .build();
     }
+
+    @GetMapping("/myInfo")
+    public ApiResponse<?> getMyInfo(){
+        return ApiResponse.builder()
+                .message("get my info successfully")
+                .data(userService.getMyInfo())
+                .build();
+    }
+
     @GetMapping
     public ApiResponse<?> getALlUsers(@RequestParam(defaultValue = "0") int pageNo,
                                       @RequestParam(defaultValue = "10") int pageSize){
