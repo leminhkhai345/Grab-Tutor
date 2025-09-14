@@ -22,7 +22,7 @@ import org.springframework.web.filter.CorsFilter;
 @EnableMethodSecurity
 public class SecurityConfiguration {
     private final String[] PUBLIC_ENDPOINTS = {
-            "/auth/token", "/auth/introspect", "/auth/logout", "/auth/refresh"
+            "/users","/auth/token", "/auth/introspect", "/auth/logout", "/auth/refresh"
     };
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
@@ -31,8 +31,8 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(request ->
                 request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/users")
-//                        .hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/users")
+                        .hasAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated());
 
         httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer

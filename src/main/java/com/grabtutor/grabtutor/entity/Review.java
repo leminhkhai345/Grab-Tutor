@@ -3,22 +3,20 @@ package com.grabtutor.grabtutor.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "reviews")
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@SuperBuilder
 @Data
-@Builder
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class Review {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+public class Review extends BaseEntity {
+
     String description;
-    boolean isDeleted = false;
-    LocalDate createdAt = LocalDate.now();
-    LocalDate updatedAt = LocalDate.now();
+
 }

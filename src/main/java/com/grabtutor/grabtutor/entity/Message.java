@@ -14,14 +14,10 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Message {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+public class Message extends BaseEntity{
+
     String content;
-    boolean isDeleted;
-    LocalDate createdAt = LocalDate.now();
-    LocalDate updatedAt = LocalDate.now();
+
     @ManyToOne
     @JoinColumn(name = "senderId", nullable = false)
     User user;
