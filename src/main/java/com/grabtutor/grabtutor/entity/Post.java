@@ -3,6 +3,7 @@ package com.grabtutor.grabtutor.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -10,31 +11,15 @@ import java.util.List;
 @Entity
 @Table(name = "posts")
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Post {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+public class Post extends BaseEntity {
+
     String imageUrl;
     String description;
-    @Builder.Default
-    boolean isDeleted = false;
-    LocalDate createdAt;
-    LocalDate updatedAt = LocalDate.now();
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDate.now();
-        updatedAt = LocalDate.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDate.now();
-    }
 
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)

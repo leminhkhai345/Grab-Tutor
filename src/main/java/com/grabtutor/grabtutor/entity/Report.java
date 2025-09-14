@@ -3,6 +3,7 @@ package com.grabtutor.grabtutor.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 
@@ -10,15 +11,13 @@ import java.time.LocalDate;
 @Table(name = "reports")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
-@Builder
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class Report {
-    @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.UUID)
-    String id;
+public class Report extends BaseEntity {
+
     String detail;
-    LocalDate createdAt = LocalDate.now();
 
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)

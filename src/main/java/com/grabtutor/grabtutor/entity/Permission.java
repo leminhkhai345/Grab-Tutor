@@ -14,12 +14,8 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Permission {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+public class Permission extends BaseEntity {
     String name;
     String description;
-    LocalDate createdAt = LocalDate.now();
-    LocalDate updatedAt = LocalDate.now();
+
 }
