@@ -11,11 +11,15 @@ import com.grabtutor.grabtutor.repository.UserRepository;
 import com.grabtutor.grabtutor.service.UserService;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,6 +31,7 @@ import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserServiceImpl implements UserService {
     UserRepository userRepository;
@@ -48,7 +53,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
-
+    @PostAuthorize("returnObject.username == authentication.name or hasRole('ADMIN')")
     @Override
     public UserResponse getUserById(String id){
         User user = userRepository.findById(id)
@@ -56,6 +61,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserResponse(user);
     }
 
+    @PreAuthorize("returnObject.username == authentication.name or hasRole('ADMIN')")
     @Override
     public UserResponse updateUser(String id, UserRequest userRequest) {
         User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -70,12 +76,14 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public void deleteUser(String id){
         User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         userRepository.delete(user);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public UserResponse changeActive(String id, boolean active){
         User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -83,6 +91,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public PageResponse<?> getAllUsers(int pageNo, int pageSize, String ... sorts){
 
@@ -112,5 +121,13 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
+    @PostAuthorize("returnObject.username == authentication.name")
+    @Override
+    public UserResponse getMyInfo(){
+        var context = SecurityContextHolder.getContext();
+        String name = context.getAuthentication().getName();
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        return userMapper.toUserResponse(user);
+    }
 
 }
