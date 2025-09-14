@@ -1,7 +1,10 @@
 package com.grabtutor.grabtutor.controller;
 
+import com.grabtutor.grabtutor.dto.request.SendMailRequest;
 import com.grabtutor.grabtutor.dto.request.UserRequest;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
+import com.grabtutor.grabtutor.service.MailSenderService;
+import com.grabtutor.grabtutor.service.impl.MailSenderServiceImpl;
 import com.grabtutor.grabtutor.service.impl.UserServiceImpl;
 
 import jakarta.validation.Valid;
@@ -19,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
     UserServiceImpl userService;
-
+    MailSenderServiceImpl sendMailService;
     @PostMapping
     public ApiResponse<?> createUser(@RequestBody @Valid UserRequest userRequest){
         return ApiResponse.builder()
@@ -83,5 +86,12 @@ public class UserController {
                 .data(userService.changeActive(id, active))
                 .build();
     }
-
+    //Test gửi mail
+    @PostMapping("/sendmail")
+    public ApiResponse<?> sendMail(@RequestBody @Valid SendMailRequest request){
+        sendMailService.sendMail(request.getTo(), request.getSubject(), request.getBody());
+        return ApiResponse.builder()
+                .message("Mail sent successfully")
+                .build();
+    }
 }

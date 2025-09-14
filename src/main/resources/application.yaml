@@ -6,6 +6,18 @@ server:
 spring:
   application:
     name: grabtutor
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:khoatrancraft3@gmail.com}
+    password: ${MAIL_PASSWORD:cfmg mblu tenp losn}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
 
   datasource:
     url: jdbc:mysql://localhost:3306/grabtutor_db
@@ -24,3 +36,4 @@ jwt:
   signer-key: "Qk9WeWZxa0xEaEpUdWxzRk1sR1h5ZWlMV0RuY3NaRktyZ0tLY3VzaEZtQnhJckN1a2MzS1A3UjA9"
   valid-duration: 3600 # in second
   refreshable-duration: 36000 # in seconds
+
