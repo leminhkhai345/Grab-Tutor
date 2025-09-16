@@ -10,6 +10,7 @@ public enum ErrorCode {
     USERNAME_ALREADY_EXISTS(1002, "Username already exists", HttpStatus.CONFLICT),
     EMAIL_ALREADY_EXISTS(1003, "Email already exists", HttpStatus.CONFLICT),
     UNAUTHENTICATED(1004, "Unauthenticated", HttpStatus.UNAUTHORIZED),
+    NATIONAL_ID_ALREADY_EXISTS(1005, "National id already exists", HttpStatus.CONFLICT),
     POST_NOT_EXIST(2001, "Post does not exist", HttpStatus.NOT_FOUND),
     ;
     private final long code;

@@ -20,6 +20,8 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class User extends BaseEntity {
+
+
     @Column(unique = true)
     String email;
     @Column(nullable = false)
@@ -40,5 +42,9 @@ public class User extends BaseEntity {
 
     @ManyToMany
     Set<Role> roles;
+    
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "tutor_info_id")
+    TutorInfo tutorInfo;
 
 }

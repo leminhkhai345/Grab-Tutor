@@ -26,7 +26,7 @@ public class ApplicationConfiguration {
     PasswordEncoder passwordEncoder;
 
     @NonFinal
-    static final String ADMIN_USER_NAME = "admin";
+    static final String ADMIN_MAIL = "admin";
 
     @NonFinal
     static final String ADMIN_PASSWORD = "admin";
@@ -39,7 +39,8 @@ public class ApplicationConfiguration {
     ApplicationRunner applicationRunner(UserRepository userRepository, RoleRepository roleRepository) {
         log.info("Initializing application.....");
         return args -> {
-            if (userRepository.findByEmail(ADMIN_USER_NAME).isEmpty()) {
+
+            if (userRepository.findByEmail(ADMIN_MAIL).isEmpty()) {
                 roleRepository.save(Role.builder()
                         .name("USER")
                         .description("User role")
@@ -54,7 +55,9 @@ public class ApplicationConfiguration {
                 roles.add(adminRole);
 
                 User user = User.builder()
-                        .email(ADMIN_USER_NAME)
+
+                .email(ADMIN_MAIL)
+
                         .password(passwordEncoder.encode(ADMIN_PASSWORD))
                         .roles(roles)
                         .build();
