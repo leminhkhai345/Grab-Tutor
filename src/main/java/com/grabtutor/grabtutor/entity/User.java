@@ -20,8 +20,6 @@ import java.util.List;
 @AllArgsConstructor
 public class User extends BaseEntity {
 
-    @Column(unique = true)
-    String username;
     String password;
     LocalDate dob;
     @Column(unique = true)
@@ -43,5 +41,7 @@ public class User extends BaseEntity {
     @ManyToMany
     Set<Role> roles;
 
-
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "tutor_info_id")
+    TutorInfo tutorInfo;
 }

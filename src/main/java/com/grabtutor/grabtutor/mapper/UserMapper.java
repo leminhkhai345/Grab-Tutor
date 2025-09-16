@@ -1,5 +1,6 @@
 package com.grabtutor.grabtutor.mapper;
 
+import com.grabtutor.grabtutor.dto.request.TutorInfoRequest;
 import com.grabtutor.grabtutor.dto.request.UserRequest;
 import com.grabtutor.grabtutor.dto.response.UserResponse;
 import com.grabtutor.grabtutor.entity.User;
@@ -19,7 +20,6 @@ public interface UserMapper {
         UserResponse.UserResponseBuilder userResponse = UserResponse.builder();
 
         userResponse.id(user.getId() );
-        userResponse.username(user.getUsername() );
         userResponse.dob( user.getDob() );
         userResponse.email( user.getEmail() );
         userResponse.phoneNumber( user.getPhoneNumber() );
