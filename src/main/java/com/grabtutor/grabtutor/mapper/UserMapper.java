@@ -19,7 +19,6 @@ public interface UserMapper {
         UserResponse.UserResponseBuilder userResponse = UserResponse.builder();
 
         userResponse.id(user.getId() );
-        userResponse.username(user.getUsername() );
         userResponse.dob( user.getDob() );
         userResponse.email( user.getEmail() );
         userResponse.phoneNumber( user.getPhoneNumber() );

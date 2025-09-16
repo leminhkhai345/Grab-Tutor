@@ -14,9 +14,6 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class UserRequest {
-    @Size(min = 5, max = 20, message = "username must be between 5 and 20 characters")
-    @NotBlank(message = "username must be not blank")
-    String username;
     @NotBlank(message = "password must be not blank")
     @NotNull
     @Size(min = 5, message = "password must be at least 8 characters")

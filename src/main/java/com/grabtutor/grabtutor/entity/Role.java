@@ -1,24 +1,20 @@
 package com.grabtutor.grabtutor.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDate;
 import java.util.Set;
 
-@Entity
-@Table(name = "roles")
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@Getter
-@Setter
-@SuperBuilder
-@EqualsAndHashCode(callSuper = true)
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Entity
 public class Role extends BaseEntity {
-
     String name;
     String description;
 
