@@ -1,6 +1,8 @@
 package com.grabtutor.grabtutor.controller;
 
+import com.grabtutor.grabtutor.dto.request.AccountVerificationRequest;
 import com.grabtutor.grabtutor.dto.request.SendMailRequest;
+import com.grabtutor.grabtutor.dto.request.TutorInfoRequest;
 import com.grabtutor.grabtutor.dto.request.UserRequest;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
 import com.grabtutor.grabtutor.service.MailSenderService;
@@ -87,11 +89,28 @@ public class UserController {
                 .build();
     }
     //Test gửi mail
-    @PostMapping("/sendmail")
+    @PostMapping("/sendMail")
     public ApiResponse<?> sendMail(@RequestBody @Valid SendMailRequest request){
         sendMailService.sendMail(request.getTo(), request.getSubject(), request.getBody());
         return ApiResponse.builder()
                 .message("Mail sent successfully")
                 .build();
     }
+    @PostMapping("/addInfo")
+    public ApiResponse<?> addInfo(@RequestBody @Valid TutorInfoRequest request){
+        return ApiResponse.builder()
+                .success(true)
+                .data(userService.addInfo(request))
+                .message("Tutor info added successfully")
+                .build();
+    }
+    @PostMapping("/submitRequest")
+    public ApiResponse<?> submitVerificationRequest(AccountVerificationRequest request){
+        return ApiResponse.builder()
+                .success(true)
+                .data(userService.verifyTutor(request))
+                .message("Sending request successfully")
+                .build();
+    }
+
 }

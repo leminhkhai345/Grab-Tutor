@@ -17,7 +17,7 @@ public class TutorInfoRequest {
 
     String userId;
     @NotBlank(message = "national id must not be blank")
-    String nationalID;
+    String nationalId;
     @NotBlank(message = "university must not be blank")
     String university;
     @NotBlank(message = "highest academic degree must not be blank")

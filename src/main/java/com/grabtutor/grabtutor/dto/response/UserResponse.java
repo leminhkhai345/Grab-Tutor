@@ -1,6 +1,5 @@
 package com.grabtutor.grabtutor.dto.response;
 
-import com.grabtutor.grabtutor.entity.Role;
 import com.grabtutor.grabtutor.enums.UserStatus;
 
 import lombok.*;
@@ -24,5 +23,5 @@ public class UserResponse {
     UserStatus userStatus;
     LocalDate createdAt;
     LocalDate updatedAt;
-    Set<Role> roles;
+    String role;
 }
