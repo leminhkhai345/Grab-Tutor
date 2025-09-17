@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -35,6 +36,7 @@ public class PostServiceImpl implements PostService {
     PostMapper postMapper;
     private final UserRepository userRepository;
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Override
     public PostResponse addPost(PostRequest postRequest) {
         Post post = postMapper.toPost(postRequest);

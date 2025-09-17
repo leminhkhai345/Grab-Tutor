@@ -14,9 +14,12 @@ public enum ErrorCode {
     POST_NOT_EXIST(2001, "Post does not exist", HttpStatus.NOT_FOUND),
 
 
-
     SUBJECT_ALREADY_EXISTS(3001, "Subject already exists", HttpStatus.CONFLICT),
     SUBJECT_NOT_FOUND(3002, "Subject not found", HttpStatus.NOT_FOUND),
+
+    INVALID_KEY(4001, "Invalid key", HttpStatus.BAD_REQUEST),
+    INVALID_DOB(1008, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
+    INVALID_PASSWORD(1004, "Password must be at least {min} characters", HttpStatus.BAD_REQUEST),
 
     ;
     private final long code;
