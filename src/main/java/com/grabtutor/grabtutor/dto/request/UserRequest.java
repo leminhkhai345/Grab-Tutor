@@ -14,14 +14,15 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class UserRequest {
+    @NotBlank(message = "email must be not blank")
+    @Email(message = "email not valid")
+    String email;
     @NotBlank(message = "password must be not blank")
     @NotNull
     @Size(min = 5, message = "password must be at least 8 characters")
     String password;
     LocalDate dob;
-    @NotBlank(message = "email must be not blank")
-    @Email(message = "email not valid")
-    String email;
+
     @Size(min = 10, max = 10, message = "phone number must be 10 characters")
     String phoneNumber;
 }
