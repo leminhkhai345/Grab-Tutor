@@ -19,7 +19,7 @@ public class UserRequest {
     String email;
     @NotBlank(message = "password must be not blank")
     @NotNull
-    @Size(min = 5, message = "password must be at least 8 characters")
+    @Size(min = 5, message = "INVALID_PASSWORD")
     String password;
     LocalDate dob;
 
