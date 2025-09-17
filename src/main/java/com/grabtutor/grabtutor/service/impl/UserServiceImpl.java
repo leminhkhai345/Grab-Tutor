@@ -51,9 +51,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse addUser(UserRequest userRequest){
-        if(userRepository.existsByUsername(userRequest.getUsername())){
-            throw new AppException(ErrorCode.USERNAME_ALREADY_EXISTS);
-        }
         if(userRepository.existsByEmail(userRequest.getEmail())){
             throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
@@ -76,9 +73,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse updateUser(String id, UserRequest userRequest) {
         User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        if (!user.getUsername().equals(userRequest.getUsername()) && userRepository.existsByUsername(userRequest.getUsername())) {
-            throw new AppException(ErrorCode.USERNAME_ALREADY_EXISTS);
-        }
+
         if (!user.getEmail().equals(userRequest.getEmail()) && userRepository.existsByEmail(userRequest.getEmail())) {
             throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
@@ -109,7 +104,7 @@ public class UserServiceImpl implements UserService {
         List<Sort.Order> orders = new ArrayList<>();
         for(String sortBy : sorts){
             // firstname:asc|desc
-            Pattern pattern = Pattern.compile("(\\w+?):(.*)");
+            Pattern pattern = Pattern.compile("(\\w+?)(:)(.*)");
             Matcher matcher = pattern.matcher(sortBy);
             if(matcher.find()){
                 if(matcher.group(3).equalsIgnoreCase("desc")){
@@ -137,7 +132,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse getMyInfo(){
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
-        User user = userRepository.findByUsername(name).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findByEmail(name).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         return userMapper.toUserResponse(user);
     }
     // Register gia sư cần 3 bước:

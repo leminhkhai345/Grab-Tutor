@@ -17,7 +17,6 @@ import java.util.Set;
 @NoArgsConstructor
 public class UserResponse {
     String id;
-    String username;
     LocalDate dob;
     String email;
     String phoneNumber;

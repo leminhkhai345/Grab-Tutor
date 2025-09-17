@@ -3,6 +3,7 @@ package com.grabtutor.grabtutor.controller;
 import com.grabtutor.grabtutor.dto.request.PostRequest;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
 import com.grabtutor.grabtutor.service.PostService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,7 @@ public class PostController {
     PostService postService;
 
     @PostMapping()
-    public ApiResponse<?> createPost(@RequestBody PostRequest postRequest){
+    public ApiResponse<?> createPost(@RequestBody @Valid PostRequest postRequest){
         return ApiResponse.builder()
                 .data(postService.addPost(postRequest))
                 .message("Post created successfully")
@@ -26,7 +27,7 @@ public class PostController {
     }
 
     @PostMapping("/{postId}")
-    public ApiResponse<?> updatePost(@PathVariable String postId, @RequestBody PostRequest postRequest){
+    public ApiResponse<?> updatePost(@PathVariable String postId, @RequestBody @Valid PostRequest postRequest){
         return ApiResponse.builder()
                 .data(postService.updatePost(postId, postRequest))
                 .message("Post updated successfully")

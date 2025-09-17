@@ -17,5 +17,4 @@ import java.time.LocalDate;
 public class Permission extends BaseEntity {
     String name;
     String description;
-
 }

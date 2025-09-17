@@ -1,5 +1,6 @@
 package com.grabtutor.grabtutor.dto.request;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +12,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
-public class IntrospectRequest {
-    String token;
+public class SubjectRequest {
+    @NotNull(message = "Name must be not null")
+    String name;
+    String description;
 }
