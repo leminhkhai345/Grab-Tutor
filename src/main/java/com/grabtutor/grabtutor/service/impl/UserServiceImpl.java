@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
-    @PostAuthorize("returnObject.username == authentication.name or hasRole('ADMIN')")
+    @PostAuthorize("returnObject.email == authentication.name or hasRole('ADMIN')")
     @Override
     public UserResponse getUserById(String id){
         User user = userRepository.findById(id)
@@ -69,7 +69,16 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserResponse(user);
     }
 
-    @PreAuthorize("returnObject.username == authentication.name or hasRole('ADMIN')")
+    @PostAuthorize("returnObject.email == authentication.name")
+    @Override
+    public UserResponse getMyInfo(){
+        var context = SecurityContextHolder.getContext();
+        String name = context.getAuthentication().getName();
+        User user = userRepository.findByEmail(name).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        return userMapper.toUserResponse(user);
+    }
+
+    @PostAuthorize("returnObject.email == authentication.name or hasRole('ADMIN')")
     @Override
     public UserResponse updateUser(String id, UserRequest userRequest) {
         User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -127,17 +136,6 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-    @PostAuthorize("returnObject.username == authentication.name")
-    @Override
-    public UserResponse getMyInfo(){
-        var context = SecurityContextHolder.getContext();
-        String name = context.getAuthentication().getName();
-        User user = userRepository.findByEmail(name).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        return userMapper.toUserResponse(user);
-    }
-    // Register gia sư cần 3 bước:
-    //Tạo tài khoản thành công -> chuyển sang điền thông tin học vị + CCCD -> Submit để tạo request duyệt
-    //Tạm chưa xử lí logic phía tài khoản người dùng để hạn chế người chưa được duyệt ((?) kiểm tra role + userStatus)
     @Override
     public TutorInfoResponse addInfo(TutorInfoRequest request) {
         var info = tutorInfoMapper.toTutorInfo(request);
