@@ -29,7 +29,7 @@ public class User extends BaseEntity {
     LocalDate dob;
     String phoneNumber;
     @Builder.Default
-    boolean isActive = true;
+    boolean isActive = false;
     @Enumerated(EnumType.STRING)
     @Builder.Default
     UserStatus userStatus = UserStatus.NORMAL;

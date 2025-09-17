@@ -12,6 +12,12 @@ public enum ErrorCode {
     UNAUTHENTICATED(1004, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     NATIONAL_ID_ALREADY_EXISTS(1005, "National id already exists", HttpStatus.CONFLICT),
     POST_NOT_EXIST(2001, "Post does not exist", HttpStatus.NOT_FOUND),
+
+
+
+    SUBJECT_ALREADY_EXISTS(3001, "Subject already exists", HttpStatus.CONFLICT),
+    SUBJECT_NOT_FOUND(3002, "Subject not found", HttpStatus.NOT_FOUND),
+
     ;
     private final long code;
     private final String message;

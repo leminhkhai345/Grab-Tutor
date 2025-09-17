@@ -57,14 +57,14 @@ public class UserController {
 
     @GetMapping
     public ApiResponse<?> getALlUsers(@RequestParam(defaultValue = "0") int pageNo,
-                                      @RequestParam(defaultValue = "10") int pageSize){
+                                      @RequestParam(defaultValue = "10") int pageSize, String... sorts){
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         log.info("Username: {}", authentication.getName());
         authentication.getAuthorities().forEach(authority -> log.info(authority.getAuthority()));
 
         return ApiResponse.builder()
                 .message("get all users simple successfully")
-                .data(userService.getAllUsers(pageNo, pageSize))
+                .data(userService.getAllUsers(pageNo, pageSize, sorts))
                 .build();
     }
 

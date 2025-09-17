@@ -15,6 +15,7 @@ public class GlobalExceptionHandler {
         ApiResponse response = new ApiResponse();
         response.setSuccess(false);
         response.setMessage(ex.getErrorCode().getMessage());
+        response.setCode(ex.getErrorCode().getCode());
         return ResponseEntity.status(ex.getErrorCode().getHttpStatusCode()).body(response);
     }
 
