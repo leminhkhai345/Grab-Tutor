@@ -27,7 +27,7 @@ public interface UserMapper {
         userResponse.createdAt( user.getCreatedAt() );
         userResponse.updatedAt( user.getUpdatedAt() );
         userResponse.isActive(user.isActive());
-        userResponse.roles( user.getRoles() );
+        userResponse.role( user.getRole().toString() );
 
         return userResponse.build();
     }

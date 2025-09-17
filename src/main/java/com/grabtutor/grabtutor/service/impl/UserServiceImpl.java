@@ -10,6 +10,7 @@ import com.grabtutor.grabtutor.dto.response.AccountVerificationResponse;
 import com.grabtutor.grabtutor.entity.User;
 import com.grabtutor.grabtutor.entity.VerificationRequest;
 import com.grabtutor.grabtutor.enums.RequestStatus;
+import com.grabtutor.grabtutor.enums.Role;
 import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.TutorInfoMapper;
@@ -135,7 +136,7 @@ public class UserServiceImpl implements UserService {
                 .items(users.stream().map(userMapper::toUserResponse).toList())
                 .build();
     }
-
+    @PreAuthorize("hasRole('TUTOR')")
     @Override
     public TutorInfoResponse addInfo(TutorInfoRequest request) {
         var info = tutorInfoMapper.toTutorInfo(request);
@@ -151,11 +152,11 @@ public class UserServiceImpl implements UserService {
                 .major(info.getMajor())
                 .build();
     }
-
+    @PreAuthorize("hasRole('TUTOR')")
     @Override
     public AccountVerificationResponse verifyTutor(AccountVerificationRequest request) {
         var user = userRepository.findById(request.getUserId()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-
+        if(user.getRole() ==  Role.TUTOR && user.isActive()) throw new AppException(ErrorCode.ACCOUNT_ALREADY_VERIFIED);
         var newRequest = VerificationRequest.builder()
                 .status(RequestStatus.Pending)
                 .user(user)

@@ -1,8 +1,6 @@
 package com.grabtutor.grabtutor.configuration;
-
-import com.grabtutor.grabtutor.entity.Role;
+import com.grabtutor.grabtutor.enums.Role;
 import com.grabtutor.grabtutor.entity.User;
-import com.grabtutor.grabtutor.repository.RoleRepository;
 import com.grabtutor.grabtutor.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -36,36 +34,19 @@ public class ApplicationConfiguration {
             prefix = "spring",
             value = "datasource.driver-class-name",
             havingValue = "com.mysql.cj.jdbc.Driver")
-    ApplicationRunner applicationRunner(UserRepository userRepository, RoleRepository roleRepository) {
+    ApplicationRunner applicationRunner(UserRepository userRepository) {
         log.info("Initializing application.....");
         return args -> {
-
-            if (userRepository.findByEmail(ADMIN_MAIL).isEmpty()) {
-                roleRepository.save(Role.builder()
-                        .name("USER")
-                        .description("User role")
-                        .build());
-
-                Role adminRole = roleRepository.save(Role.builder()
-                        .name("ADMIN")
-                        .description("Admin role")
-                        .build());
-
-                var roles = new HashSet<Role>();
-                roles.add(adminRole);
-
+            if(!userRepository.findByEmail(ADMIN_MAIL).isPresent()) {
                 User user = User.builder()
-
-                .email(ADMIN_MAIL)
-
+                        .email(ADMIN_MAIL)
                         .password(passwordEncoder.encode(ADMIN_PASSWORD))
-                        .roles(roles)
+                        .role(Role.ADMIN)
                         .build();
-
                 userRepository.save(user);
                 log.warn("admin user has been created with default password: admin, please change it");
+                log.info("Application initialization completed .....");
             }
-            log.info("Application initialization completed .....");
         };
     }
 }
