@@ -17,9 +17,10 @@ import java.util.List;
 @NoArgsConstructor
 public class AccountBalance extends BaseEntity{
     long balance = 0;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "userId")
-    User user;
+
     @OneToMany(mappedBy = "accountBalance", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<Transaction> transactions;
+
+    @OneToOne(mappedBy = "accountBalance", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    User user;
 }

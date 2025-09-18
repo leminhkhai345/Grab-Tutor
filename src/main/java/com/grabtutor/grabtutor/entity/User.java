@@ -42,7 +42,10 @@ public class User extends BaseEntity {
     List<Report> reports;
     
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "tutor_info_id")
+    @JoinColumn(name = "tutorInfoId")
     TutorInfo tutorInfo;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "accountBalanceId")
+    AccountBalance accountBalance;
 }
