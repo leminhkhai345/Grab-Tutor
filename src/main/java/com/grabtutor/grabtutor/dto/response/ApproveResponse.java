@@ -7,8 +7,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 @Data
 @Builder
-public class AccountVerificationResponse {
-    String userId;
+public class ApproveResponse {
     String requestId;
-    String status;
 }

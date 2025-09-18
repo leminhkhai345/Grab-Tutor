@@ -1,9 +1,6 @@
 package com.grabtutor.grabtutor.controller;
 
-import com.grabtutor.grabtutor.dto.request.AccountVerificationRequest;
-import com.grabtutor.grabtutor.dto.request.SendMailRequest;
-import com.grabtutor.grabtutor.dto.request.TutorInfoRequest;
-import com.grabtutor.grabtutor.dto.request.UserRequest;
+import com.grabtutor.grabtutor.dto.request.*;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
 import com.grabtutor.grabtutor.service.MailSenderService;
 import com.grabtutor.grabtutor.service.impl.MailSenderServiceImpl;
@@ -108,9 +105,40 @@ public class UserController {
     public ApiResponse<?> submitVerificationRequest(AccountVerificationRequest request){
         return ApiResponse.builder()
                 .success(true)
-                .data(userService.verifyTutor(request))
+                .data(userService.submitRequest(request))
                 .message("Sending request successfully")
                 .build();
     }
-
+    @PostMapping("/request")
+    public ApiResponse<?> approveRequest(ApproveRequest request){
+        return ApiResponse.builder()
+                .success(true)
+//                .data(userService.approveRequest(request))
+                .message("Approve request successfully")
+                .build();
+    }
+    @PostMapping("/request")
+    public ApiResponse<?> rejectRequest(RejectRequest request){
+        return ApiResponse.builder()
+                .success(true)
+//                .data(userService.rejectRequest(request))
+                .message("Reject request successfully")
+                .build();
+    }
+    @PostMapping("/sendOtp")
+    public ApiResponse<?> sendOTP(SendOTPRequest request){
+        sendMailService.sendOTP(request);
+        return ApiResponse.builder()
+                .success(true)
+                .message("OTP sending successfully")
+                .build();
+    }
+    @PostMapping("/verifyOtp")
+    public ApiResponse<?> verifyOTP(OTPVerificationRequest request){
+        sendMailService.verifyOTP(request);
+        return ApiResponse.builder()
+                .success(true)
+                .message("OTP verified successfully")
+                .build();
+    }
 }

@@ -1,4 +1,4 @@
-package com.grabtutor.grabtutor.dto.response;
+package com.grabtutor.grabtutor.dto.request;
 
 import lombok.Builder;
 import lombok.Data;
@@ -7,8 +7,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 @Data
 @Builder
-public class AccountVerificationResponse {
-    String userId;
+public class RejectRequest {
     String requestId;
-    String status;
 }

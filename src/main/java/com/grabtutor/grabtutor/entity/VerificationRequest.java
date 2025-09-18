@@ -15,7 +15,9 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class VerificationRequest extends BaseEntity{
-    RequestStatus status;
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    RequestStatus status =  RequestStatus.PENDING;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "senderId")
     User user;

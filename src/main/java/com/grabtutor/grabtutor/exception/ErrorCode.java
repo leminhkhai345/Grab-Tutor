@@ -14,14 +14,14 @@ public enum ErrorCode {
     ACCOUNT_ALREADY_VERIFIED(1006, "Account already verified", HttpStatus.CONFLICT),
     POST_NOT_EXIST(2001, "Post does not exist", HttpStatus.NOT_FOUND),
 
-
     SUBJECT_ALREADY_EXISTS(3001, "Subject already exists", HttpStatus.CONFLICT),
     SUBJECT_NOT_FOUND(3002, "Subject not found", HttpStatus.NOT_FOUND),
 
     INVALID_KEY(4001, "Invalid key", HttpStatus.BAD_REQUEST),
     INVALID_DOB(1008, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
-    INVALID_PASSWORD(1004, "Password must be at least {min} characters", HttpStatus.BAD_REQUEST),
+    INVALID_PASSWORD(1007, "Password must be at least {min} characters", HttpStatus.BAD_REQUEST),
 
+    OTP_NOT_FOUND(5001, "OTP not found", HttpStatus.NOT_FOUND),
     ;
     private final long code;
     private final String message;

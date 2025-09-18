@@ -1,12 +1,7 @@
 package com.grabtutor.grabtutor.service.impl;
 
-import com.grabtutor.grabtutor.dto.request.TutorInfoRequest;
-import com.grabtutor.grabtutor.dto.request.UserRequest;
-import com.grabtutor.grabtutor.dto.request.AccountVerificationRequest;
-import com.grabtutor.grabtutor.dto.response.PageResponse;
-import com.grabtutor.grabtutor.dto.response.TutorInfoResponse;
-import com.grabtutor.grabtutor.dto.response.UserResponse;
-import com.grabtutor.grabtutor.dto.response.AccountVerificationResponse;
+import com.grabtutor.grabtutor.dto.request.*;
+import com.grabtutor.grabtutor.dto.response.*;
 import com.grabtutor.grabtutor.entity.User;
 import com.grabtutor.grabtutor.entity.VerificationRequest;
 import com.grabtutor.grabtutor.enums.RequestStatus;
@@ -15,6 +10,7 @@ import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.TutorInfoMapper;
 import com.grabtutor.grabtutor.mapper.UserMapper;
+import com.grabtutor.grabtutor.mapper.VerificationRequestMapper;
 import com.grabtutor.grabtutor.repository.TutorInfoRepository;
 import com.grabtutor.grabtutor.repository.UserRepository;
 import com.grabtutor.grabtutor.repository.VerificationRequestRepository;
@@ -47,6 +43,7 @@ public class UserServiceImpl implements UserService {
     VerificationRequestRepository  verificationRequestRepository;
     UserMapper userMapper;
     TutorInfoMapper  tutorInfoMapper;
+    VerificationRequestMapper verificationRequestMapper;
 
     PasswordEncoder passwordEncoder;
 
@@ -139,26 +136,34 @@ public class UserServiceImpl implements UserService {
     @PreAuthorize("hasRole('TUTOR')")
     @Override
     public TutorInfoResponse addInfo(TutorInfoRequest request) {
-        var info = tutorInfoMapper.toTutorInfo(request);
-        if(tutorInfoRepository.existsByNationalId(info.getNationalId()))
-            throw new AppException(ErrorCode.NATIONAL_ID_ALREADY_EXISTS);
-        tutorInfoRepository.save(info);
+        var user = userRepository.findById(request.getUserId()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        if(user.getTutorInfo() != null) {
+            var existInfo = user.getTutorInfo();
+            tutorInfoMapper.updateTutorInfoFromRequest(request,existInfo);
+            tutorInfoRepository.save(existInfo);
+        }
+        else{
+            var info = tutorInfoMapper.toTutorInfo(request);
+            if(tutorInfoRepository.existsByNationalId(info.getNationalId()))
+                throw new AppException(ErrorCode.NATIONAL_ID_ALREADY_EXISTS);
+            tutorInfoRepository.save(info);
+        }
 
         return TutorInfoResponse.builder()
                 .userId(request.getUserId())
-                .nationalId(info.getNationalId())
-                .university(info.getUniversity())
-                .highestAcademicDegree(info.getHighestAcademicDegree())
-                .major(info.getMajor())
+                .nationalId(request.getNationalId())
+                .university(request.getUniversity())
+                .highestAcademicDegree(request.getHighestAcademicDegree())
+                .major(request.getMajor())
                 .build();
     }
     @PreAuthorize("hasRole('TUTOR')")
     @Override
-    public AccountVerificationResponse verifyTutor(AccountVerificationRequest request) {
+    public AccountVerificationResponse submitRequest(AccountVerificationRequest request) {
         var user = userRepository.findById(request.getUserId()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         if(user.getRole() ==  Role.TUTOR && user.isActive()) throw new AppException(ErrorCode.ACCOUNT_ALREADY_VERIFIED);
         var newRequest = VerificationRequest.builder()
-                .status(RequestStatus.Pending)
                 .user(user)
                 .build();
         verificationRequestRepository.save(newRequest);
@@ -166,6 +171,56 @@ public class UserServiceImpl implements UserService {
         return AccountVerificationResponse.builder()
                 .userId(user.getId())
                 .requestId(newRequest.getId())
+                .status(newRequest.getStatus().toString())
+                .build();
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @Override
+    public ApproveResponse approveRequest(ApproveRequest request){
+        var req = verificationRequestRepository.getById(request.getRequestId());
+        req.setStatus(RequestStatus.APPROVED);
+        verificationRequestRepository.save(req);
+
+        return ApproveResponse.builder()
+                .requestId(req.getId())
+                .build();
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @Override
+    public RejectResponse rejectRequest(RejectRequest request){
+        var req = verificationRequestRepository.getById(request.getRequestId());
+        req.setStatus(RequestStatus.REJECTED);
+        verificationRequestRepository.save(req);
+
+        return RejectResponse.builder()
+                .requestId(req.getId())
+                .build();
+    }
+
+    @Override
+    public PageResponse<?> getRequests(int pageNo, int pageSize, String... sorts) {
+        List<Sort.Order> orders = new ArrayList<>();
+        for(String sortBy : sorts){
+            // firstname:asc|desc
+            Pattern pattern = Pattern.compile("(\\w+?)(:|#)(.*)");
+            Matcher matcher = pattern.matcher(sortBy);
+            if(matcher.find()){
+                if(matcher.group(2).equalsIgnoreCase(":")){
+                    if(matcher.group(3).equalsIgnoreCase("desc")){
+                        orders.add(new Sort.Order(Sort.Direction.DESC, matcher.group(1)));
+                    } else {
+                        orders.add(new Sort.Order(Sort.Direction.ASC, matcher.group(1)));
+                    }
+                }
+            }
+        }
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(orders));
+        Page<VerificationRequest> requests = verificationRequestRepository.findAll(pageable);
+        return PageResponse.builder()
+                .pageNo(pageNo)
+                .pageSize(pageSize)
+                .totalPages(requests.getTotalPages())
+                .items(requests.stream().map(verificationRequestMapper::toAccountVerificationResponse))
                 .build();
     }
 }

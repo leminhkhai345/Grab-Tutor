@@ -1,12 +1,9 @@
 package com.grabtutor.grabtutor.service;
 
-import com.grabtutor.grabtutor.dto.request.TutorInfoRequest;
-import com.grabtutor.grabtutor.dto.request.UserRequest;
-import com.grabtutor.grabtutor.dto.request.AccountVerificationRequest;
-import com.grabtutor.grabtutor.dto.response.PageResponse;
-import com.grabtutor.grabtutor.dto.response.TutorInfoResponse;
-import com.grabtutor.grabtutor.dto.response.UserResponse;
-import com.grabtutor.grabtutor.dto.response.AccountVerificationResponse;
+import com.grabtutor.grabtutor.dto.request.*;
+import com.grabtutor.grabtutor.dto.response.*;
+
+import java.util.List;
 
 
 public interface UserService {
@@ -26,5 +23,11 @@ public interface UserService {
 
     TutorInfoResponse addInfo(TutorInfoRequest tutorInfoRequest);
 
-    AccountVerificationResponse verifyTutor(AccountVerificationRequest request);
+    AccountVerificationResponse submitRequest(AccountVerificationRequest request);
+
+    ApproveResponse approveRequest(ApproveRequest request);
+
+    RejectResponse rejectRequest(RejectRequest request);
+
+    PageResponse<?> getRequests(int pageNo, int pageSize,String... sorts);
 }
