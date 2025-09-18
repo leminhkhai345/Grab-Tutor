@@ -15,7 +15,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Transaction extends BaseEntity {
-    String transactionId;
+
+    String transactionNo;
     PaymentMethod paymentMethod;
     long amount;
     @ManyToOne(cascade = CascadeType.ALL)

@@ -22,7 +22,7 @@ public enum ErrorCode {
     INVALID_PASSWORD(1007, "Password must be at least {min} characters", HttpStatus.BAD_REQUEST),
 
     OTP_NOT_FOUND(5001, "OTP not found", HttpStatus.NOT_FOUND),
-    OTP_EXPIRED(5002, "OTP expired", HttpStatus.UNAUTHORIZED),
+    OTP_EXPIRED(5002, "OTP expired", HttpStatus.BAD_REQUEST),
 
     ;
     private final long code;
