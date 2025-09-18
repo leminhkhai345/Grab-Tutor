@@ -67,7 +67,10 @@ public class MailSenderServiceImpl implements MailSenderService {
     public void verifyOTP(OTPVerificationRequest request) {
         var otps = otpRepository.findOtpByCode(request.getOtp());
         otps.forEach(otp -> {
-            if(Objects.equals(otp.getUser().getId(), request.getUserId())) return;
+            if(Objects.equals(otp.getUser().getId(), request.getUserId())){
+                if(otp.getExpiryTime().isBefore(LocalDateTime.now())){ throw new AppException(ErrorCode.OTP_EXPIRED); }
+                return;
+            }
         });
         throw new AppException(ErrorCode.OTP_NOT_FOUND);
     }
