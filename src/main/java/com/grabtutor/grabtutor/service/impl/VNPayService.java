@@ -14,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +33,7 @@ public class VNPayService {
     TransactionRepository transactionRepository;
     AccountBalanceRepository accountBalanceRepository;
     UserRepository userRepository;
+    @PreAuthorize("hasRole('USER') or hasRole('TUTOR')")
     public String createOrder(int total, String orderInfor, String urlReturn){
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         var userEmail = authentication.getName();
@@ -80,19 +82,15 @@ public class VNPayService {
         while (itr.hasNext()) {
             String fieldName = (String) itr.next();
             String fieldValue = (String) vnp_Params.get(fieldName);
-            if ((fieldValue != null) && (fieldValue.length() > 0)) {
+            if ((fieldValue != null) && (!fieldValue.isEmpty())) {
                 //Build hash data
                 hashData.append(fieldName);
                 hashData.append('=');
-                try {
-                    hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
-                    //Build query
-                    query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
-                    query.append('=');
-                    query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
+                hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
+                //Build query
+                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII));
+                query.append('=');
+                query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
                 if (itr.hasNext()) {
                     query.append('&');
                     hashData.append('&');
@@ -102,8 +100,7 @@ public class VNPayService {
         String queryUrl = query.toString();
         String vnp_SecureHash = VNPayConfig.hmacSHA512(VNPayConfig.vnp_HashSecret, hashData.toString());
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
-        String paymentUrl = VNPayConfig.vnp_PayUrl + "?" + queryUrl;
-        return paymentUrl;
+        return VNPayConfig.vnp_PayUrl + "?" + queryUrl;
     }
 
     public DepositResponse orderReturn(HttpServletRequest request){
@@ -112,27 +109,19 @@ public class VNPayService {
         var user = userRepository.findByEmail(userEmail).orElseThrow(()->new AppException(ErrorCode.USER_NOT_FOUND));
 
         Map fields = new HashMap();
-        for (Enumeration params = request.getParameterNames(); params.hasMoreElements();) {
+        for (Enumeration<String> params = request.getParameterNames(); params.hasMoreElements();) {
             String fieldName = null;
             String fieldValue = null;
-            try {
-                fieldName = URLEncoder.encode((String) params.nextElement(), StandardCharsets.US_ASCII.toString());
-                fieldValue = URLEncoder.encode(request.getParameter(fieldName), StandardCharsets.US_ASCII.toString());
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-            if ((fieldValue != null) && (fieldValue.length() > 0)) {
+            fieldName = URLEncoder.encode((String) params.nextElement(), StandardCharsets.US_ASCII);
+            fieldValue = URLEncoder.encode(request.getParameter(fieldName), StandardCharsets.US_ASCII);
+            if ((fieldValue != null) && (!fieldValue.isEmpty())) {
                 fields.put(fieldName, fieldValue);
             }
         }
 
         String vnp_SecureHash = request.getParameter("vnp_SecureHash");
-        if (fields.containsKey("vnp_SecureHashType")) {
-            fields.remove("vnp_SecureHashType");
-        }
-        if (fields.containsKey("vnp_SecureHash")) {
-            fields.remove("vnp_SecureHash");
-        }
+        fields.remove("vnp_SecureHashType");
+        fields.remove("vnp_SecureHash");
         String signValue = VNPayConfig.hashAllFields(fields);
         boolean success;
         if (signValue.equals(vnp_SecureHash)) {
@@ -154,7 +143,7 @@ public class VNPayService {
             var transaction = Transaction.builder()
                     .transactionNo(transactionId)
                     .paymentMethod(PaymentMethod.VN_PAY)
-                    .amount(Long.valueOf(totalAmount))
+                    .amount(Long.parseLong(totalAmount))
                     .accountBalance(accountBalance)
                     .build();
             transactionRepository.save(transaction);
