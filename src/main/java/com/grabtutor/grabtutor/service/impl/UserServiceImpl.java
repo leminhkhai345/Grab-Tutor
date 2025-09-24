@@ -15,6 +15,7 @@ import com.grabtutor.grabtutor.repository.TutorInfoRepository;
 import com.grabtutor.grabtutor.repository.UserRepository;
 import com.grabtutor.grabtutor.repository.VerificationRequestRepository;
 import com.grabtutor.grabtutor.service.UserService;
+import jakarta.transaction.Transactional;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -143,8 +144,9 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
     @PreAuthorize("hasRole('TUTOR')")
+    @Transactional
     @Override
-    public TutorInfoResponse addInfo(TutorInfoRequest request) {
+    public TutorInfoResponse submitInfo(TutorInfoRequest request) {
         var user = userRepository.findById(request.getUserId()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         if(user.getTutorInfo() != null) {
@@ -159,28 +161,18 @@ public class UserServiceImpl implements UserService {
             tutorInfoRepository.save(info);
         }
 
-        return TutorInfoResponse.builder()
-                .userId(request.getUserId())
-                .nationalId(request.getNationalId())
-                .university(request.getUniversity())
-                .highestAcademicDegree(request.getHighestAcademicDegree())
-                .major(request.getMajor())
-                .build();
-    }
-    @PreAuthorize("hasRole('TUTOR')")
-    @Override
-    public AccountVerificationResponse submitRequest(AccountVerificationRequest request) {
-        var user = userRepository.findById(request.getUserId()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         if(user.getRole() ==  Role.TUTOR && user.isActive()) throw new AppException(ErrorCode.ACCOUNT_ALREADY_VERIFIED);
         var newRequest = VerificationRequest.builder()
                 .user(user)
                 .build();
         verificationRequestRepository.save(newRequest);
 
-        return AccountVerificationResponse.builder()
-                .userId(user.getId())
-                .requestId(newRequest.getId())
-                .status(newRequest.getStatus().toString())
+        return TutorInfoResponse.builder()
+                .userId(request.getUserId())
+                .nationalId(request.getNationalId())
+                .university(request.getUniversity())
+                .highestAcademicDegree(request.getHighestAcademicDegree())
+                .major(request.getMajor())
                 .build();
     }
     @PreAuthorize("hasRole('ADMIN')")

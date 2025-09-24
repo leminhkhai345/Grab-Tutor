@@ -21,9 +21,9 @@ public interface UserService {
 
     UserResponse getMyInfo();
 
-    TutorInfoResponse addInfo(TutorInfoRequest tutorInfoRequest);
+    TutorInfoResponse submitInfo(TutorInfoRequest tutorInfoRequest);
 
-    AccountVerificationResponse submitRequest(AccountVerificationRequest request);
+//    AccountVerificationResponse submitRequest(AccountVerificationRequest request);
 
     ApproveResponse approveRequest(ApproveRequest request);
 
