@@ -82,20 +82,12 @@ public class UserController {
                 .data(userService.changeActive(id, active))
                 .build();
     }
-    @PostMapping("/addInfo")
-    public ApiResponse<?> addInfo(@RequestBody @Valid TutorInfoRequest request){
+    @PostMapping("/submitInfo")
+    public ApiResponse<?> submitInfo(@RequestBody @Valid TutorInfoRequest request){
         return ApiResponse.builder()
                 .success(true)
-                .data(userService.addInfo(request))
-                .message("Tutor info added successfully")
-                .build();
-    }
-    @PostMapping("/submitRequest")
-    public ApiResponse<?> submitVerificationRequest(AccountVerificationRequest request){
-        return ApiResponse.builder()
-                .success(true)
-                .data(userService.submitRequest(request))
-                .message("Sending request successfully")
+                .data(userService.submitInfo(request))
+                .message("Tutor info added and verification request sent successfully")
                 .build();
     }
     @PostMapping("/requests")
