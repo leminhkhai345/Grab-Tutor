@@ -21,9 +21,9 @@ public enum ErrorCode {
     INVALID_DOB(1008, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
     INVALID_PASSWORD(1007, "Password must be at least {min} characters", HttpStatus.BAD_REQUEST),
 
-    OTP_NOT_FOUND(5001, "OTP not found", HttpStatus.NOT_FOUND),
+    OTP_INVALID(5001, "OTP invalid", HttpStatus.BAD_REQUEST),
     OTP_EXPIRED(5002, "OTP expired", HttpStatus.BAD_REQUEST),
-
+    OTP_USED(5003, "OTP used", HttpStatus.BAD_REQUEST),
     ;
     private final long code;
     private final String message;

@@ -21,8 +21,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Otp extends BaseEntity{
     String code;
+    @Builder.Default
+    boolean isUsed = false;
+    String email;
     LocalDateTime expiryTime;
-    @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
-    User user;
+
 }

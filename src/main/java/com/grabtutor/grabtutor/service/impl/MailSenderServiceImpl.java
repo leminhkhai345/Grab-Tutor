@@ -3,6 +3,7 @@ package com.grabtutor.grabtutor.service.impl;
 import com.grabtutor.grabtutor.dto.request.OTPVerificationRequest;
 import com.grabtutor.grabtutor.dto.request.SendOTPRequest;
 import com.grabtutor.grabtutor.entity.Otp;
+import com.grabtutor.grabtutor.enums.OtpType;
 import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.repository.OtpRepository;
@@ -45,33 +46,43 @@ public class MailSenderServiceImpl implements MailSenderService {
     }
 
     @Override
-    public void sendOTP(SendOTPRequest request) {
-        var user = userRepository.findById(request.getUserId()).orElseThrow(() ->new AppException(ErrorCode.USER_NOT_FOUND));
-
+    public void sendOtp(SendOTPRequest request, OtpType otpType) {
         Random random = new Random();
         int code = 100000 + random.nextInt(900000);
-
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(user.getEmail());
+        if(otpType == OtpType.REGISTER && !Objects.isNull(userRepository.findByEmail(request.getEmail()))) {
+            throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
+        }
+        var otp = otpRepository.findOtpByEmail(request.getEmail());
+        if(Objects.isNull(otp)){
+            var newOtp = Otp.builder()
+                        .code(String.valueOf(code))
+                        .expiryTime(LocalDateTime.now().plusSeconds(300))
+                        .build();
+            otpRepository.save(newOtp);
+        } else{
+            otp.setCode(String.valueOf(code));
+            otp.setExpiryTime(LocalDateTime.now().plusSeconds(300));
+            otp.setUsed(false);
+            otpRepository.save(otp);
+        }
+        message.setTo(request.getEmail());
         message.setSubject("OTP verification");
         message.setText("Here is your OTP verification code: " + code);
         mailSender.send(message);
-
-        var otp = Otp.builder()
-                .code(String.valueOf(code))
-                .expiryTime(LocalDateTime.now().plusSeconds(300))
-                .build();
     }
 
     @Override
-    public void verifyOTP(OTPVerificationRequest request) {
-        var otps = otpRepository.findOtpByCode(request.getOtp());
-        otps.forEach(otp -> {
-            if(Objects.equals(otp.getUser().getId(), request.getUserId())){
-                if(otp.getExpiryTime().isBefore(LocalDateTime.now())){ throw new AppException(ErrorCode.OTP_EXPIRED); }
-                return;
-            }
-        });
-        throw new AppException(ErrorCode.OTP_NOT_FOUND);
+    public void verifyOtp(OTPVerificationRequest request) {
+        var otp = otpRepository.findOtpByEmail((request.getCode()));
+        if (Objects.isNull(otp) || !otp.getCode().equals(request.getCode())) {
+            throw new AppException(ErrorCode.OTP_INVALID);
+        }
+        if(otp.isUsed()){
+            throw new AppException(ErrorCode.OTP_USED);
+        }
+        if(otp.getExpiryTime().isBefore(LocalDateTime.now())) {
+            throw new AppException(ErrorCode.OTP_EXPIRED);
+        }
     }
 }
