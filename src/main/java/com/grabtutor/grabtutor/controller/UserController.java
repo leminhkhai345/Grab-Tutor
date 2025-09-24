@@ -2,8 +2,6 @@ package com.grabtutor.grabtutor.controller;
 
 import com.grabtutor.grabtutor.dto.request.*;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
-import com.grabtutor.grabtutor.service.MailSenderService;
-import com.grabtutor.grabtutor.service.impl.MailSenderServiceImpl;
 import com.grabtutor.grabtutor.service.impl.UserServiceImpl;
 
 import jakarta.validation.Valid;
@@ -21,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
     UserServiceImpl userService;
-    MailSenderServiceImpl sendMailService;
     @PostMapping
     public ApiResponse<?> createUser(@RequestBody @Valid UserRequest userRequest){
         return ApiResponse.builder()
@@ -85,14 +82,6 @@ public class UserController {
                 .data(userService.changeActive(id, active))
                 .build();
     }
-    //Test gửi mail
-    @PostMapping("/sendMail")
-    public ApiResponse<?> sendMail(@RequestBody @Valid SendMailRequest request){
-        sendMailService.sendMail(request.getTo(), request.getSubject(), request.getBody());
-        return ApiResponse.builder()
-                .message("Mail sent successfully")
-                .build();
-    }
     @PostMapping("/addInfo")
     public ApiResponse<?> addInfo(@RequestBody @Valid TutorInfoRequest request){
         return ApiResponse.builder()
@@ -109,36 +98,30 @@ public class UserController {
                 .message("Sending request successfully")
                 .build();
     }
-    @PostMapping("/request")
+    @PostMapping("/requests")
+    public ApiResponse<?> getAllRequests(@RequestParam(defaultValue = "0") int pageNo,
+                                         @RequestParam(defaultValue = "10") int pageSize, String... sorts){
+        return ApiResponse.builder()
+                .success(true)
+                .data(userService.getRequests(pageNo, pageSize, sorts))
+                .message("Get all requests successfully")
+                .build();
+    }
+    @PostMapping("/approve")
     public ApiResponse<?> approveRequest(ApproveRequest request){
         return ApiResponse.builder()
                 .success(true)
-//                .data(userService.approveRequest(request))
+                .data(userService.approveRequest(request))
                 .message("Approve request successfully")
                 .build();
     }
-//    @PostMapping("/request")
-//    public ApiResponse<?> rejectRequest(RejectRequest request){
-//        return ApiResponse.builder()
-//                .success(true)
-////                .data(userService.rejectRequest(request))
-//                .message("Reject request successfully")
-//                .build();
-//    }
-    @PostMapping("/sendOtp")
-    public ApiResponse<?> sendOTP(SendOTPRequest request){
-        sendMailService.sendOTP(request);
+    @PostMapping("/reject")
+    public ApiResponse<?> rejectRequest(RejectRequest request){
         return ApiResponse.builder()
                 .success(true)
-                .message("OTP sending successfully")
+                .data(userService.rejectRequest(request))
+                .message("Reject request successfully")
                 .build();
     }
-    @PostMapping("/verifyOtp")
-    public ApiResponse<?> verifyOTP(OTPVerificationRequest request){
-        sendMailService.verifyOTP(request);
-        return ApiResponse.builder()
-                .success(true)
-                .message("OTP verified successfully")
-                .build();
-    }
+
 }

@@ -17,5 +17,6 @@ public interface AuthenticationService {
     SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException;
     String generateToken(User user);
     void changePassword(String userId, ChangePasswordRequest changePasswordRequest);
+    void changeForgotPassword(ChangeForgotPasswordRequest request);
     String getUserIdFromSecurityContext();
 }

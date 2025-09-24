@@ -26,6 +26,9 @@ public enum ErrorCode {
     OTP_INVALID(5001, "OTP invalid", HttpStatus.BAD_REQUEST),
     OTP_EXPIRED(5002, "OTP expired", HttpStatus.BAD_REQUEST),
     OTP_USED(5003, "OTP used", HttpStatus.BAD_REQUEST),
+    SESSION_END(5004, "Session ended", HttpStatus.BAD_REQUEST),
+
+    UNCATEGORIZED(99999, "Uncategorized", HttpStatus.BAD_REQUEST),
     ;
     private final long code;
     private final String message;

@@ -211,7 +211,7 @@ public class UserServiceImpl implements UserService {
         List<Sort.Order> orders = new ArrayList<>();
         for(String sortBy : sorts){
             // firstname:asc|desc
-            Pattern pattern = Pattern.compile("(\\w+?)(:|#)(.*)");
+            Pattern pattern = Pattern.compile("(\\w+?)(:)(.*)");
             Matcher matcher = pattern.matcher(sortBy);
             if(matcher.find()){
                 if(matcher.group(2).equalsIgnoreCase(":")){
