@@ -1,9 +1,6 @@
 package com.grabtutor.grabtutor.service;
 
-import com.grabtutor.grabtutor.dto.request.AuthenticationRequest;
-import com.grabtutor.grabtutor.dto.request.IntrospectRequest;
-import com.grabtutor.grabtutor.dto.request.LogoutRequest;
-import com.grabtutor.grabtutor.dto.request.RefreshRequest;
+import com.grabtutor.grabtutor.dto.request.*;
 import com.grabtutor.grabtutor.dto.response.AuthenticationResponse;
 import com.grabtutor.grabtutor.dto.response.IntrospectResponse;
 import com.grabtutor.grabtutor.entity.User;
@@ -19,4 +16,6 @@ public interface AuthenticationService {
     void logout(LogoutRequest logoutRequest);
     SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException;
     String generateToken(User user);
+    void changePassword(String userId, ChangePasswordRequest changePasswordRequest);
+    String getUserIdFromSecurityContext();
 }

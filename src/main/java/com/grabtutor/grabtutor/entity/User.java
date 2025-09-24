@@ -3,6 +3,7 @@ package com.grabtutor.grabtutor.entity;
 import com.grabtutor.grabtutor.enums.Role;
 import com.grabtutor.grabtutor.enums.UserStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
@@ -26,6 +27,7 @@ public class User extends BaseEntity {
     String email;
     @Column(nullable = false)
     String password;
+    String fullName;
     LocalDate dob;
     String phoneNumber;
     @Enumerated(EnumType.STRING)
@@ -48,4 +50,8 @@ public class User extends BaseEntity {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "accountBalanceId")
     AccountBalance accountBalance;
+
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    Set<Role> roles;
 }
