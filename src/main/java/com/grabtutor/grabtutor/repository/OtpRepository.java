@@ -8,7 +8,5 @@ import java.util.Optional;
 
 public interface OtpRepository extends JpaRepository<Otp,String> {
 
-    Object getOtpByCode(String code);
-
-    List<Otp> findOtpByCode(String code);
+    Otp findOtpByEmail(String email);
 }

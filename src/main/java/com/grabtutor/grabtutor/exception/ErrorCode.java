@@ -23,9 +23,9 @@ public enum ErrorCode {
     INVALID_CURRENT_PASSWORD(1009, "Current password is incorrect", HttpStatus.BAD_REQUEST),
     TOKEN_INVALID(4002, "Token is invalid", HttpStatus.UNAUTHORIZED),
 
-    OTP_NOT_FOUND(5001, "OTP not found", HttpStatus.NOT_FOUND),
+    OTP_INVALID(5001, "OTP invalid", HttpStatus.BAD_REQUEST),
     OTP_EXPIRED(5002, "OTP expired", HttpStatus.BAD_REQUEST),
-
+    OTP_USED(5003, "OTP used", HttpStatus.BAD_REQUEST),
     ;
     private final long code;
     private final String message;

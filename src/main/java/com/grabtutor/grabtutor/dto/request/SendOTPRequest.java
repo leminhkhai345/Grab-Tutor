@@ -8,5 +8,5 @@ import lombok.experimental.FieldDefaults;
 @Data
 @Builder
 public class SendOTPRequest {
-    String userId;
+    String email;
 }

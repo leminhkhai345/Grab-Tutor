@@ -8,6 +8,6 @@ import lombok.experimental.FieldDefaults;
 @Data
 @Builder
 public class OTPVerificationRequest {
-    String userId;
-    String otp;
+    String email;
+    String code;
 }
