@@ -21,8 +21,14 @@ public class UserRequest {
     @NotNull
     @Size(min = 5, message = "INVALID_PASSWORD")
     String password;
-    LocalDate dob;
+    @NotBlank(message = "full name must be not blank")
+    String fullName;
 
+    LocalDate dob;
+    @NotBlank(message = "phone number must be not blank")
     @Size(min = 10, max = 10, message = "phone number must be 10 characters")
     String phoneNumber;
+
+    String role;
+
 }

@@ -29,7 +29,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,7 +46,6 @@ public class UserServiceImpl implements UserService {
     UserMapper userMapper;
     TutorInfoMapper  tutorInfoMapper;
     VerificationRequestMapper verificationRequestMapper;
-
     PasswordEncoder passwordEncoder;
 
     @Override
@@ -54,6 +55,14 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = userMapper.toUser(userRequest);
+        Set<Role> roles = new HashSet<>();
+        if(userRequest.getRole() == Role.TUTOR.name()){
+            roles.add(Role.TUTOR);
+        } else if(userRequest.getRole() == Role.ADMIN.name()){
+            roles.add(Role.ADMIN);
+        } else {
+            roles.add(Role.USER);
+        }
 
         user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
         return userMapper.toUserResponse(userRepository.save(user));

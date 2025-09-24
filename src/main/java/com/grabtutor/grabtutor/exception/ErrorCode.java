@@ -20,6 +20,8 @@ public enum ErrorCode {
     INVALID_KEY(4001, "Invalid key", HttpStatus.BAD_REQUEST),
     INVALID_DOB(1008, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
     INVALID_PASSWORD(1007, "Password must be at least {min} characters", HttpStatus.BAD_REQUEST),
+    INVALID_CURRENT_PASSWORD(1009, "Current password is incorrect", HttpStatus.BAD_REQUEST),
+    TOKEN_INVALID(4002, "Token is invalid", HttpStatus.UNAUTHORIZED),
 
     OTP_NOT_FOUND(5001, "OTP not found", HttpStatus.NOT_FOUND),
     OTP_EXPIRED(5002, "OTP expired", HttpStatus.BAD_REQUEST),

@@ -117,14 +117,14 @@ public class UserController {
                 .message("Approve request successfully")
                 .build();
     }
-    @PostMapping("/request")
-    public ApiResponse<?> rejectRequest(RejectRequest request){
-        return ApiResponse.builder()
-                .success(true)
-//                .data(userService.rejectRequest(request))
-                .message("Reject request successfully")
-                .build();
-    }
+//    @PostMapping("/request")
+//    public ApiResponse<?> rejectRequest(RejectRequest request){
+//        return ApiResponse.builder()
+//                .success(true)
+////                .data(userService.rejectRequest(request))
+//                .message("Reject request successfully")
+//                .build();
+//    }
     @PostMapping("/sendOtp")
     public ApiResponse<?> sendOTP(SendOTPRequest request){
         sendMailService.sendOTP(request);

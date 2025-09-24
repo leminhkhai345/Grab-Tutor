@@ -1,14 +1,15 @@
 package com.grabtutor.grabtutor.controller;
 
-import com.grabtutor.grabtutor.dto.request.AuthenticationRequest;
-import com.grabtutor.grabtutor.dto.request.IntrospectRequest;
-import com.grabtutor.grabtutor.dto.request.LogoutRequest;
-import com.grabtutor.grabtutor.dto.request.RefreshRequest;
+import com.grabtutor.grabtutor.dto.request.*;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
 import com.grabtutor.grabtutor.dto.response.AuthenticationResponse;
 import com.grabtutor.grabtutor.dto.response.IntrospectResponse;
+import com.grabtutor.grabtutor.exception.AppException;
+import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.service.impl.AuthenticationServiceImpl;
 import com.nimbusds.jose.JOSEException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -50,5 +51,17 @@ public class AuthenticationController {
     ApiResponse<Void> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
         authenticationService.logout(request);
         return ApiResponse.<Void>builder().build();
+    }
+
+    @PostMapping("/change-password")
+    ApiResponse<?> chnangePassword(@Valid @RequestBody ChangePasswordRequest request) {
+          String uerId = authenticationService.getUserIdFromSecurityContext();
+            if (uerId == null) {
+                throw new AppException(ErrorCode.TOKEN_INVALID);
+            }
+            authenticationService.changePassword(uerId, request);
+        return ApiResponse.builder()
+                .message("Change password successfully")
+                .build();
     }
 }

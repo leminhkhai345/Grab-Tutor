@@ -17,6 +17,7 @@ import java.util.Set;
 public class UserResponse {
     String id;
     LocalDate dob;
+    String fullName;
     String email;
     String phoneNumber;
     boolean isActive;

@@ -1,9 +1,6 @@
 package com.grabtutor.grabtutor.service.impl;
 
-import com.grabtutor.grabtutor.dto.request.AuthenticationRequest;
-import com.grabtutor.grabtutor.dto.request.IntrospectRequest;
-import com.grabtutor.grabtutor.dto.request.LogoutRequest;
-import com.grabtutor.grabtutor.dto.request.RefreshRequest;
+import com.grabtutor.grabtutor.dto.request.*;
 import com.grabtutor.grabtutor.dto.response.AuthenticationResponse;
 import com.grabtutor.grabtutor.dto.response.IntrospectResponse;
 import com.grabtutor.grabtutor.entity.InvalidatedToken;
@@ -27,8 +24,11 @@ import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -179,10 +179,32 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new RuntimeException(e);
         }
     }
+
+
+
     private String buildScope(User user){
         StringJoiner stringJoiner = new StringJoiner(" ");
         stringJoiner.add("ROLE_" + user.getRole().toString());
 
         return stringJoiner.toString();
+    }
+
+    @Override
+    public void changePassword(String userId, ChangePasswordRequest changePasswordRequest) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        if(!passwordEncoder.matches(changePasswordRequest.getCurrentPassword(), user.getPassword())){
+            throw new AppException(ErrorCode.INVALID_CURRENT_PASSWORD);
+        }
+        user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    @Override
+    public String getUserIdFromSecurityContext() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof Jwt jwt) {
+            return jwt.getClaim("userId");
+        }
+        return null;
     }
 }

@@ -26,10 +26,10 @@ public class TransactionController {
         String vnpayUrl = vnPayService.createOrder( orderTotal, orderInfo, baseUrl);
         return "redirect:" + vnpayUrl;
     }
-    @GetMapping("/vnpay-payment-return")
-    public DepositResponse paymentCompleted(HttpServletRequest request){
-        int paymentStatus = vnPayService.orderReturn(request);
-
-
-    }
+//    @GetMapping("/vnpay-payment-return")
+//    public DepositResponse paymentCompleted(HttpServletRequest request){
+//        int paymentStatus = vnPayService.orderReturn(request);
+//
+//
+//    }
 }
