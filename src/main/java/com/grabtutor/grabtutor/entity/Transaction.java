@@ -17,7 +17,9 @@ import lombok.experimental.SuperBuilder;
 public class Transaction extends BaseEntity {
 
     String transactionNo;
-    PaymentMethod paymentMethod;
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    PaymentMethod paymentMethod = PaymentMethod.VN_PAY;
     long amount;
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "accountBalanceId", nullable = false)

@@ -4,9 +4,11 @@ import com.grabtutor.grabtutor.dto.request.*;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
 import com.grabtutor.grabtutor.dto.response.AuthenticationResponse;
 import com.grabtutor.grabtutor.dto.response.IntrospectResponse;
+import com.grabtutor.grabtutor.enums.OtpType;
 import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.service.impl.AuthenticationServiceImpl;
+import com.grabtutor.grabtutor.service.impl.MailSenderServiceImpl;
 import com.nimbusds.jose.JOSEException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -26,6 +28,7 @@ import java.text.ParseException;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationController {
     AuthenticationServiceImpl authenticationService;
+    MailSenderServiceImpl sendMailService;
 
     @PostMapping("/token")
     ApiResponse<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
@@ -54,14 +57,45 @@ public class AuthenticationController {
     }
 
     @PostMapping("/change-password")
-    ApiResponse<?> chnangePassword(@Valid @RequestBody ChangePasswordRequest request) {
-          String uerId = authenticationService.getUserIdFromSecurityContext();
-            if (uerId == null) {
+    ApiResponse<?> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+          String userId = authenticationService.getUserIdFromSecurityContext();
+            if (userId == null) {
                 throw new AppException(ErrorCode.TOKEN_INVALID);
             }
-            authenticationService.changePassword(uerId, request);
+            authenticationService.changePassword(userId, request);
         return ApiResponse.builder()
                 .message("Change password successfully")
+                .build();
+    }
+    @PostMapping("/change-forgot-password")
+    ApiResponse<?> changeForgotPassword(@Valid @RequestBody ChangeForgotPasswordRequest request) {
+        authenticationService.changeForgotPassword(request);
+        return ApiResponse.builder()
+                .message("Change password successfully")
+                .build();
+    }
+    @PostMapping("/send-register-otp")
+    public ApiResponse<?> sendRegisterOtp(SendOTPRequest request){
+        sendMailService.sendOtp(request, OtpType.REGISTER);
+        return ApiResponse.builder()
+                .success(true)
+                .message("OTP sending successfully")
+                .build();
+    }
+    @PostMapping("/send-forgot-password-otp")
+    public ApiResponse<?> sendForgotPasswordOtp(SendOTPRequest request){
+        sendMailService.sendOtp(request, OtpType.FORGOT_PASSWORD);
+        return ApiResponse.builder()
+                .success(true)
+                .message("OTP sending successfully")
+                .build();
+    }
+    @PostMapping("/verify-otp")
+    public ApiResponse<?> verifyOtp(OTPVerificationRequest request){
+        sendMailService.verifyOtp(request);
+        return ApiResponse.builder()
+                .success(true)
+                .message("OTP verified successfully")
                 .build();
     }
 }

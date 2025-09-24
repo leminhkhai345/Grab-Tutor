@@ -75,7 +75,10 @@ public class MailSenderServiceImpl implements MailSenderService {
     @Override
     public void verifyOtp(OTPVerificationRequest request) {
         var otp = otpRepository.findOtpByEmail((request.getCode()));
-        if (Objects.isNull(otp) || !otp.getCode().equals(request.getCode())) {
+        if(Objects.isNull(otp)){
+            throw new AppException(ErrorCode.UNCATEGORIZED);
+        }
+        if (otp.getCode().equals(request.getCode())) {
             throw new AppException(ErrorCode.OTP_INVALID);
         }
         if(otp.isUsed()){

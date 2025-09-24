@@ -8,6 +8,7 @@ import com.grabtutor.grabtutor.entity.User;
 import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.repository.InvalidatedTokenRepository;
+import com.grabtutor.grabtutor.repository.OtpRepository;
 import com.grabtutor.grabtutor.repository.UserRepository;
 import com.grabtutor.grabtutor.service.AuthenticationService;
 import com.grabtutor.grabtutor.configuration.EncodingConfiguration;
@@ -34,8 +35,10 @@ import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.UUID;
 
@@ -45,6 +48,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationServiceImpl implements AuthenticationService {
     UserRepository userRepository;
+    OtpRepository  otpRepository;
     InvalidatedTokenRepository invalidatedTokenRepository;
     @NonFinal
     @Value("${jwt.signer-key}")
@@ -165,6 +169,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(user))
+                .claim("userId", user.getId())
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
@@ -179,8 +184,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new RuntimeException(e);
         }
     }
-
-
 
     private String buildScope(User user){
         StringJoiner stringJoiner = new StringJoiner(" ");
@@ -197,6 +200,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
         user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
         userRepository.save(user);
+    }
+
+    @Override
+    public void changeForgotPassword(ChangeForgotPasswordRequest request) {
+        var user = userRepository.findById(request.getEmail()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        var otp = otpRepository.findOtpByEmail(request.getEmail());
+        if(Objects.isNull(otp)){
+            throw new AppException(ErrorCode.UNCATEGORIZED);
+        }
+        if(!otp.getExpiryTime().isBefore(LocalDateTime.now())){
+            throw new AppException(ErrorCode.SESSION_END);
+        }
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
     }
 
     @Override

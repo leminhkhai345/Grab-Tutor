@@ -25,5 +25,4 @@ public class Otp extends BaseEntity{
     boolean isUsed = false;
     String email;
     LocalDateTime expiryTime;
-
 }
