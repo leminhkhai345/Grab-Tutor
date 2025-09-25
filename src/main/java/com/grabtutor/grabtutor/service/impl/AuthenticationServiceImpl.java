@@ -204,7 +204,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void changeForgotPassword(ChangeForgotPasswordRequest request) {
-        var user = userRepository.findById(request.getEmail()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        var user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         var otp = otpRepository.findOtpByEmail(request.getEmail());
         if(Objects.isNull(otp)){
             throw new AppException(ErrorCode.UNCATEGORIZED);
