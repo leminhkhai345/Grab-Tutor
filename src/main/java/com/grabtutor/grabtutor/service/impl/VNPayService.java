@@ -10,6 +10,7 @@ import com.grabtutor.grabtutor.repository.TransactionRepository;
 import com.grabtutor.grabtutor.repository.UserRepository;
 import com.grabtutor.grabtutor.service.config.VNPayConfig;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -102,7 +103,7 @@ public class VNPayService {
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
         return VNPayConfig.vnp_PayUrl + "?" + queryUrl;
     }
-
+    @Transactional
     public DepositResponse orderReturn(HttpServletRequest request){
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         var userEmail = authentication.getName();
@@ -139,7 +140,7 @@ public class VNPayService {
         if(success){
             var accountBalance = user.getAccountBalance();
             //Quy tắc cộng tiền tính sau
-            //accountBalance.setBalance();
+            accountBalance.setBalance(accountBalance.getBalance() + Long.parseLong(totalAmount)/1000);
             var transaction = Transaction.builder()
                     .transactionNo(transactionId)
                     .paymentMethod(PaymentMethod.VN_PAY)
