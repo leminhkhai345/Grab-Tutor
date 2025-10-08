@@ -28,6 +28,12 @@ public enum ErrorCode {
     OTP_USED(5003, "OTP used", HttpStatus.BAD_REQUEST),
     SESSION_END(5004, "Session ended", HttpStatus.BAD_REQUEST),
 
+
+    REPORT_NOT_EXIST(6001, "Report does not exist", HttpStatus.NOT_FOUND),
+
+    REVIEW_NOT_EXIST(7001, "Review does not exist", HttpStatus.NOT_FOUND),
+
+    FORBIDDEN(88888, "You do not have permission to access this resource", HttpStatus.FORBIDDEN),
     UNCATEGORIZED(99999, "Uncategorized", HttpStatus.BAD_REQUEST),
     ;
     private final long code;

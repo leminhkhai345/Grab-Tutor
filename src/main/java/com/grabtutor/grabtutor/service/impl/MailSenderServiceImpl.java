@@ -78,13 +78,13 @@ public class MailSenderServiceImpl implements MailSenderService {
         if(Objects.isNull(otp)){
             throw new AppException(ErrorCode.UNCATEGORIZED);
         }
-        if (otp.getCode().equals(request.getCode())) {
+        if (!otp.getCode().equals(request.getCode())) {
             throw new AppException(ErrorCode.OTP_INVALID);
         }
         if(otp.isUsed()){
             throw new AppException(ErrorCode.OTP_USED);
         }
-        if(otp.getExpiryTime().isBefore(LocalDateTime.now())) {
+        if(!otp.getExpiryTime().isBefore(LocalDateTime.now())) {
             throw new AppException(ErrorCode.OTP_EXPIRED);
         }
     }
