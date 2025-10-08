@@ -8,6 +8,7 @@ import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.repository.AccountBalanceRepository;
 import com.grabtutor.grabtutor.repository.TransactionRepository;
 import com.grabtutor.grabtutor.repository.UserRepository;
+import com.grabtutor.grabtutor.service.VNPayService;
 import com.grabtutor.grabtutor.service.config.VNPayConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -19,7 +20,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -29,7 +29,7 @@ import java.util.*;
 @RequiredArgsConstructor
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class VNPayService {
+public class VNPayServiceImpl implements VNPayService {
 
     TransactionRepository transactionRepository;
     AccountBalanceRepository accountBalanceRepository;

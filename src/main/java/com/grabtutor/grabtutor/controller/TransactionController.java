@@ -1,8 +1,6 @@
 package com.grabtutor.grabtutor.controller;
 
-import com.grabtutor.grabtutor.dto.response.DepositResponse;
-import com.grabtutor.grabtutor.service.config.VNPayConfig;
-import com.grabtutor.grabtutor.service.impl.VNPayService;
+import com.grabtutor.grabtutor.service.impl.VNPayServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TransactionController {
-    VNPayService vnPayService;
+    VNPayServiceImpl vnPayService;
 
     @PostMapping("/deposit")
     public String deposit(@RequestParam("amount") int orderTotal,

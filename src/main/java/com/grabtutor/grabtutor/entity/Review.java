@@ -5,7 +5,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "reviews")
@@ -16,7 +15,14 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Review extends BaseEntity {
-
+    int rating;
     String description;
+    @ManyToOne
+    @JoinColumn(name = "userId", nullable = false)
+    User user;
+
+    @ManyToOne
+    @JoinColumn(name = "postId", nullable = false)
+    Post post;
 
 }
