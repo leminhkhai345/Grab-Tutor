@@ -7,14 +7,14 @@ import lombok.experimental.FieldDefaults;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 @Data
 @Builder
-public class PostResponse {
-    String id;
-    String imageUrl;
-    String description;
-    boolean isDeleted;
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
+public class MessageResponse {
+    String userId;
+    String roomId;
+    String message;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
+
 }

@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table(name = "account_verification_request")
+@Table(name = "verificationRequests")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @SuperBuilder
 @Data

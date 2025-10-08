@@ -3,7 +3,6 @@ package com.grabtutor.grabtutor.entity;
 import com.grabtutor.grabtutor.enums.Role;
 import com.grabtutor.grabtutor.enums.UserStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
@@ -54,4 +53,16 @@ public class User extends BaseEntity {
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     Set<Role> roles;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_group", // bảng trung gian
+            joinColumns = @JoinColumn(name = "user_id"), // khóa ngoại đến User
+            inverseJoinColumns = @JoinColumn(name = "room_id") // khóa ngoại đến Group
+    )
+    private Set<ChatRoom> chatRooms;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Message> messages;
+
 }
