@@ -9,6 +9,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @MappedSuperclass
 @Data
@@ -21,21 +22,21 @@ public abstract class BaseEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     @Column(updatable = false, nullable = false)
-    LocalDate createdAt;
+    LocalDateTime createdAt;
     @Column(nullable = false)
-    LocalDate updatedAt;
+    LocalDateTime updatedAt;
     @Builder.Default
     boolean isDeleted = false;
 
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDate.now();
-        updatedAt = LocalDate.now();
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = LocalDate.now();
+        updatedAt = LocalDateTime.now();
     }
 
 }

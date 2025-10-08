@@ -5,20 +5,17 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Entity
-@Table(name = "chatmember")
+@Table(name = "chatMembers")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatMember {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+public class ChatMember extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "chatBoxId", nullable = false)
-    ChatBox chatBox;
+    ChatRoom chatBox;
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)
     User user;

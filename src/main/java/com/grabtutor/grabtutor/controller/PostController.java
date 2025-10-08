@@ -23,7 +23,6 @@ public class PostController {
                 .data(postService.addPost(postRequest))
                 .message("Post created successfully")
                 .build();
-
     }
 
     @PostMapping("/{postId}")

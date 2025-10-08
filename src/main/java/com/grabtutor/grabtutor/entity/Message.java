@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "message")
+@Table(name = "messages")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
 @Setter
@@ -15,10 +15,12 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Message extends BaseEntity{
-
-    String content;
+    String message;
 
     @ManyToOne
     @JoinColumn(name = "senderId", nullable = false)
     User user;
+    @ManyToOne
+    @JoinColumn(name = "roomId", nullable = false)
+    ChatRoom chatRoom;
 }
