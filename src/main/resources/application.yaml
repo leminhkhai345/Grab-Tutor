@@ -45,3 +45,9 @@ jwt:
 #          socket: DEBUG
 #        messaging:
 #          simp: DEBUG
+
+cloudinary:
+  cloud_name: dk3pmg0tr
+  api_key: 746891315239322
+  api_secret: ${CLOUDINARY_API_SECRET:}
+
