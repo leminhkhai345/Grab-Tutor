@@ -4,11 +4,14 @@ import com.grabtutor.grabtutor.dto.request.PostRequest;
 import com.grabtutor.grabtutor.dto.response.PageResponse;
 import com.grabtutor.grabtutor.dto.response.PostResponse;
 import com.grabtutor.grabtutor.entity.Post;
+import com.grabtutor.grabtutor.entity.Subject;
 import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.PostMapper;
 import com.grabtutor.grabtutor.repository.PostRepository;
+import com.grabtutor.grabtutor.repository.SubjectRepository;
 import com.grabtutor.grabtutor.repository.UserRepository;
+import com.grabtutor.grabtutor.service.FileUploadService;
 import com.grabtutor.grabtutor.service.PostService;
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +23,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -35,11 +40,19 @@ public class PostServiceImpl implements PostService {
     PostRepository postRepository;
     PostMapper postMapper;
     private final UserRepository userRepository;
+    FileUploadService fileUploadService;
+    SubjectRepository subjectRepository;
 
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Override
-    public PostResponse addPost(PostRequest postRequest) {
-        Post post = postMapper.toPost(postRequest);
+    public PostResponse addPost(String userId, String subjectId,String description , MultipartFile file) throws IOException {
+        String imageUrl = fileUploadService.uploadFile(file);
+        Post post = new Post();
+        post.setDescription(description);
+        post.setImageUrl(imageUrl);
+        post.setUser(userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)));
+        Subject subject = subjectRepository.findById(subjectId).orElseThrow(() -> new AppException(ErrorCode.SUBJECT_NOT_FOUND));
+        post.setSubject(subject);
         return postMapper.toPostResponse(postRepository.save(post));
     }
 

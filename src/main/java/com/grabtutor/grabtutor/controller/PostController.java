@@ -1,5 +1,6 @@
 package com.grabtutor.grabtutor.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grabtutor.grabtutor.dto.request.PostRequest;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
 import com.grabtutor.grabtutor.service.PostService;
@@ -7,7 +8,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/posts")
@@ -17,10 +24,17 @@ import org.springframework.web.bind.annotation.*;
 public class PostController {
     PostService postService;
 
-    @PostMapping()
-    public ApiResponse<?> createPost(@RequestBody @Valid PostRequest postRequest){
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<?> createPost(
+            @RequestParam("description") String description,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("subjectId") String subjectId,
+            @AuthenticationPrincipal Jwt jwt) throws IOException {
+
+        String userId = jwt.getClaimAsString("userId");
+
         return ApiResponse.builder()
-                .data(postService.addPost(postRequest))
+                .data(postService.addPost(userId, subjectId, description, file))
                 .message("Post created successfully")
                 .build();
     }
