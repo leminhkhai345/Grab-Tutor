@@ -59,12 +59,21 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostResponse getPostByPostId(String postId) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXIST));
+        if(post.isDeleted()) {
+            throw new AppException(ErrorCode.POST_NOT_EXIST);
+        }
         return postMapper.toPostResponse(post);
     }
 
     @Override
-    public PostResponse updatePost(String postId, PostRequest postRequest) {
+    public PostResponse updatePost(String userId, String postId, PostRequest postRequest) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXIST));
+        if(post.isDeleted()) {
+            throw new AppException(ErrorCode.POST_NOT_EXIST);
+        }
+        if(!post.getUser().getId().equals(userId)){
+            throw new AppException(ErrorCode.FORBIDDEN);
+        }
         postMapper.updatePostFromRequest(postRequest, post);
         postRepository.save(post);
         return postMapper.toPostResponse(post);
@@ -72,12 +81,18 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void deletePost(String postId) {
-        userRepository.deleteById(postId);
+        Post post = postRepository.findById(postId).orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXIST));
+        if(post.isDeleted()) {
+            throw new AppException(ErrorCode.POST_NOT_EXIST);
+        }
+        post.setDeleted(true);
+        postRepository.save(post);
     }
 
     @Override
     public List<PostResponse> getPostByUserId(String userId) {
         List<Post> posts = postRepository.findByUserId(userId);
+        posts.removeIf(Post::isDeleted);
         return posts.stream().map(postMapper::toPostResponse).toList();
     }
 
@@ -98,7 +113,8 @@ public class PostServiceImpl implements PostService {
 
         }
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(orders));
-        Page<Post> posts = postRepository.findAll(pageable);
+        Page<Post> posts = postRepository.findAllByIsDeletedFalse(pageable);
+
         return PageResponse.builder()
                 .pageNo(pageNo)
                 .pageSize(pageSize)

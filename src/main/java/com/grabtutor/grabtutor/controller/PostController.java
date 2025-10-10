@@ -40,9 +40,12 @@ public class PostController {
     }
 
     @PostMapping("/{postId}")
-    public ApiResponse<?> updatePost(@PathVariable String postId, @RequestBody @Valid PostRequest postRequest){
+    public ApiResponse<?> updatePost(@PathVariable String postId,
+                                     @RequestBody @Valid PostRequest postRequest,
+                                     @AuthenticationPrincipal Jwt jwt) {
+        String userId = jwt.getClaimAsString("userId");
         return ApiResponse.builder()
-                .data(postService.updatePost(postId, postRequest))
+                .data(postService.updatePost(userId, postId, postRequest))
                 .message("Post updated successfully")
                 .build();
     }
@@ -58,7 +61,7 @@ public class PostController {
     @GetMapping("/{postId}")
     public ApiResponse<?> getPostById(@PathVariable String postId) {
         return ApiResponse.builder()
-                .message("get post by postid")
+                .message("get post by postId")
                 .data(postService.getPostByPostId(postId))
                 .build();
     }
