@@ -19,6 +19,8 @@ public interface MessageMapper {
                 .roomId(message.getRoomId())
                 .userId(message.getUserId())
                 .message(message.getMessage())
+                .fileName(message.getFileName())
+                .fileUrl(message.getFileUrl())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
