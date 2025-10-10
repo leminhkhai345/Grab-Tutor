@@ -11,7 +11,7 @@ import java.util.List;
 public interface PostService {
     PostResponse addPost(String userId, String subjectId, String description, MultipartFile file) throws IOException;
     PostResponse getPostByPostId(String postId);
-    PostResponse updatePost(String postId, PostRequest postRequest);
+    PostResponse updatePost(String userId, String postId, PostRequest postRequest);
     void deletePost(String postId);
     List<PostResponse> getPostByUserId(String userId);
     PageResponse<?> getAllPosts(int pageNo, int pageSize, String... sorts);
