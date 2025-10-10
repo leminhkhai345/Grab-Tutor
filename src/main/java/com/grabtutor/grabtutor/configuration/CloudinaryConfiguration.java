@@ -25,10 +25,16 @@ public class CloudinaryConfiguration {
     String API_SECRET;
     @Bean
     public Cloudinary configKey(){
-        Map<String, String> config = new HashMap<>();
-        config.put("cloud_name", CLOUD_NAME);
-        config.put("api_key", API_KEY);
-        config.put("api_secret", API_SECRET);
-        return new Cloudinary(config);
+//        Map<String, String> config = new HashMap<>();
+//        config.put("cloud_name", CLOUD_NAME);
+//        config.put("api_key", API_KEY);
+//        config.put("api_secret", API_SECRET);
+//        return new Cloudinary(config);
+        return new Cloudinary(com.cloudinary.utils.ObjectUtils.asMap(
+                "cloud_name", CLOUD_NAME,
+                "api_key", API_KEY,
+                "api_secret", API_SECRET,
+                "secure", true
+        ));
     }
 }

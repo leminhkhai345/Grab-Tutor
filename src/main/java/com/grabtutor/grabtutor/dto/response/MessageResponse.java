@@ -14,7 +14,8 @@ public class MessageResponse {
     String userId;
     String roomId;
     String message;
+    String fileName;
+    String fileUrl;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
-
 }
