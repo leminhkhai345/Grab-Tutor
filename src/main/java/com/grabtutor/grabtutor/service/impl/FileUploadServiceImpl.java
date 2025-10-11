@@ -16,12 +16,19 @@ import java.util.UUID;
 public class FileUploadServiceImpl implements FileUploadService {
 
     private final Cloudinary cloudinary;
+
     @Override
     public String uploadFile(MultipartFile multipartFile) throws IOException {
         return cloudinary.uploader()
-                .upload(multipartFile.getBytes(),
-                        Map.of("public_id", UUID.randomUUID().toString()))
-                .get("url")
+                .upload(
+                        multipartFile.getBytes(),
+                        Map.of(
+                                "resource_type", "auto",
+                                "chunk_size", 6_000_000,
+                                "public_id", UUID.randomUUID().toString()
+                        )
+                )
+                .get("secure_url")
                 .toString();
     }
 }

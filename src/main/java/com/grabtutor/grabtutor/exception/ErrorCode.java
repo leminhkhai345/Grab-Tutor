@@ -32,6 +32,8 @@ public enum ErrorCode {
     REPORT_NOT_EXIST(6001, "Report does not exist", HttpStatus.NOT_FOUND),
 
     REVIEW_NOT_EXIST(7001, "Review does not exist", HttpStatus.NOT_FOUND),
+    COURSE_NOT_FOUND(8001, "Course not found", HttpStatus.NOT_FOUND),
+    LESSON_NOT_FOUND(9001, "Lesson not found", HttpStatus.NOT_FOUND),
 
     FORBIDDEN(88888, "You do not have permission to access this resource", HttpStatus.FORBIDDEN),
     UNCATEGORIZED(99999, "Uncategorized", HttpStatus.BAD_REQUEST),
