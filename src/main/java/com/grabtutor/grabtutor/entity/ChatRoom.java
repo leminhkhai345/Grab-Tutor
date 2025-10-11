@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -16,7 +17,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class ChatRoom extends BaseEntity{
     @ManyToMany(mappedBy = "chatRooms") // bên này là "bị ánh xạ"
-    private Set<User> users;
+    private List<User> users;
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Message> messages;
+    private List<Message> messages;
 }
