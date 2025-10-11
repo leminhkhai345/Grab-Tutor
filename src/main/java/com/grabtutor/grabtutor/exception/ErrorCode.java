@@ -35,6 +35,8 @@ public enum ErrorCode {
     COURSE_NOT_FOUND(8001, "Course not found", HttpStatus.NOT_FOUND),
     LESSON_NOT_FOUND(9001, "Lesson not found", HttpStatus.NOT_FOUND),
 
+    CHAT_ROOM_NOT_FOUND(8001, "Chat room not found", HttpStatus.NOT_FOUND),
+
     FORBIDDEN(88888, "You do not have permission to access this resource", HttpStatus.FORBIDDEN),
     UNCATEGORIZED(99999, "Uncategorized", HttpStatus.BAD_REQUEST),
     ;

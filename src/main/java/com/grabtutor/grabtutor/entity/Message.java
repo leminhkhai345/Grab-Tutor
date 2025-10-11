@@ -16,6 +16,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class Message extends BaseEntity{
     String message;
+    String fileName;
+    String fileUrl;
 
     @ManyToOne
     @JoinColumn(name = "senderId", nullable = false)
