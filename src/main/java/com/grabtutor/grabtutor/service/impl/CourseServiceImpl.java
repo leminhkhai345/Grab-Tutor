@@ -44,27 +44,35 @@ public class CourseServiceImpl implements CourseService {
         return courseMapper.toCourseResponse(courseRepository.save(course));
     }
 
-    @Override
-    public CourseResponse getCourseById(String courseId) {
-        Course course = courseRepository.findById(courseId).orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
-        if(course.isDeleted()) {
-            throw new AppException(ErrorCode.COURSE_NOT_FOUND);
-        }
-        return courseMapper.toCourseResponse(course);
-    }
 
     @Override
-    public CourseResponse updateCourse(String tutorId, String courseId, CourseRequest request) {
-        User tutor = userRepository.findById(tutorId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    public CourseResponse updateCourse(String tutorId, String courseId, CourseRequest request, Set<String> subjectIds) {
         Course course = courseRepository.findById(courseId).orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
         if(course.isDeleted()) {
             throw new AppException(ErrorCode.COURSE_NOT_FOUND);
         }
-        if(!course.getTutor().getId().equals(tutor.getId())) {
+        if(!course.getTutor().getId().equals(tutorId)) {
             throw new AppException(ErrorCode.FORBIDDEN);
         }
         courseMapper.updateCourseFromRequest(request, course);
+        if(!subjectIds.isEmpty()){
+            Set<Subject> subjects = new HashSet<>(subjectRepository.findAllById(subjectIds));
+            course.setSubjects(subjects);
+        }
         return courseMapper.toCourseResponse(courseRepository.save(course));
+    }
+
+    @Override
+    public CourseResponse getCourseById(String courseId, String tutorId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+        if(course.isDeleted()) {
+            throw new AppException(ErrorCode.COURSE_NOT_FOUND);
+        }
+        if(!course.getTutor().getId().equals(tutorId) && !course.isPublished()) {
+            throw new AppException(ErrorCode.FORBIDDEN);
+        }
+        return courseMapper.toCourseResponse(course);
     }
 
     @Override
