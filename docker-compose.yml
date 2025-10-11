@@ -1,0 +1,14 @@
+services:
+  redis:
+    image: redis
+    container_name: redis-pbl4
+    restart: always
+    ports:
+      - "6379:6379"
+    command: ["redis-server"]
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:
+    driver: local

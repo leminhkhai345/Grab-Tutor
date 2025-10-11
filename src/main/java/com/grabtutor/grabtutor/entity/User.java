@@ -57,12 +57,12 @@ public class User extends BaseEntity {
     @ManyToMany
     @JoinTable(
             name = "user_group", // bảng trung gian
-            joinColumns = @JoinColumn(name = "user_id"), // khóa ngoại đến User
-            inverseJoinColumns = @JoinColumn(name = "room_id") // khóa ngoại đến Group
+            joinColumns = @JoinColumn(name = "userId"), // khóa ngoại đến User
+            inverseJoinColumns = @JoinColumn(name = "roomId") // khóa ngoại đến Group
     )
-    private Set<ChatRoom> chatRooms;
+    private List<ChatRoom> chatRooms;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Message> messages;
+    private List<Message> messages;
 
 }

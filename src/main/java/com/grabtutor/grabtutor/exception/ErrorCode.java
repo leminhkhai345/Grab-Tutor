@@ -33,6 +33,8 @@ public enum ErrorCode {
 
     REVIEW_NOT_EXIST(7001, "Review does not exist", HttpStatus.NOT_FOUND),
 
+    CHAT_ROOM_NOT_FOUND(8001, "Chat room not found", HttpStatus.NOT_FOUND),
+
     FORBIDDEN(88888, "You do not have permission to access this resource", HttpStatus.FORBIDDEN),
     UNCATEGORIZED(99999, "Uncategorized", HttpStatus.BAD_REQUEST),
     ;
