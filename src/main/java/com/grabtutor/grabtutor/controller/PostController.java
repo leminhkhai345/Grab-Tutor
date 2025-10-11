@@ -1,8 +1,10 @@
 package com.grabtutor.grabtutor.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.grabtutor.grabtutor.dto.request.CourseRequest;
 import com.grabtutor.grabtutor.dto.request.PostRequest;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
+import com.grabtutor.grabtutor.service.FileUploadService;
 import com.grabtutor.grabtutor.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,29 +25,36 @@ import java.io.IOException;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 public class PostController {
     PostService postService;
+    ObjectMapper objectMapper;
+    FileUploadService fileUploadService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<?> createPost(
-            @RequestParam("description") String description,
+            @RequestParam("post") String postJson,
             @RequestParam("file") MultipartFile file,
             @RequestParam("subjectId") String subjectId,
             @AuthenticationPrincipal Jwt jwt) throws IOException {
-
+        PostRequest request = objectMapper.readValue(postJson, PostRequest.class);
         String userId = jwt.getClaimAsString("userId");
+        String imageUrl = fileUploadService.uploadFile(file);
 
         return ApiResponse.builder()
-                .data(postService.addPost(userId, subjectId, description, file))
+                .data(postService.addPost(userId, subjectId, request, imageUrl))
                 .message("Post created successfully")
                 .build();
     }
 
     @PostMapping("/{postId}")
     public ApiResponse<?> updatePost(@PathVariable String postId,
-                                     @RequestBody @Valid PostRequest postRequest,
-                                     @AuthenticationPrincipal Jwt jwt) {
+                                     @RequestParam("post") String postJson,
+                                     @RequestParam("file") MultipartFile file,
+                                     @RequestParam("subjectId") String subjectId,
+                                     @AuthenticationPrincipal Jwt jwt) throws IOException {
+        PostRequest request = objectMapper.readValue(postJson, PostRequest.class);
         String userId = jwt.getClaimAsString("userId");
+        String imageUrl = fileUploadService.uploadFile(file);
         return ApiResponse.builder()
-                .data(postService.updatePost(userId, postId, postRequest))
+                .data(postService.updatePost(userId, postId, request,imageUrl, subjectId))
                 .message("Post updated successfully")
                 .build();
     }

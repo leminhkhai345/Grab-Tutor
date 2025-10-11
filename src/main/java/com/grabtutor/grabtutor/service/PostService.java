@@ -9,9 +9,9 @@ import java.io.IOException;
 import java.util.List;
 
 public interface PostService {
-    PostResponse addPost(String userId, String subjectId, String description, MultipartFile file) throws IOException;
+    PostResponse addPost(String userId, String subjectId, PostRequest request, String imageUrl) throws IOException;
     PostResponse getPostByPostId(String postId);
-    PostResponse updatePost(String userId, String postId, PostRequest postRequest);
+    PostResponse updatePost(String userId, String postId, PostRequest postRequest, String imageUrl, String subjectId) throws IOException;
     void deletePost(String postId);
     List<PostResponse> getPostByUserId(String userId);
     PageResponse<?> getAllPosts(int pageNo, int pageSize, String... sorts);
