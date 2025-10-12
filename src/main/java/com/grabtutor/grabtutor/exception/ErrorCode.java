@@ -35,6 +35,8 @@ public enum ErrorCode {
     COURSE_NOT_FOUND(8001, "Course not found", HttpStatus.NOT_FOUND),
     LESSON_NOT_FOUND(9001, "Lesson not found", HttpStatus.NOT_FOUND),
 
+    TUTOR_NOT_AUTHORIZED(9002, "Tutor not authorized", HttpStatus.FORBIDDEN),
+
     CHAT_ROOM_NOT_FOUND(10001, "Chat room not found", HttpStatus.NOT_FOUND),
 
     ACCOUNT_BALANCE_NOT_FOUND(11001, "Account balance not found", HttpStatus.NOT_FOUND),

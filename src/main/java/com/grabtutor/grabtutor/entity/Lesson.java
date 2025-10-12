@@ -26,6 +26,7 @@ public class Lesson extends BaseEntity {
     @Builder.Default
     boolean isPublished = false;
 
+
     @ManyToOne
     @JoinColumn(name = "course_id", nullable = false)
     Course course;

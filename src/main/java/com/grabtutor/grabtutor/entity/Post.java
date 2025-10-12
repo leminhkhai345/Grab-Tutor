@@ -26,11 +26,11 @@ public class Post extends BaseEntity {
     boolean isAccepted = false;
 
     @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     User user;
 
     @ManyToOne
-    @JoinColumn(name = "sujectId", nullable = false)
+    @JoinColumn(name = "subject_id", nullable = false)
     Subject subject;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

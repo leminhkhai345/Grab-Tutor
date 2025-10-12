@@ -36,7 +36,9 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public CourseResponse createCourse(CourseRequest request, String tutorId, Set<String> subjectIds) {
-        User tutor = userRepository.findById(tutorId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User tutor = userRepository.findById(tutorId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
         Course course = courseMapper.toCourse(request);
         Set<Subject> subjects = new HashSet<>(subjectRepository.findAllById(subjectIds));
         course.setSubjects(subjects);
@@ -46,8 +48,10 @@ public class CourseServiceImpl implements CourseService {
 
 
     @Override
-    public CourseResponse updateCourse(String tutorId, String courseId, CourseRequest request, Set<String> subjectIds) {
-        Course course = courseRepository.findById(courseId).orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+    public CourseResponse updateCourse(String tutorId, String courseId, CourseRequest request,
+                                       Set<String> subjectIds) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
         if(course.isDeleted()) {
             throw new AppException(ErrorCode.COURSE_NOT_FOUND);
         }

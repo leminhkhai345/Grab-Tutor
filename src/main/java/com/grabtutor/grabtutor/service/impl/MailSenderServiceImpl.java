@@ -9,25 +9,16 @@ import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.repository.OtpRepository;
 import com.grabtutor.grabtutor.repository.UserRepository;
 import com.grabtutor.grabtutor.service.MailSenderService;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.util.StringUtil;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.Objects;
 import java.util.Random;
-import java.util.random.RandomGenerator;
 
 @Service
 @Slf4j

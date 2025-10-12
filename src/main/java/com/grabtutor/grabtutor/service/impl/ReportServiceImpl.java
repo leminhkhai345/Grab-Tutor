@@ -13,8 +13,6 @@ import com.grabtutor.grabtutor.repository.PostRepository;
 import com.grabtutor.grabtutor.repository.ReportRepository;
 import com.grabtutor.grabtutor.repository.UserRepository;
 import com.grabtutor.grabtutor.service.ReportService;
-import lombok.Builder;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
