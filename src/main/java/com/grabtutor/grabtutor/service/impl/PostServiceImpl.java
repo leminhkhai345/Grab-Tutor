@@ -5,6 +5,7 @@ import com.grabtutor.grabtutor.dto.response.PageResponse;
 import com.grabtutor.grabtutor.dto.response.PostResponse;
 import com.grabtutor.grabtutor.entity.Post;
 import com.grabtutor.grabtutor.entity.Subject;
+import com.grabtutor.grabtutor.entity.User;
 import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.PostMapper;
@@ -45,14 +46,24 @@ public class PostServiceImpl implements PostService {
 
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Override
-    public PostResponse addPost(String userId, String subjectId,PostRequest request , String imageUrl) throws IOException {
-        Post post = new Post();
-        post.setDescription(request.getDescription());
-        post.setImageUrl(imageUrl);
-        post.setUser(userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)));
-        Subject subject = subjectRepository.findById(subjectId).orElseThrow(() -> new AppException(ErrorCode.SUBJECT_NOT_FOUND));
+    public PostResponse addPost(String userId, String subjectId, PostRequest request,
+                                String imageUrl) throws IOException {
+
+        Post post = postMapper.toPost(request);
+        if(imageUrl != null && !imageUrl.isEmpty())
+            post.setImageUrl(imageUrl);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        if(user.isDeleted()) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
+        }
+        post.setUser(user);
+
+        Subject subject = subjectRepository
+                .findById(subjectId).orElseThrow(() -> new AppException(ErrorCode.SUBJECT_NOT_FOUND));
+
         post.setSubject(subject);
-        post.setImageUrl(imageUrl);
+
         return postMapper.toPostResponse(postRepository.save(post));
     }
 
@@ -68,9 +79,12 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostResponse updatePost(String userId, String postId, PostRequest postRequest, String imageUrl, String subjectId) throws IOException {
+    public PostResponse updatePost(String userId, String postId, PostRequest postRequest,
+                                   String imageUrl, String subjectId) throws IOException {
+
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXIST));
+
         if(post.isDeleted()) {
             throw new AppException(ErrorCode.POST_NOT_EXIST);
         }
@@ -86,13 +100,18 @@ public class PostServiceImpl implements PostService {
                     .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_NOT_FOUND));
             post.setSubject(subject);
         }
-        postRepository.save(post);
-        return postMapper.toPostResponse(post);
+        if(imageUrl != null && !imageUrl.isEmpty()) {
+            post.setImageUrl(imageUrl);
+        }
+
+        return postMapper.toPostResponse(postRepository.save(post));
     }
 
     @Override
     public void deletePost(String postId) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXIST));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXIST));
+
         if(post.isDeleted()) {
             throw new AppException(ErrorCode.POST_NOT_EXIST);
         }
