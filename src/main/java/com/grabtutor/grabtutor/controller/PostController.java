@@ -35,10 +35,14 @@ public class PostController {
             @AuthenticationPrincipal Jwt jwt) throws IOException {
         PostRequest request = objectMapper.readValue(postJson, PostRequest.class);
         String userId = jwt.getClaimAsString("userId");
-        String imageUrl = fileUploadService.uploadFile(file);
+        String imageUrl;
+        if (file != null && !file.isEmpty()) {
+            imageUrl = fileUploadService.uploadFile(file);
+            request.setImageUrl(imageUrl);
+        }
 
         return ApiResponse.builder()
-                .data(postService.addPost(userId, subjectId, request, imageUrl))
+                .data(postService.addPost(userId, subjectId, request))
                 .message("Post created successfully")
                 .build();
     }
@@ -49,21 +53,18 @@ public class PostController {
                                      @RequestParam(value = "file", required = false) MultipartFile file,
                                      @RequestParam(value = "subjectId", required = false) String subjectId,
                                      @AuthenticationPrincipal Jwt jwt) throws IOException {
-        PostRequest request = objectMapper.readValue(postJson, PostRequest.class);
+        PostRequest postRequest = objectMapper.readValue(postJson, PostRequest.class);
         String userId = jwt.getClaimAsString("userId");
-        try {
-            String imageUrl = fileUploadService.uploadFile(file);
-            return ApiResponse.builder()
-                    .data(postService.updatePost(userId, postId, request, imageUrl, subjectId))
-                    .message("Post updated successfully")
-                    .build();
-        } catch (Exception e) {
-            return ApiResponse.builder()
-                    .data(postService.updatePost(userId, postId, request,null, subjectId))
-                    .message("Post updated successfully")
-                    .build();
+        String imageUrl;
+        if (file != null && !file.isEmpty()) {
+             imageUrl = fileUploadService.uploadFile(file);
+             postRequest.setImageUrl(imageUrl);
         }
 
+        return ApiResponse.builder()
+                .data(postService.updatePost(userId, postId, postRequest, subjectId))
+                .message("Post updated successfully")
+                .build();
 
     }
 

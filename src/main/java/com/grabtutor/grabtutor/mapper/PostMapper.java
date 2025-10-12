@@ -9,6 +9,18 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface PostMapper {
     Post toPost(PostRequest postRequest);
-    void updatePostFromRequest(PostRequest postRequest,@MappingTarget Post post);
+
+    default void updatePostFromRequest(PostRequest postRequest,@MappingTarget Post post){
+        if(postRequest.getDescription() != null && !postRequest.getDescription().isEmpty()){
+            post.setDescription(postRequest.getDescription());
+        }
+        if(postRequest.getReward() > 0){
+            post.setReward(postRequest.getReward());
+        }
+        if(postRequest.getImageUrl() != null && !postRequest.getImageUrl().isEmpty()){
+            post.setImageUrl(postRequest.getImageUrl());
+        }
+    }
+
     PostResponse toPostResponse(Post post);
 }

@@ -12,12 +12,9 @@ import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.PostMapper;
 import com.grabtutor.grabtutor.repository.*;
-import com.grabtutor.grabtutor.service.FileUploadService;
 import com.grabtutor.grabtutor.service.PostService;
 import jakarta.transaction.Transactional;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Data;
+
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -25,17 +22,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -49,7 +42,6 @@ public class PostServiceImpl implements PostService {
     PostRepository postRepository;
     PostMapper postMapper;
     UserRepository userRepository;
-    FileUploadService fileUploadService;
     SubjectRepository subjectRepository;
     ChatRoomRepository chatRoomRepository;
     AccountBalanceRepository  accountBalanceRepository;
@@ -61,11 +53,8 @@ public class PostServiceImpl implements PostService {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Override
     @Transactional
-    public PostResponse addPost(String userId, String subjectId, PostRequest request,
-                                String imageUrl) throws IOException {
+    public PostResponse addPost(String userId, String subjectId, PostRequest request) throws IOException {
         Post post = postMapper.toPost(request);
-        if(imageUrl != null && !imageUrl.isEmpty())
-            post.setImageUrl(imageUrl);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         if(user.isDeleted()) {
@@ -78,7 +67,8 @@ public class PostServiceImpl implements PostService {
         post.setSubject(subject);
 
         //Logic trừ tiền
-        var accountBalance = accountBalanceRepository.findByUserId(userId).orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_BALANCE_NOT_FOUND));
+        var accountBalance = accountBalanceRepository.findByUserId(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_BALANCE_NOT_FOUND));
         if(accountBalance.getBalance() < post.getReward()) {
             throw new AppException(ErrorCode.ACCOUNT_DONT_HAVE_ENOUGH_MONEY);
         }
@@ -108,7 +98,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostResponse updatePost(String userId, String postId, PostRequest postRequest,
-                                   String imageUrl, String subjectId) throws IOException {
+                                   String subjectId) throws IOException {
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXIST));
@@ -120,16 +110,11 @@ public class PostServiceImpl implements PostService {
             throw new AppException(ErrorCode.FORBIDDEN);
         }
         postMapper.updatePostFromRequest(postRequest, post);
-        if(imageUrl != null && !imageUrl.isEmpty()) {
-            post.setImageUrl(imageUrl);
-        }
+
         if(subjectId != null && !subjectId.isEmpty()) {
             Subject subject = subjectRepository.findById(subjectId)
                     .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_NOT_FOUND));
             post.setSubject(subject);
-        }
-        if(imageUrl != null && !imageUrl.isEmpty()) {
-            post.setImageUrl(imageUrl);
         }
 
         return postMapper.toPostResponse(postRepository.save(post));

@@ -10,5 +10,18 @@ import org.mapstruct.MappingTarget;
 public interface CourseMapper {
     Course toCourse(CourseRequest request);
     CourseResponse toCourseResponse(Course course);
-    void updateCourseFromRequest(CourseRequest request, @MappingTarget Course course);
+    default void updateCourseFromRequest(CourseRequest request, @MappingTarget Course course){
+        if(request.getName() != null) {
+            course.setName(request.getName());
+        }
+        if(request.getDescription() != null) {
+            course.setDescription(request.getDescription());
+        }
+        if(request.getPrice() > 0) {
+            course.setPrice(request.getPrice());
+        }
+        if(request.getImageUrl() != null && !request.getImageUrl().isEmpty()) {
+            course.setImageUrl(request.getImageUrl());
+        }
+    }
 }

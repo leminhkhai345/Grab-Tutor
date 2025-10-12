@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.web.multipart.MultipartFile;
+
 
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 @Data
@@ -16,4 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class PostRequest {
     @NotBlank(message = "Description must be not blank")
     String description;
+    int reward;
+    String imageUrl;
 }
