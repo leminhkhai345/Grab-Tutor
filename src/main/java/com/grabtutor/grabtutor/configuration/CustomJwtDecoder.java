@@ -4,6 +4,8 @@ import com.grabtutor.grabtutor.dto.request.IntrospectRequest;
 import com.grabtutor.grabtutor.service.AuthenticationService;
 import com.grabtutor.grabtutor.service.impl.AuthenticationServiceImpl;
 import com.nimbusds.jose.JOSEException;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -17,14 +19,15 @@ import javax.crypto.spec.SecretKeySpec;
 import java.text.ParseException;
 import java.util.Objects;
 @Component
+@RequiredArgsConstructor
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class CustomJwtDecoder implements JwtDecoder {
     @Value("${jwt.signer-key}")
-    private String signerKey;
+    String signerKey;
 
-    @Autowired
-    private AuthenticationServiceImpl authenticationService;
+    final AuthenticationServiceImpl authenticationService;
 
-    private NimbusJwtDecoder nimbusJwtDecoder = null;
+    NimbusJwtDecoder nimbusJwtDecoder = null;
 
     @Override
     public Jwt decode(String token) throws JwtException {

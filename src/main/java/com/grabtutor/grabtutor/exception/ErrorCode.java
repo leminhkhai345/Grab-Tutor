@@ -39,6 +39,7 @@ public enum ErrorCode {
 
     FORBIDDEN(88888, "You do not have permission to access this resource", HttpStatus.FORBIDDEN),
     UNCATEGORIZED(99999, "Uncategorized", HttpStatus.BAD_REQUEST),
+    MISSING_PARAMETER(77777, "Missing parameter: {parameterName}", HttpStatus.BAD_REQUEST)
     ;
     private final long code;
     private final String message;

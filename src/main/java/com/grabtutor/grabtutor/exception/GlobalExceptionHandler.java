@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -16,6 +17,15 @@ import java.util.Objects;
 @Slf4j
 public class GlobalExceptionHandler {
     private static final String MIN_ATTRIBUTE = "min";
+
+    @ExceptionHandler(value = RuntimeException.class)
+    ResponseEntity<ApiResponse> handleRuntimeException(RuntimeException ex) {
+        ApiResponse response = new ApiResponse();
+        response.setSuccess(false);
+        response.setMessage(ex.getMessage());
+        response.setCode(ErrorCode.UNCATEGORIZED.getCode());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
 
     @ExceptionHandler(value = AppException.class)
     ResponseEntity<ApiResponse> handleAppException(AppException ex) {
@@ -71,6 +81,25 @@ public class GlobalExceptionHandler {
         String minValue = String.valueOf(attributes.get(MIN_ATTRIBUTE));
 
         return message.replace("{" + MIN_ATTRIBUTE + "}", minValue);
+    }
+
+    @ExceptionHandler(value = MissingServletRequestParameterException.class)
+    ResponseEntity<ApiResponse> handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
+        ApiResponse response = new ApiResponse();
+        response.setSuccess(false);
+        response.setMessage(ex.getMessage());
+        response.setCode(ErrorCode.MISSING_PARAMETER.getCode());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+
+    @ExceptionHandler(value = IllegalStateException.class)
+    ResponseEntity<ApiResponse> handleIllegalStateException(IllegalStateException ex) {
+        ApiResponse response = new ApiResponse();
+        response.setSuccess(false);
+        response.setMessage(ex.getMessage());
+        response.setCode(ErrorCode.UNCATEGORIZED.getCode());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
 }

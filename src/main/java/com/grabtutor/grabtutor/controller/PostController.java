@@ -1,12 +1,10 @@
 package com.grabtutor.grabtutor.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.grabtutor.grabtutor.dto.request.CourseRequest;
 import com.grabtutor.grabtutor.dto.request.PostRequest;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
 import com.grabtutor.grabtutor.service.FileUploadService;
 import com.grabtutor.grabtutor.service.PostService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +29,7 @@ public class PostController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<?> createPost(
             @RequestParam("post") String postJson,
-            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "file", required = false) MultipartFile file,
             @RequestParam("subjectId") String subjectId,
             @AuthenticationPrincipal Jwt jwt) throws IOException {
         PostRequest request = objectMapper.readValue(postJson, PostRequest.class);
@@ -44,19 +42,28 @@ public class PostController {
                 .build();
     }
 
-    @PostMapping("/{postId}")
+    @PutMapping("/{postId}")
     public ApiResponse<?> updatePost(@PathVariable String postId,
                                      @RequestParam("post") String postJson,
-                                     @RequestParam("file") MultipartFile file,
-                                     @RequestParam("subjectId") String subjectId,
+                                     @RequestParam(value = "file", required = false) MultipartFile file,
+                                     @RequestParam(value = "subjectId", required = false) String subjectId,
                                      @AuthenticationPrincipal Jwt jwt) throws IOException {
         PostRequest request = objectMapper.readValue(postJson, PostRequest.class);
         String userId = jwt.getClaimAsString("userId");
-        String imageUrl = fileUploadService.uploadFile(file);
-        return ApiResponse.builder()
-                .data(postService.updatePost(userId, postId, request,imageUrl, subjectId))
-                .message("Post updated successfully")
-                .build();
+        try {
+            String imageUrl = fileUploadService.uploadFile(file);
+            return ApiResponse.builder()
+                    .data(postService.updatePost(userId, postId, request, imageUrl, subjectId))
+                    .message("Post updated successfully")
+                    .build();
+        } catch (Exception e) {
+            return ApiResponse.builder()
+                    .data(postService.updatePost(userId, postId, request,null, subjectId))
+                    .message("Post updated successfully")
+                    .build();
+        }
+
+
     }
 
     @DeleteMapping("/{postId}")
@@ -75,7 +82,7 @@ public class PostController {
                 .build();
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/user/{userId}")
     public ApiResponse<?> getPostsByUserId(@PathVariable String userId) {
         return ApiResponse.builder()
                 .message("get posts by userid")
@@ -83,7 +90,7 @@ public class PostController {
                 .build();
     }
 
-    @GetMapping("/list")
+    @GetMapping("/all")
     public ApiResponse<?> getALlPosts(@RequestParam(defaultValue = "0") int pageNo,
         @RequestParam(defaultValue = "10") int pageSize){
         return ApiResponse.builder()
