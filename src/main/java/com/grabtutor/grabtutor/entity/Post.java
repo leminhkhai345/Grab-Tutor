@@ -19,7 +19,7 @@ public class Post extends BaseEntity {
 
     String imageUrl;
     String description;
-    int reward;
+    double reward;
     @Builder.Default
     boolean isSolved = false;
     @Builder.Default
