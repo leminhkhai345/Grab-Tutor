@@ -1,6 +1,7 @@
 package com.grabtutor.grabtutor.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.grabtutor.grabtutor.dto.request.AcceptPostRequest;
 import com.grabtutor.grabtutor.dto.request.PostRequest;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
 import com.grabtutor.grabtutor.service.FileUploadService;
@@ -98,5 +99,11 @@ public class PostController {
                 .data(postService.getAllPosts(pageNo, pageSize))
                 .build();
         }
-
+    @PutMapping("/accept")
+    public ApiResponse<?> acceptPost(AcceptPostRequest request){
+        postService.acceptPost(request);
+        return ApiResponse.builder()
+                .message("accept post successfully")
+                .build();
+    }
 }

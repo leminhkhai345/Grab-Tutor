@@ -34,8 +34,10 @@ public class VNPayServiceImpl implements VNPayService {
     TransactionRepository transactionRepository;
     AccountBalanceRepository accountBalanceRepository;
     UserRepository userRepository;
+    double addFundRate = 0.1;
+
     @PreAuthorize("hasRole('USER') or hasRole('TUTOR')")
-    public String createOrder(int total, String orderInfor, String urlReturn){
+    public String addFunds(int total, String orderInfor, String urlReturn){
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         var userEmail = authentication.getName();
         var user = userRepository.findByEmail(userEmail).orElseThrow(()->new AppException(ErrorCode.USER_NOT_FOUND));
@@ -104,7 +106,7 @@ public class VNPayServiceImpl implements VNPayService {
         return VNPayConfig.vnp_PayUrl + "?" + queryUrl;
     }
     @Transactional
-    public DepositResponse orderReturn(HttpServletRequest request){
+    public DepositResponse transactionReturn(HttpServletRequest request){
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         var userEmail = authentication.getName();
         var user = userRepository.findByEmail(userEmail).orElseThrow(()->new AppException(ErrorCode.USER_NOT_FOUND));
@@ -140,7 +142,9 @@ public class VNPayServiceImpl implements VNPayService {
         if(success){
             var accountBalance = user.getAccountBalance();
             //Quy tắc cộng tiền tính sau
-            accountBalance.setBalance(accountBalance.getBalance() + Long.parseLong(totalAmount)/1000);
+            var addAmount = (long) (Long.parseLong(totalAmount)*addFundRate);
+            accountBalance.setBalance(accountBalance.getBalance() + addAmount);
+
             var transaction = Transaction.builder()
                     .transactionNo(transactionId)
                     .paymentMethod(PaymentMethod.VN_PAY)
