@@ -2,7 +2,7 @@ package com.grabtutor.grabtutor.controller;
 
 import com.grabtutor.grabtutor.dto.request.MessageRequest;
 import com.grabtutor.grabtutor.mapper.MessageMapper;
-import com.grabtutor.grabtutor.service.impl.MessageServiceImpl;
+import com.grabtutor.grabtutor.service.impl.ChatServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Controller;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 public class ChatController {
     SimpMessagingTemplate messagingTemplate;
-    MessageServiceImpl messageService;
+    ChatServiceImpl chatService;
     MessageMapper  messageMapper;
 
     // Gửi tin vào kênh cụ thể (ví dụ: /topic/room1)
@@ -26,7 +26,7 @@ public class ChatController {
     public void sendToChannel(MessageRequest message) {
         log.debug("Sending message to room {}", message.getRoomId());
         messagingTemplate.convertAndSend("/topic/" + message.getRoomId(), messageMapper.ToMessageResponse(message));
-//        return messageService.saveMessage(message);
+//        return chatService.saveMessage(message);
     }
 
     // Gửi thông báo riêng cho 1 user

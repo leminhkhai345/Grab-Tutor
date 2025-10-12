@@ -17,6 +17,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,8 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
-@Data
-@Builder
+@Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 public class ReportServiceImpl implements ReportService {

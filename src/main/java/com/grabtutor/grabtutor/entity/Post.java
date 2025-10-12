@@ -19,6 +19,11 @@ public class Post extends BaseEntity {
 
     String imageUrl;
     String description;
+    int reward;
+    @Builder.Default
+    boolean isSolved = false;
+    @Builder.Default
+    boolean isAccepted = false;
 
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)

@@ -2,22 +2,22 @@ package com.grabtutor.grabtutor.service.impl;
 
 import com.grabtutor.grabtutor.dto.request.LoadMessagesRequest;
 import com.grabtutor.grabtutor.dto.request.MessageRequest;
+import com.grabtutor.grabtutor.dto.response.LoadChatRoomsResponse;
 import com.grabtutor.grabtutor.dto.response.LoadMessagesResponse;
 import com.grabtutor.grabtutor.dto.response.MessageResponse;
-import com.grabtutor.grabtutor.entity.ChatRoom;
 import com.grabtutor.grabtutor.entity.User;
 import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
+import com.grabtutor.grabtutor.mapper.ChatRoomMapper;
 import com.grabtutor.grabtutor.mapper.MessageMapper;
 import com.grabtutor.grabtutor.repository.ChatRoomRepository;
 import com.grabtutor.grabtutor.repository.MessageRepository;
 import com.grabtutor.grabtutor.repository.UserRepository;
-import com.grabtutor.grabtutor.service.MessageService;
+import com.grabtutor.grabtutor.service.ChatService;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,8 +29,9 @@ import org.springframework.stereotype.Service;
 @Data
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
-public class MessageServiceImpl implements MessageService {
+public class ChatServiceImpl implements ChatService {
     MessageMapper  messageMapper;
+    ChatRoomMapper chatRoomMapper;
     UserRepository userRepository;
     ChatRoomRepository chatRoomRepository;
     MessageRepository messageRepository;
@@ -43,8 +44,8 @@ public class MessageServiceImpl implements MessageService {
         return messageMapper.ToMessageResponse(message);
     }
 
+    //Load message -> chắc chắn đã đc authen mới gọi được
     @Override
-    @PreAuthorize("hasRole('USER')||hasRole('TUTOR')")
     public LoadMessagesResponse loadMessages(LoadMessagesRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) auth.getPrincipal();
@@ -66,6 +67,18 @@ public class MessageServiceImpl implements MessageService {
         var messages = messageRepository.findByChatRoomId(request.getRoomId());
         return LoadMessagesResponse.builder()
                 .messages(messages.stream().map(messageMapper::ToMessageResponse).toList())
+                .build();
+    }
+
+    @Override
+    public LoadChatRoomsResponse loadRooms() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String userId = jwt.getClaim("userId");
+        var user = userRepository.findById(userId).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        return LoadChatRoomsResponse.builder()
+                .rooms(user.getChatRooms().stream().map(chatRoomMapper::toChatRoomResponse).toList())
                 .build();
     }
 }
