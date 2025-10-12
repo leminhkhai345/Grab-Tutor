@@ -47,7 +47,7 @@ public class PostServiceImpl implements PostService {
     AccountBalanceRepository  accountBalanceRepository;
 //    RedisTemplate<String, String> redisTemplate;
 
-    int acceptFee = 100;
+    double acceptFee = 100;
 
 
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")

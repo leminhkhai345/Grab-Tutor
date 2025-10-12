@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AccountBalance extends BaseEntity{
-    long balance = 0;
+    double balance = 0;
 
     @OneToMany(mappedBy = "accountBalance", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<Transaction> transactions;

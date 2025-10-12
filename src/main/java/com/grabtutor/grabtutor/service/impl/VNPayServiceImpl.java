@@ -142,7 +142,7 @@ public class VNPayServiceImpl implements VNPayService {
         if(success){
             var accountBalance = user.getAccountBalance();
             //Quy tắc cộng tiền tính sau
-            var addAmount = (long) (Long.parseLong(totalAmount)*addFundRate);
+            var addAmount = Double.parseDouble(totalAmount)*addFundRate;
             accountBalance.setBalance(accountBalance.getBalance() + addAmount);
 
             var transaction = Transaction.builder()
