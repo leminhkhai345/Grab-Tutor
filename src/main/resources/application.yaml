@@ -48,6 +48,6 @@ jwt:
 cloudinary:
   cloud_name: dk3pmg0tr
   api_key: 746891315239322
-  api_secret: ${CLOUDINARY_API_SECRET:bRSqau7RN7Ji8TUo_nYilGk7pK0}
+  api_secret: ${CLOUDINARY_API_SECRET:}
 
 

@@ -19,7 +19,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class PostWorker {
+public class  PostWorker {
 
 //    RedisTemplate<String, Object> redisTemplate;
 //    PostRepository postRepository;
