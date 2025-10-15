@@ -10,8 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,9 +29,7 @@ public class CourseController {
     public ApiResponse<?> createCourse(
             @RequestParam("course") String courseJson,
             @RequestParam(value = "image", required = false) MultipartFile imageFile,
-            @RequestParam("subjectIds") Set<String> subjectIds,
-            @AuthenticationPrincipal Jwt jwt) throws Exception {
-        String tutorId = jwt.getClaimAsString("userId");
+            @RequestParam("subjectIds") Set<String> subjectIds) throws Exception {
         CourseRequest request = objectMapper.readValue(courseJson, CourseRequest.class);
         if (imageFile != null && !imageFile.isEmpty()) {
             String imageUrl = fileUploadService.uploadFile(imageFile);
@@ -41,7 +37,7 @@ public class CourseController {
         }
         return ApiResponse.builder()
                 .message("Course created successfully")
-                .data(courseService.createCourse(request, tutorId, subjectIds))
+                .data(courseService.createCourse(request, subjectIds))
                 .build();
     }
 
@@ -50,9 +46,7 @@ public class CourseController {
             @PathVariable("courseId") String courseId,
             @RequestParam("course") String courseJson,
             @RequestParam(value = "image", required = false) MultipartFile imageFile,
-            @RequestParam("subjectIds") Set<String> subjectIds,
-            @AuthenticationPrincipal Jwt jwt) throws Exception {
-        String tutorId = jwt.getClaimAsString("userId");
+            @RequestParam("subjectIds") Set<String> subjectIds) throws Exception {
         CourseRequest request = objectMapper.readValue(courseJson, CourseRequest.class);
         if (imageFile != null && !imageFile.isEmpty()) {
             String imageUrl = fileUploadService.uploadFile(imageFile);
@@ -60,16 +54,15 @@ public class CourseController {
         }
         return ApiResponse.builder()
                 .message("Course updated successfully")
-                .data(courseService.updateCourse(tutorId, courseId, request, subjectIds))
+                .data(courseService.updateCourse(courseId, request, subjectIds))
                 .build();
     }
 
     @GetMapping("/{courseId}")
-    public ApiResponse<?> getCourseById(@PathVariable String courseId, @AuthenticationPrincipal Jwt jwt) {
-        String tutorId = jwt.getClaimAsString("userId");
+    public ApiResponse<?> getCourseById(@PathVariable String courseId) {
         return ApiResponse.builder()
                 .message("Course fetched successfully")
-                .data(courseService.getCourseById(courseId, tutorId))
+                .data(courseService.getCourseById(courseId))
                 .build();
     }
 
@@ -81,4 +74,15 @@ public class CourseController {
                 .build();
     }
 
+    @GetMapping("/tutor/{tutorId}")
+    public ApiResponse<?> getAllCoursesByTutorId(
+            @PathVariable String tutorId,
+            @RequestParam(defaultValue = "0") int pageNo,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(defaultValue = "createdAt") String... sorts) {
+        return ApiResponse.builder()
+                .message("Courses fetched successfully")
+                .data(courseService.getAllCoursesByTutorId(tutorId, pageNo, pageSize, sorts))
+                .build();
+    }
 }

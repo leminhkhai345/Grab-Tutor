@@ -27,7 +27,8 @@ public class SubjectController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("{id}")
-    public ApiResponse<?> updateSubject(@PathVariable String id, @RequestBody @Valid SubjectRequest subjectRequest) {
+    public ApiResponse<?> updateSubject(@PathVariable String id,
+                                        @RequestBody @Valid SubjectRequest subjectRequest) {
         return ApiResponse.builder()
                 .data(subjectService.updateSubject(id, subjectRequest))
                 .message("Subject updated successfully")

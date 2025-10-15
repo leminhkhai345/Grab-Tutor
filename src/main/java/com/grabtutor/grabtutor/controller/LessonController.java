@@ -9,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,10 +27,8 @@ public class LessonController {
             @RequestParam("courseId") String courseId,
             @RequestParam("lesson") String lessonJson,
             @RequestParam(value = "video", required = false) MultipartFile video,
-            @RequestParam(value = "image", required = false) MultipartFile image,
-            @AuthenticationPrincipal Jwt jwt) throws Exception {
+            @RequestParam(value = "image", required = false) MultipartFile image) throws Exception {
         LessonRequest request = objectMapper.readValue(lessonJson, LessonRequest.class);
-        String tutorId = jwt.getClaimAsString("userId");
         if (video != null && !video.isEmpty()) {
             request.setVideoUrl(fileUploadService.uploadFile(video));
         }
@@ -41,7 +37,7 @@ public class LessonController {
         }
         return ApiResponse.builder()
                 .message("Lesson created successfully")
-                .data(lessonService.createLesson(tutorId, courseId, request))
+                .data(lessonService.createLesson(courseId, request))
                 .build();
     }
 
@@ -50,10 +46,8 @@ public class LessonController {
             @PathVariable String lessonId,
             @RequestParam("lesson") String lessonJson,
             @RequestParam(value = "video", required = false) MultipartFile video,
-            @RequestParam(value = "image", required = false) MultipartFile image,
-            @AuthenticationPrincipal Jwt jwt) throws Exception {
+            @RequestParam(value = "image", required = false) MultipartFile image) throws Exception {
         LessonRequest request = objectMapper.readValue(lessonJson, LessonRequest.class);
-        String tutorId = jwt.getClaimAsString("userId");
         if (video != null && !video.isEmpty()) {
             request.setVideoUrl(fileUploadService.uploadFile(video));
         }
@@ -62,7 +56,7 @@ public class LessonController {
         }
         return ApiResponse.builder()
                 .message("Lesson updated successfully")
-                .data(lessonService.updateLesson(tutorId, lessonId, request))
+                .data(lessonService.updateLesson(lessonId, request))
                 .build();
     }
 

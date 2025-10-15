@@ -10,8 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,10 +29,8 @@ public class PostController {
     public ApiResponse<?> createPost(
             @RequestParam("post") String postJson,
             @RequestParam(value = "file", required = false) MultipartFile file,
-            @RequestParam("subjectId") String subjectId,
-            @AuthenticationPrincipal Jwt jwt) throws IOException {
+            @RequestParam("subjectId") String subjectId) throws IOException {
         PostRequest request = objectMapper.readValue(postJson, PostRequest.class);
-        String userId = jwt.getClaimAsString("userId");
         String imageUrl;
         if (file != null && !file.isEmpty()) {
             imageUrl = fileUploadService.uploadFile(file);
@@ -42,7 +38,7 @@ public class PostController {
         }
 
         return ApiResponse.builder()
-                .data(postService.addPost(userId, subjectId, request))
+                .data(postService.addPost(subjectId, request))
                 .message("Post created successfully")
                 .build();
     }
@@ -51,10 +47,10 @@ public class PostController {
     public ApiResponse<?> updatePost(@PathVariable String postId,
                                      @RequestParam("post") String postJson,
                                      @RequestParam(value = "file", required = false) MultipartFile file,
-                                     @RequestParam(value = "subjectId", required = false) String subjectId,
-                                     @AuthenticationPrincipal Jwt jwt) throws IOException {
+                                     @RequestParam(value = "subjectId", required = false) String subjectId)
+            throws IOException {
+
         PostRequest postRequest = objectMapper.readValue(postJson, PostRequest.class);
-        String userId = jwt.getClaimAsString("userId");
         String imageUrl;
         if (file != null && !file.isEmpty()) {
              imageUrl = fileUploadService.uploadFile(file);
@@ -62,7 +58,7 @@ public class PostController {
         }
 
         return ApiResponse.builder()
-                .data(postService.updatePost(userId, postId, postRequest, subjectId))
+                .data(postService.updatePost(postId, postRequest, subjectId))
                 .message("Post updated successfully")
                 .build();
 
@@ -94,7 +90,7 @@ public class PostController {
 
     @GetMapping("/all")
     public ApiResponse<?> getALlPosts(@RequestParam(defaultValue = "0") int pageNo,
-        @RequestParam(defaultValue = "10") int pageSize){
+                                      @RequestParam(defaultValue = "10") int pageSize){
         return ApiResponse.builder()
                 .message("get all posts")
                 .data(postService.getAllPosts(pageNo, pageSize))

@@ -53,7 +53,11 @@ public class PostServiceImpl implements PostService {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Override
     @Transactional
-    public PostResponse addPost(String userId, String subjectId, PostRequest request) throws IOException {
+    public PostResponse addPost(String subjectId, PostRequest request)
+            throws IOException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String userId = jwt.getClaimAsString("userId");
         Post post = postMapper.toPost(request);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -97,9 +101,12 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostResponse updatePost(String userId, String postId, PostRequest postRequest,
+    public PostResponse updatePost(String postId, PostRequest postRequest,
                                    String subjectId) throws IOException {
 
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String userId = jwt.getClaimAsString("userId");
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXIST));
 
