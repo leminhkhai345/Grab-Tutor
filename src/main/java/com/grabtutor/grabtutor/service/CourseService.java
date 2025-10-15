@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Set;
 
 public interface CourseService {
-    CourseResponse createCourse(CourseRequest request, String tutorId, Set<String> subjectIds);
-    CourseResponse getCourseById(String courseId, String tutorId);
-    CourseResponse updateCourse(String tutorId, String courseId, CourseRequest request, Set<String> subjectIds);
+    CourseResponse createCourse(CourseRequest request, Set<String> subjectIds);
+    CourseResponse getCourseById(String courseId);
+    CourseResponse updateCourse(String courseId, CourseRequest request, Set<String> subjectIds);
     void deleteCourse(String courseId);
     List<CourseResponse> getAllCoursesByTutorId(String tutorId, int pageNo, int pageSize, String... sorts);
 }

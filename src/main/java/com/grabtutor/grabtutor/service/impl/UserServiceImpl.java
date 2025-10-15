@@ -25,8 +25,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -57,9 +59,9 @@ public class UserServiceImpl implements UserService {
 
         User user = userMapper.toUser(userRequest);
         Set<Role> roles = new HashSet<>();
-        if(userRequest.getRole() == Role.TUTOR.name()){
+        if(userRequest.getRole().equalsIgnoreCase(Role.TUTOR.name())){
             roles.add(Role.TUTOR);
-        } else if(userRequest.getRole() == Role.ADMIN.name()){
+        } else if(userRequest.getRole().equalsIgnoreCase(Role.ADMIN.name())){
             roles.add(Role.ADMIN);
         } else {
             roles.add(Role.USER);
@@ -72,17 +74,18 @@ public class UserServiceImpl implements UserService {
     @PostAuthorize("returnObject.email == authentication.name or hasRole('ADMIN')")
     @Override
     public UserResponse getUserById(String id){
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User user = getUser(id);
         return userMapper.toUserResponse(user);
     }
 
     @PostAuthorize("returnObject.email == authentication.name")
     @Override
     public UserResponse getMyInfo(){
-        var context = SecurityContextHolder.getContext();
-        String name = context.getAuthentication().getName();
-        User user = userRepository.findByEmail(name).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String userId = jwt.getClaimAsString("userId");
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         return userMapper.toUserResponse(user);
     }
 
@@ -102,14 +105,24 @@ public class UserServiceImpl implements UserService {
     @PreAuthorize("hasRole('ADMIN')")
     @Override
     public void deleteUser(String id){
-        User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        userRepository.delete(user);
+        User user = getUser(id);
+        user.setDeleted(true);
+        userRepository.save(user);
+    }
+
+    User getUser(String userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        if(user.isDeleted()){
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
+        }
+        return user;
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @Override
     public UserResponse changeActive(String id, boolean active){
-        User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User user = getUser(id);
         user.setActive(active);
         return userMapper.toUserResponse(userRepository.save(user));
     }
@@ -134,7 +147,7 @@ public class UserServiceImpl implements UserService {
         }
 
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(orders));
-        Page<User> users = userRepository.findAll(pageable);
+        Page<User> users = userRepository.findAllByIsDeletedFalseAndIsActiveTrue(pageable);
 
         return PageResponse.builder()
                 .pageNo(pageNo)
@@ -147,7 +160,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public TutorInfoResponse submitInfo(TutorInfoRequest request) {
-        var user = userRepository.findById(request.getUserId()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        var user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         if(user.getTutorInfo() != null) {
             var existInfo = user.getTutorInfo();

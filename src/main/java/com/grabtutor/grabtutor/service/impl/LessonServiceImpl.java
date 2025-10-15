@@ -14,7 +14,11 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +29,12 @@ public class LessonServiceImpl implements LessonService {
     LessonMapper lessonMapper;
     CourseRepository courseRepository;
 
+    @Transactional
     @Override
-    public LessonResponse createLesson(String tutorId, String courseId, LessonRequest request) {
+    public LessonResponse createLesson(String courseId, LessonRequest request) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String tutorId = jwt.getClaimAsString("userId");
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
         if (!course.getTutor().getId().equals(tutorId)) {
@@ -37,9 +45,12 @@ public class LessonServiceImpl implements LessonService {
         lesson.setCourse(course);
         return lessonMapper.toLessonResponse(lessonRepository.save(lesson));
     }
-
+    @Transactional
     @Override
-    public LessonResponse updateLesson(String tutorId, String lessonId, LessonRequest request) {
+    public LessonResponse updateLesson(String lessonId, LessonRequest request) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String tutorId = jwt.getClaimAsString("userId");
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
         if (!lesson.getCourse().getTutor().getId().equals(tutorId)) {
@@ -56,10 +67,19 @@ public class LessonServiceImpl implements LessonService {
         return lessonMapper.toLessonResponse(lesson);
     }
 
+    @Transactional
     @Override
-    public void deleteLesson(String lessonId) {
+    public void deleteLesson(String lessonId) { // Thêm tutorId param
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new AppException(ErrorCode.LESSON_NOT_FOUND));
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String tutorId = jwt.getClaimAsString("userId");
+
+        if (!lesson.getCourse().getTutor().getId().equals(tutorId)) {
+            throw new AppException(ErrorCode.TUTOR_NOT_AUTHORIZED);
+        }
+
         lesson.setDeleted(true);
         lessonRepository.save(lesson);
     }

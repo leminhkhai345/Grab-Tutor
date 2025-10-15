@@ -2,8 +2,7 @@ package com.grabtutor.grabtutor.controller;
 
 import com.grabtutor.grabtutor.dto.request.*;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
-import com.grabtutor.grabtutor.service.impl.UserServiceImpl;
-
+import com.grabtutor.grabtutor.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
-    UserServiceImpl userService;
+    UserService userService;
     @PostMapping
     public ApiResponse<?> createUser(@RequestBody @Valid UserRequest userRequest){
         return ApiResponse.builder()
@@ -27,21 +26,23 @@ public class UserController {
                 .build();
     }
 
-    @PostMapping("/{id}")
-    public ApiResponse<?> updateUser(@PathVariable String id, @RequestBody @Valid UserRequest userRequest){
+    @PutMapping("/{userId}")
+    public ApiResponse<?> updateUser(@PathVariable String userId,
+                                     @RequestBody @Valid UserRequest userRequest){
         return ApiResponse.builder()
                 .message("User updated successfully")
-                .data(userService.updateUser(id, userRequest))
+                .data(userService.updateUser(userId, userRequest))
                 .build();
     }
 
-    @GetMapping("/{id}")
-    public ApiResponse<?> getUserById(@PathVariable String id){
+    @GetMapping("/{userId}")
+    public ApiResponse<?> getUserById(@PathVariable String userId){
         return ApiResponse.builder()
                 .message("get user by id successfully")
-                .data(userService.getUserById(id))
+                .data(userService.getUserById(userId))
                 .build();
     }
+
     @GetMapping("/myInfo")
     public ApiResponse<?> getMyInfo(){
         return ApiResponse.builder()
@@ -50,7 +51,7 @@ public class UserController {
                 .build();
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ApiResponse<?> getALlUsers(@RequestParam(defaultValue = "0") int pageNo,
                                       @RequestParam(defaultValue = "10") int pageSize, String... sorts){
         var authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -64,21 +65,21 @@ public class UserController {
     }
 
 
-    @DeleteMapping("/{id}")
-    public ApiResponse<?> deleteUser(@PathVariable String id){
-        userService.deleteUser(id);
+    @DeleteMapping("/{userId}")
+    public ApiResponse<?> deleteUser(@PathVariable String userId){
+        userService.deleteUser(userId);
         return ApiResponse.builder()
                 .message("User deleted successfully")
                 .build();
     }
 
-    @PostMapping("active/{id}")
-    public ApiResponse<?> changeActive(@PathVariable String id, @RequestParam boolean active){
+    @PostMapping("active/{userId}")
+    public ApiResponse<?> changeActive(@PathVariable String userId, @RequestParam boolean active){
 
         String message = active ? "activated" : "deactivated";
         return ApiResponse.builder()
                 .message("Change " + message + " successfully")
-                .data(userService.changeActive(id, active))
+                .data(userService.changeActive(userId, active))
                 .build();
     }
     @PostMapping("/submitInfo")
@@ -89,7 +90,7 @@ public class UserController {
                 .message("Tutor info added and verification request sent successfully")
                 .build();
     }
-    @PostMapping("/requests")
+    @GetMapping("/requests")
     public ApiResponse<?> getAllRequests(@RequestParam(defaultValue = "0") int pageNo,
                                          @RequestParam(defaultValue = "10") int pageSize, String... sorts){
         return ApiResponse.builder()

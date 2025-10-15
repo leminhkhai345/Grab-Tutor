@@ -8,8 +8,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,23 +20,19 @@ public class ReviewController {
 
     @PostMapping("/post/{postId}/")
     public ApiResponse<?> createReview(@PathVariable String postId,
-                                       @RequestBody @Valid ReviewRequest request,
-                                       @AuthenticationPrincipal Jwt jwt){
-        String userId = jwt.getClaimAsString("userId");
+                                       @RequestBody @Valid ReviewRequest request){
         return  ApiResponse.builder()
                 .message("Review created successfully")
-                .data(reviewService.createReview(userId, postId, request))
+                .data(reviewService.createReview(postId, request))
                 .build();
     }
 
     @PutMapping("/{reviewId}")
     public ApiResponse<?> updateReview(@PathVariable String reviewId,
-                                       @RequestBody @Valid ReviewRequest request,
-                                       @AuthenticationPrincipal Jwt jwt){
-        String userId = jwt.getClaimAsString("userId");
+                                       @RequestBody @Valid ReviewRequest request){
         return  ApiResponse.builder()
                 .message("Review updated successfully")
-                .data(reviewService.updateReview(userId, reviewId, request))
+                .data(reviewService.updateReview(reviewId, request))
                 .build();
     }
 
@@ -55,6 +49,22 @@ public class ReviewController {
         return  ApiResponse.builder()
                 .message("Review fetched successfully")
                 .data(reviewService.getReviewById(reviewId))
+                .build();
+    }
+
+    @GetMapping("/post/{postId}")
+    public ApiResponse<?> getReviewsByPostId(@PathVariable String postId) {
+        return ApiResponse.builder()
+                .message("Reviews fetched successfully")
+                .data(reviewService.getReviewsByPostId(postId))
+                .build();
+    }
+
+    @GetMapping("/user/{userId}")
+    public ApiResponse<?> getReviewsByUserId(@PathVariable String userId) {
+        return ApiResponse.builder()
+                .message("Reviews fetched successfully")
+                .data(reviewService.getReviewsByUserId(userId))
                 .build();
     }
 }

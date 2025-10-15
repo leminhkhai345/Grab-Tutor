@@ -12,12 +12,15 @@ import com.grabtutor.grabtutor.repository.PostRepository;
 import com.grabtutor.grabtutor.repository.ReviewRepository;
 import com.grabtutor.grabtutor.repository.UserRepository;
 import com.grabtutor.grabtutor.service.ReviewService;
-import lombok.Builder;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -30,7 +33,10 @@ public class ReviewServiceImpl implements ReviewService{
     PostRepository postRepository;
 
     @Override
-    public ReviewResponse createReview(String userId, String postId, ReviewRequest reviewRequest) {
+    public ReviewResponse createReview(String postId, ReviewRequest reviewRequest) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String userId = jwt.getClaimAsString("userId");
         Review review = reviewMapper.toReview(reviewRequest);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -42,7 +48,10 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
-    public ReviewResponse updateReview(String userId, String reviewId, ReviewRequest reviewRequest) {
+    public ReviewResponse updateReview(String reviewId, ReviewRequest reviewRequest) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String userId = jwt.getClaimAsString("userId");
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_EXIST));
         if(!review.getUser().getId().equals(userId)){
@@ -71,5 +80,17 @@ public class ReviewServiceImpl implements ReviewService{
             throw new AppException(ErrorCode.REVIEW_NOT_EXIST);
         }
         return reviewMapper.toReviewResponse(review);
+    }
+
+    @Override
+    public List<ReviewResponse> getReviewsByPostId(String postId) {
+        var reviews = reviewRepository.findByPostIdAndIsDeletedFalse(postId);
+        return reviews.stream().map(reviewMapper::toReviewResponse).toList();
+    }
+
+    @Override
+    public List<ReviewResponse> getReviewsByUserId(String userId) {
+        var reviews = reviewRepository.findByUserIdAndIsDeletedFalse(userId);
+        return reviews.stream().map(reviewMapper::toReviewResponse).toList();
     }
 }

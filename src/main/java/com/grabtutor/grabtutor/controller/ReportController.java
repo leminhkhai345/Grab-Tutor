@@ -7,8 +7,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,12 +18,11 @@ public class ReportController {
     ReportService reportService;
 
     @PostMapping("/post/{postId}/")
-    public ApiResponse<?> createReport(@PathVariable String postId,@RequestBody @Valid ReportRequest request,
-                                       @AuthenticationPrincipal Jwt jwt){
-        String userId = jwt.getClaimAsString("userId");
+    public ApiResponse<?> createReport(@PathVariable String postId,
+                                       @RequestBody @Valid ReportRequest request){
         return  ApiResponse.builder()
                 .message("Report created successfully")
-                .data(reportService.createReport(request, userId, postId))
+                .data(reportService.createReport(request, postId))
                 .build();
     }
 

@@ -12,11 +12,16 @@ import com.grabtutor.grabtutor.repository.CourseRepository;
 import com.grabtutor.grabtutor.repository.SubjectRepository;
 import com.grabtutor.grabtutor.repository.UserRepository;
 import com.grabtutor.grabtutor.service.CourseService;
-import lombok.Builder;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -34,24 +39,34 @@ public class CourseServiceImpl implements CourseService {
     SubjectRepository subjectRepository;
 
 
+
     @Override
-    public CourseResponse createCourse(CourseRequest request, String tutorId, Set<String> subjectIds) {
+    public CourseResponse createCourse(CourseRequest request, Set<String> subjectIds) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String tutorId = jwt.getClaimAsString("userId");
         User tutor = userRepository.findById(tutorId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         Course course = courseMapper.toCourse(request);
-        Set<Subject> subjects = new HashSet<>(subjectRepository.findAllById(subjectIds));
-        course.setSubjects(subjects);
+        if(subjectIds != null && !subjectIds.isEmpty()) {
+            Set<Subject> subjects = new HashSet<>(subjectRepository.findAllById(subjectIds));
+            course.setSubjects(subjects);
+        }
         course.setTutor(tutor);
         return courseMapper.toCourseResponse(courseRepository.save(course));
     }
 
 
     @Override
-    public CourseResponse updateCourse(String tutorId, String courseId, CourseRequest request,
+    public CourseResponse updateCourse(String courseId, CourseRequest request,
                                        Set<String> subjectIds) {
+
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String tutorId = jwt.getClaimAsString("userId");
         if(course.isDeleted()) {
             throw new AppException(ErrorCode.COURSE_NOT_FOUND);
         }
@@ -67,7 +82,11 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public CourseResponse getCourseById(String courseId, String tutorId) {
+    public CourseResponse getCourseById(String courseId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String tutorId = jwt.getClaimAsString("userId");
+
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
         if(course.isDeleted()) {
@@ -81,9 +100,16 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void deleteCourse(String courseId) {
-        Course course = courseRepository.findById(courseId).orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String tutorId = jwt.getClaimAsString("userId");
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
         if(course.isDeleted()) {
             throw new AppException(ErrorCode.COURSE_NOT_FOUND);
+        }
+        if(!course.getTutor().getId().equals(tutorId)) {
+            throw new AppException(ErrorCode.FORBIDDEN);
         }
         course.setDeleted(true);
         courseRepository.save(course);
@@ -91,6 +117,10 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public List<CourseResponse> getAllCoursesByTutorId(String tutorId, int pageNo, int pageSize, String... sorts) {
-        return List.of();
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sorts));
+        Page<Course> courses = courseRepository.findByTutorIdAndIsDeletedFalse(tutorId, pageable);
+        return courses.stream()
+                .map(courseMapper::toCourseResponse)
+                .toList();
     }
 }
