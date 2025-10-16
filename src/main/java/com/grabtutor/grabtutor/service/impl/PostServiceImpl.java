@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,6 +30,8 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -45,7 +48,7 @@ public class PostServiceImpl implements PostService {
     SubjectRepository subjectRepository;
     ChatRoomRepository chatRoomRepository;
     AccountBalanceRepository  accountBalanceRepository;
-//    RedisTemplate<String, String> redisTemplate;
+    RedisTemplate<String, String> redisTemplate;
 
     double acceptFee = 100;
 
@@ -203,5 +206,11 @@ public class PostServiceImpl implements PostService {
 
         post.setAccepted(true);
         postRepository.save(post);
+//        redisTemplate.opsForZSet().add("post:timeout", post.getId(),
+//                LocalDateTime.now()
+//                .atZone(ZoneId.systemDefault())
+//                .toInstant()
+//                .toEpochMilli() + 60000*30);
+
     }
 }

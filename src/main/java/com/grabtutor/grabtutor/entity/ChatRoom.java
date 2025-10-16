@@ -16,8 +16,12 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatRoom extends BaseEntity{
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "postId")
+    Post post;
     @ManyToMany(mappedBy = "chatRooms") // bên này là "bị ánh xạ"
-    private List<User> users;
+    List<User> users;
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Message> messages;
+    List<Message> messages;
 }

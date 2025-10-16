@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -19,13 +21,15 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@EnableAsync
+@EnableScheduling
 public class  PostWorker {
-
+//
 //    RedisTemplate<String, Object> redisTemplate;
 //    PostRepository postRepository;
 //
 //    //Cái ni để xử lý post quá hạn chưa được accept
-//    @Scheduled(fixedRate = 2000)
+//    @Scheduled(fixedDelay = 500)
 //    public void processPost() {
 //        long now = System.currentTimeMillis();
 //        Set<Object> jobs = redisTemplate.opsForZSet()
@@ -48,7 +52,7 @@ public class  PostWorker {
 //        }
 //    }
 //    //Xử lý post được accept nhưng lại không được giải trong thời gian quy định
-//    @Scheduled(fixedRate = 2000)
+//    @Scheduled(fixedDelay = 500)
 //    public void processPostTimeout() {
 //        long now = System.currentTimeMillis();
 //        Set<Object> jobs = redisTemplate.opsForZSet()
@@ -64,7 +68,7 @@ public class  PostWorker {
 //            } catch (Exception e) {
 //                log.error(ErrorCode.POST_NOT_EXIST.getMessage(), e);
 //            } finally {
-//                redisTemplate.opsForZSet().remove("post:expire", job);
+//                redisTemplate.opsForZSet().remove("post:timeout", job);
 //            }
 //        }
 //    }
