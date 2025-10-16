@@ -35,4 +35,7 @@ public class Post extends BaseEntity {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<Report> reports;
+
+    @OneToOne(mappedBy = "post")
+    ChatRoom chatRoom;
 }
