@@ -206,8 +206,9 @@ public class PostServiceImpl implements PostService {
 
         post.setAccepted(true);
         postRepository.save(post);
-//        redisTemplate.opsForZSet().add("post:timeout", post.getId(),
-//                LocalDateTime.now()
+
+//        redisTemplate.opsForZSet().add("chatroom:submit", newRoom.getId(),
+//                newRoom.getCreatedAt()
 //                .atZone(ZoneId.systemDefault())
 //                .toInstant()
 //                .toEpochMilli() + 60000*30);

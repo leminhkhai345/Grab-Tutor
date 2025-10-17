@@ -35,6 +35,8 @@ public class ChatServiceImpl implements ChatService {
     UserRepository userRepository;
     ChatRoomRepository chatRoomRepository;
     MessageRepository messageRepository;
+
+    @PreAuthorize("hasRole('USER') or hasRole('TUTOR')")
     @Override
     public MessageResponse saveMessage(MessageRequest request) {
         var message = messageMapper.ToMessage(request);
@@ -44,7 +46,7 @@ public class ChatServiceImpl implements ChatService {
         return messageMapper.ToMessageResponse(message);
     }
 
-    //Load message -> chắc chắn đã đc authen mới gọi được
+    @PreAuthorize("hasRole('USER') or hasRole('TUTOR')")
     @Override
     public LoadMessagesResponse loadMessages(LoadMessagesRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -70,13 +72,13 @@ public class ChatServiceImpl implements ChatService {
                 .build();
     }
 
+    @PreAuthorize("hasRole('USER') or hasRole('TUTOR')")
     @Override
     public LoadChatRoomsResponse loadRooms() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) auth.getPrincipal();
         String userId = jwt.getClaim("userId");
         var user = userRepository.findById(userId).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
-
         return LoadChatRoomsResponse.builder()
                 .rooms(user.getChatRooms().stream().map(chatRoomMapper::toChatRoomResponse).toList())
                 .build();

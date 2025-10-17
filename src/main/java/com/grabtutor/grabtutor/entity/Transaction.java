@@ -20,6 +20,7 @@ public class Transaction extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     PaymentMethod paymentMethod = PaymentMethod.VN_PAY;
+    //Đây là tiền thật
     long amount;
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "accountBalanceId", nullable = false)

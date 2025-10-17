@@ -15,6 +15,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import java.io.IOException;
 
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
+    //Nếu muốn FE gọi tới refreshToken thì cần điều chỉnh
     @Override
     public void commence(
             HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
