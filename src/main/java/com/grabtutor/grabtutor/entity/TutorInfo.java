@@ -23,6 +23,6 @@ public class TutorInfo extends BaseEntity{
     String highestAcademicDegree;
     String major;
     double averageStars;
-    @OneToOne(mappedBy = "tutorInfo")
+    @OneToOne(mappedBy = "tutorInfo", cascade = CascadeType.ALL)
     User user;
 }

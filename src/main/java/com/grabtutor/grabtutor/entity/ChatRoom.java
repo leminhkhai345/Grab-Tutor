@@ -17,6 +17,8 @@ import java.util.Set;
 @AllArgsConstructor
 public class ChatRoom extends BaseEntity{
 
+    @Builder.Default
+    boolean isSubmitted = false;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "postId")
     Post post;

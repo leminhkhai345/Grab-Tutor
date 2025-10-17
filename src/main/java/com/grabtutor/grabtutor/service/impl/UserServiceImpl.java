@@ -2,6 +2,7 @@ package com.grabtutor.grabtutor.service.impl;
 
 import com.grabtutor.grabtutor.dto.request.*;
 import com.grabtutor.grabtutor.dto.response.*;
+import com.grabtutor.grabtutor.entity.AccountBalance;
 import com.grabtutor.grabtutor.entity.User;
 import com.grabtutor.grabtutor.entity.VerificationRequest;
 import com.grabtutor.grabtutor.enums.RequestStatus;
@@ -12,10 +13,7 @@ import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.TutorInfoMapper;
 import com.grabtutor.grabtutor.mapper.UserMapper;
 import com.grabtutor.grabtutor.mapper.VerificationRequestMapper;
-import com.grabtutor.grabtutor.repository.OtpRepository;
-import com.grabtutor.grabtutor.repository.TutorInfoRepository;
-import com.grabtutor.grabtutor.repository.UserRepository;
-import com.grabtutor.grabtutor.repository.VerificationRequestRepository;
+import com.grabtutor.grabtutor.repository.*;
 import com.grabtutor.grabtutor.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.*;
@@ -71,8 +69,12 @@ public class UserServiceImpl implements UserService {
         } else {
             roles.add(Role.USER);
         }
-
         user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+
+        var balance = AccountBalance.builder()
+                .balance(0)
+                .build();
+        user.setAccountBalance(balance);
         return userMapper.toUserResponse(userRepository.save(user));
     }
 

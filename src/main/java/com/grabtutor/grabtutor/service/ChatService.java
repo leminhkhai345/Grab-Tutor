@@ -10,4 +10,5 @@ public interface ChatService {
     MessageResponse saveMessage(MessageRequest request);
     LoadMessagesResponse loadMessages(LoadMessagesRequest request);
     LoadChatRoomsResponse loadRooms();
+    
 }
