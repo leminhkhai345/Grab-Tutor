@@ -22,7 +22,7 @@ public class TutorInfo extends BaseEntity{
     String university;
     String highestAcademicDegree;
     String major;
-
+    double averageStars;
     @OneToOne(mappedBy = "tutorInfo")
     User user;
 }

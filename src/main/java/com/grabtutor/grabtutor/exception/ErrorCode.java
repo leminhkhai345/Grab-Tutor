@@ -42,6 +42,7 @@ public enum ErrorCode {
     ACCOUNT_BALANCE_NOT_FOUND(11001, "Account balance not found", HttpStatus.NOT_FOUND),
     ACCOUNT_DONT_HAVE_ENOUGH_MONEY(11002, "Account don't have enough money", HttpStatus.BAD_REQUEST),
 
+    VERIFICATION_REQUEST_NOT_FOUND(12001, "Verification request not found", HttpStatus.NOT_FOUND),
     FORBIDDEN(88888, "You do not have permission to access this resource", HttpStatus.FORBIDDEN),
     UNCATEGORIZED(99999, "Uncategorized", HttpStatus.BAD_REQUEST),
     MISSING_PARAMETER(77777, "Missing parameter: {parameterName}", HttpStatus.BAD_REQUEST)

@@ -6,11 +6,13 @@ import com.grabtutor.grabtutor.entity.User;
 import com.grabtutor.grabtutor.entity.VerificationRequest;
 import com.grabtutor.grabtutor.enums.RequestStatus;
 import com.grabtutor.grabtutor.enums.Role;
+import com.grabtutor.grabtutor.enums.UserStatus;
 import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.TutorInfoMapper;
 import com.grabtutor.grabtutor.mapper.UserMapper;
 import com.grabtutor.grabtutor.mapper.VerificationRequestMapper;
+import com.grabtutor.grabtutor.repository.OtpRepository;
 import com.grabtutor.grabtutor.repository.TutorInfoRepository;
 import com.grabtutor.grabtutor.repository.UserRepository;
 import com.grabtutor.grabtutor.repository.VerificationRequestRepository;
@@ -23,6 +25,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -50,17 +54,18 @@ public class UserServiceImpl implements UserService {
     TutorInfoMapper  tutorInfoMapper;
     VerificationRequestMapper verificationRequestMapper;
     PasswordEncoder passwordEncoder;
+    JavaMailSender mailSender;
 
     @Override
     public UserResponse addUser(UserRequest userRequest){
         if(userRepository.existsByEmail(userRequest.getEmail())){
             throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
-
         User user = userMapper.toUser(userRequest);
         Set<Role> roles = new HashSet<>();
         if(userRequest.getRole().equalsIgnoreCase(Role.TUTOR.name())){
             roles.add(Role.TUTOR);
+            user.setUserStatus(UserStatus.PENDING);
         } else if(userRequest.getRole().equalsIgnoreCase(Role.ADMIN.name())){
             roles.add(Role.ADMIN);
         } else {
@@ -190,23 +195,35 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
     @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
     @Override
     public ApproveResponse approveRequest(ApproveRequest request){
-        var req = verificationRequestRepository.getById(request.getRequestId());
+        var req = verificationRequestRepository.findById(request.getRequestId())
+                .orElseThrow(() -> new AppException(ErrorCode.VERIFICATION_REQUEST_NOT_FOUND));
         req.setStatus(RequestStatus.APPROVED);
         verificationRequestRepository.save(req);
-
+        var user = req.getUser();
+        user.setUserStatus(UserStatus.NORMAL);
+        userRepository.save(user);
         return ApproveResponse.builder()
                 .requestId(req.getId())
                 .build();
     }
+    //Reject thì xóa luôn tài khoản + tutor info + gửi thêm mail
     @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
     @Override
     public RejectResponse rejectRequest(RejectRequest request){
-        var req = verificationRequestRepository.getById(request.getRequestId());
+        var req = verificationRequestRepository.findById(request.getRequestId())
+                .orElseThrow(() -> new AppException(ErrorCode.VERIFICATION_REQUEST_NOT_FOUND));
         req.setStatus(RequestStatus.REJECTED);
         verificationRequestRepository.save(req);
-
+        var user = req.getUser();
+        var email =  user.getEmail();
+        userRepository.removeUserById(user.getId());
+        sendMail(email,
+        "ACCOUNT VERIFICATION FAILED",
+        "We have deleted your old account so you can now use this email to register new account on our website");
         return RejectResponse.builder()
                 .requestId(req.getId())
                 .build();
@@ -237,5 +254,13 @@ public class UserServiceImpl implements UserService {
                 .totalPages(requests.getTotalPages())
                 .items(requests.stream().map(verificationRequestMapper::toAccountVerificationResponse))
                 .build();
+    }
+
+    public void sendMail(String to, String subject, String body) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(body);
+        mailSender.send(message);
     }
 }
