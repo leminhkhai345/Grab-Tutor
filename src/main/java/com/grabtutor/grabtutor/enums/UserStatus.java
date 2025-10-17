@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 public enum UserStatus {
-
+    PENDING(0),
     NORMAL(1),
     WARNING(2),
     BANNED(3)
