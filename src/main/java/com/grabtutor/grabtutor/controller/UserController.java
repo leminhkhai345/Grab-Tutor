@@ -116,4 +116,13 @@ public class UserController {
                 .build();
     }
 
+    @PostMapping("/withdraw")
+    public ApiResponse<?> withdrawMoney(@RequestParam double withdrawAmount){
+        return ApiResponse.builder()
+                .success(true)
+                .data(userService.withdrawMoney(withdrawAmount))
+                .message("Withdraw request created successfully")
+                .build();
+    }
+
 }

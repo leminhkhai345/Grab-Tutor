@@ -41,6 +41,7 @@ public enum ErrorCode {
 
     ACCOUNT_BALANCE_NOT_FOUND(11001, "Account balance not found", HttpStatus.NOT_FOUND),
     ACCOUNT_DONT_HAVE_ENOUGH_MONEY(11002, "Account don't have enough money", HttpStatus.BAD_REQUEST),
+    USER_ALREADY_ENROLLED_COURSE(11003, "User already enrolled in this course", HttpStatus.CONFLICT),
 
     VERIFICATION_REQUEST_NOT_FOUND(12001, "Verification request not found", HttpStatus.NOT_FOUND),
     FORBIDDEN(88888, "You do not have permission to access this resource", HttpStatus.FORBIDDEN),

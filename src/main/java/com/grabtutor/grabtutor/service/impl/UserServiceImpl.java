@@ -5,6 +5,7 @@ import com.grabtutor.grabtutor.dto.response.*;
 import com.grabtutor.grabtutor.entity.AccountBalance;
 import com.grabtutor.grabtutor.entity.User;
 import com.grabtutor.grabtutor.entity.VerificationRequest;
+import com.grabtutor.grabtutor.entity.VirtualTransaction;
 import com.grabtutor.grabtutor.enums.RequestStatus;
 import com.grabtutor.grabtutor.enums.Role;
 import com.grabtutor.grabtutor.enums.UserStatus;
@@ -13,6 +14,7 @@ import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.TutorInfoMapper;
 import com.grabtutor.grabtutor.mapper.UserMapper;
 import com.grabtutor.grabtutor.mapper.VerificationRequestMapper;
+import com.grabtutor.grabtutor.mapper.VirtualTransactionMapper;
 import com.grabtutor.grabtutor.repository.*;
 import com.grabtutor.grabtutor.service.UserService;
 import jakarta.transaction.Transactional;
@@ -53,6 +55,8 @@ public class UserServiceImpl implements UserService {
     VerificationRequestMapper verificationRequestMapper;
     PasswordEncoder passwordEncoder;
     JavaMailSender mailSender;
+    VirtualTransactionMapper virtualTransactionMapper;
+    VirtualTransactionRepository virtualTransactionRepository;
 
     @Override
     public UserResponse addUser(UserRequest userRequest){
@@ -264,5 +268,23 @@ public class UserServiceImpl implements UserService {
         message.setSubject(subject);
         message.setText(body);
         mailSender.send(message);
+    }
+
+    @Transactional
+    @Override
+    public VirtualTransactionResponse withdrawMoney(double withdrawAmount){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String userId = jwt.getClaimAsString("userId");
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        if(user.getAccountBalance().getBalance() < withdrawAmount){
+            throw new AppException(ErrorCode.ACCOUNT_DONT_HAVE_ENOUGH_MONEY);
+        }
+        VirtualTransaction withdrawTransaction = virtualTransactionMapper.toVirtualTransaction(withdrawAmount);
+        withdrawTransaction.setUser(user);
+        withdrawTransaction.setPaidAmount(withdrawAmount);
+        user.getAccountBalance().setBalance(user.getAccountBalance().getBalance() - withdrawAmount);
+        return virtualTransactionMapper.toVirtualTransactionResponse(virtualTransactionRepository.save(withdrawTransaction));
     }
 }

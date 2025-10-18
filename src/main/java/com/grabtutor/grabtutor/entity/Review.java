@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Review extends BaseEntity {
-    int rating;
+    int stars;
     String description;
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)

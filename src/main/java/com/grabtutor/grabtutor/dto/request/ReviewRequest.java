@@ -12,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 public class ReviewRequest {
     @Size(min = 1, max = 5, message = "Rating must be between 1 and 5")
     @NotBlank(message = "Rating must be not blank")
-    int rating;
+    int stars;
     @NotBlank(message = "Description must be not blank")
     String description;
 }

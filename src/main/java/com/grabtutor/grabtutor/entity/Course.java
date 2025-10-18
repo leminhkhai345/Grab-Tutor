@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -39,4 +40,7 @@ public class Course extends BaseEntity {
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<Lesson> lessons;
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    Set<VirtualTransaction> virtualTransactions = new HashSet<>();
 }
