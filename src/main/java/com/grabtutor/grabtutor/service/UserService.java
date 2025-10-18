@@ -30,4 +30,6 @@ public interface UserService {
     RejectResponse rejectRequest(RejectRequest request);
 
     PageResponse<?> getRequests(int pageNo, int pageSize,String... sorts);
+
+    VirtualTransactionResponse withdrawMoney(double withdrawAmount);
 }

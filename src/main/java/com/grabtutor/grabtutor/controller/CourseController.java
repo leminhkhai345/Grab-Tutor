@@ -85,4 +85,12 @@ public class CourseController {
                 .data(courseService.getAllCoursesByTutorId(tutorId, pageNo, pageSize, sorts))
                 .build();
     }
+
+    @PostMapping("/enroll/{courseId}")
+    public ApiResponse<?> enrollCourse(@PathVariable String courseId) {
+        return ApiResponse.builder()
+                .message("Course enrolled successfully")
+                .data(courseService.enrollCourse(courseId))
+                .build();
+    }
 }

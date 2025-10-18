@@ -16,7 +16,7 @@ public class ReviewResponse {
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     boolean isDeleted;
-    int rating;
+    int stars;
     String description;
     String userId;
     Post post;
