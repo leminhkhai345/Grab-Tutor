@@ -25,8 +25,6 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 @Service
-@Builder
-@Data
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 public class ChatServiceImpl implements ChatService {
@@ -46,42 +44,5 @@ public class ChatServiceImpl implements ChatService {
         return messageMapper.ToMessageResponse(message);
     }
 
-    @PreAuthorize("hasRole('USER') or hasRole('TUTOR')")
-    @Override
-    public LoadMessagesResponse loadMessages(LoadMessagesRequest request) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Jwt jwt = (Jwt) auth.getPrincipal();
-        String userId = jwt.getClaim("userId");
-
-        var room = chatRoomRepository.findById(request.getRoomId())
-                .orElseThrow(()-> new AppException(ErrorCode.CHAT_ROOM_NOT_FOUND));
-        boolean valid = false;
-        for(User user : room.getUsers() ){
-            if(user.getId().equals(userId)){
-                valid = true;
-                break;
-            }
-        }
-        if(!valid){
-            throw new AppException(ErrorCode.FORBIDDEN);
-        }
-
-        var messages = messageRepository.findByChatRoomId(request.getRoomId());
-        return LoadMessagesResponse.builder()
-                .messages(messages.stream().map(messageMapper::ToMessageResponse).toList())
-                .build();
-    }
-
-    @PreAuthorize("hasRole('USER') or hasRole('TUTOR')")
-    @Override
-    public LoadChatRoomsResponse loadRooms() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Jwt jwt = (Jwt) auth.getPrincipal();
-        String userId = jwt.getClaim("userId");
-        var user = userRepository.findById(userId).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
-        return LoadChatRoomsResponse.builder()
-                .rooms(user.getChatRooms().stream().map(chatRoomMapper::toChatRoomResponse).toList())
-                .build();
-    }
 }
 

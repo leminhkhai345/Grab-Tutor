@@ -1,5 +1,6 @@
 package com.grabtutor.grabtutor.entity;
 
+import com.grabtutor.grabtutor.enums.PostStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -21,7 +22,7 @@ public class Post extends BaseEntity {
     String description;
     double reward;
     @Builder.Default
-    boolean isSolved = false;
+    PostStatus status =  PostStatus.OPEN;
     @Builder.Default
     boolean isAccepted = false;
 
@@ -36,6 +37,11 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<Report> reports;
 
-    @OneToOne(mappedBy = "post")
+    @OneToOne
+    @JoinColumn(name = "chatRoomId")
     ChatRoom chatRoom;
+
+    @OneToOne
+    @JoinColumn(name = "userTransactionId")
+    UserTransaction userTransaction;
 }

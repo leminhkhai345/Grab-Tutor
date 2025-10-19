@@ -73,22 +73,12 @@ public class PostServiceImpl implements PostService {
 
         post.setSubject(subject);
 
-        //Logic trừ tiền
-        var accountBalance = accountBalanceRepository.findByUserId(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_BALANCE_NOT_FOUND));
-        if(accountBalance.getBalance() < post.getReward()) {
-            throw new AppException(ErrorCode.ACCOUNT_DONT_HAVE_ENOUGH_MONEY);
-        }
-        else {
-            accountBalance.setBalance(accountBalance.getBalance() - post.getReward());
-            accountBalanceRepository.save(accountBalance);
-        }
-        //Add vào queue -> tự động xóa bài sau 15 phút
+        //Add vào queue -> tự động xóa bài sau 6 giờ
 //        redisTemplate.opsForZSet().add("post:expire", post.getId(),
 //                post.getCreatedAt()
 //                    .atZone(ZoneId.systemDefault())
 //                    .toInstant()
-//                    .toEpochMilli() + 60000*15);
+//                    .toEpochMilli() + 3600000*6);
         return postMapper.toPostResponse(postRepository.save(post));
     }
 
@@ -214,4 +204,5 @@ public class PostServiceImpl implements PostService {
 //                .toEpochMilli() + 60000*30);
 
     }
+
 }
