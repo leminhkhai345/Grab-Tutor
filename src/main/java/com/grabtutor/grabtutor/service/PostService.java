@@ -17,5 +17,7 @@ public interface PostService {
     List<PostResponse> getPostByUserId(String userId);
     PageResponse<?> getAllPosts(int pageNo, int pageSize, String... sorts);
     void acceptPost(AcceptPostRequest request);
-
+//    TutorBidResponse addTutorBid(TutorBidRequest request);
+//    List<TutorBidResponse> getAllTutorBid(String postId);
+//    AcceptTutorResponse acceptTutor(AcceptTutorRequest request);
 }
