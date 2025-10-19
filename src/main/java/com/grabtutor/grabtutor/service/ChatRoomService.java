@@ -7,6 +7,8 @@ import com.grabtutor.grabtutor.dto.response.LoadMessagesResponse;
 public interface ChatRoomService {
     LoadMessagesResponse loadMessages(LoadMessagesRequest request);
     LoadChatRoomsResponse loadRooms();
-    void submitSolution(SubmitSolutionRequest request);
-    void confirmedSolution(ConfirmedSolution request);
+    void submitSolution(String roomId);
+    void confirmedSolution(String roomId);
+    void inspectSolution(String roomId);
+    void resolveSolution(String roomId, boolean isNormal);
 }
