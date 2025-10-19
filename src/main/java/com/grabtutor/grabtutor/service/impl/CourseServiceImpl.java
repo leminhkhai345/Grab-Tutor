@@ -156,7 +156,15 @@ public class CourseServiceImpl implements CourseService {
         accountBalance.setBalance(accountBalance.getBalance() - course.getPrice());
         enrollment.setCompletedAt(LocalDateTime.now());
         virtualTransactionRepository.save(enrollment);
-        return virtualTransactionMapper.toVirtualTransactionResponse(enrollment);
+        return VirtualTransactionResponse.builder()
+                .courseId(courseId)
+                .userId(userId)
+                .paidAmount(course.getPrice())
+                .status(enrollment.getStatus())
+                .type(enrollment.getType())
+                .transactionDate(enrollment.getTransactionDate())
+                .completedAt(enrollment.getCompletedAt())
+                .build();
 
     }
 

@@ -19,10 +19,13 @@ public class Report extends BaseEntity {
 
     String detail;
 
-    @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
-    User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "senderId")
+    User sender;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "receiverId")
+    User receiver;
     @ManyToOne
     @JoinColumn(name = "postId", nullable = false)
     Post post;
