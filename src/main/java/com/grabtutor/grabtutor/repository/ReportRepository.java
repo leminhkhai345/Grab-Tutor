@@ -8,5 +8,7 @@ import com.grabtutor.grabtutor.entity.Report;
 import java.util.List;
 
 public interface ReportRepository extends JpaRepository<Report, String> {
-    Page<Report> findByUserIdAndIsDeletedFalse(String userId,Pageable pageable);
+    Page<Report> findByReceiverIdAndIsDeletedFalse(String receiverId, Pageable pageable);
+    Page<Report> findBySenderIdAndIsDeletedFalse(String senderId, Pageable pageable);
+
 }

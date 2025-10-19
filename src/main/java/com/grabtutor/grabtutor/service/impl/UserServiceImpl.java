@@ -103,9 +103,11 @@ public class UserServiceImpl implements UserService {
     @PostAuthorize("returnObject.email == authentication.name or hasRole('ADMIN')")
     @Override
     public UserResponse updateUser(String id, UserRequest userRequest) {
-        User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        if (!user.getEmail().equals(userRequest.getEmail()) && userRepository.existsByEmail(userRequest.getEmail())) {
+        if (!user.getEmail().equals(userRequest.getEmail())
+                && userRepository.existsByEmail(userRequest.getEmail())) {
             throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
         userMapper.updateUserFromRequest(userRequest, user);
@@ -186,7 +188,8 @@ public class UserServiceImpl implements UserService {
             tutorInfoRepository.save(info);
         }
 
-        if(user.getRole() ==  Role.TUTOR && user.isActive()) throw new AppException(ErrorCode.ACCOUNT_ALREADY_VERIFIED);
+        if(user.getRole() ==  Role.TUTOR && user.isActive())
+            throw new AppException(ErrorCode.ACCOUNT_ALREADY_VERIFIED);
         var newRequest = VerificationRequest.builder()
                 .user(user)
                 .build();
@@ -272,19 +275,27 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public VirtualTransactionResponse withdrawMoney(double withdrawAmount){
+    public VirtualTransactionResponse withdrawMoney(double withdrawAmount) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) auth.getPrincipal();
         String userId = jwt.getClaimAsString("userId");
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        if(user.getAccountBalance().getBalance() < withdrawAmount){
+        if (user.getAccountBalance().getBalance() < withdrawAmount) {
             throw new AppException(ErrorCode.ACCOUNT_DONT_HAVE_ENOUGH_MONEY);
         }
         VirtualTransaction withdrawTransaction = virtualTransactionMapper.toVirtualTransaction(withdrawAmount);
         withdrawTransaction.setUser(user);
         withdrawTransaction.setPaidAmount(withdrawAmount);
         user.getAccountBalance().setBalance(user.getAccountBalance().getBalance() - withdrawAmount);
-        return virtualTransactionMapper.toVirtualTransactionResponse(virtualTransactionRepository.save(withdrawTransaction));
+        virtualTransactionRepository.save(withdrawTransaction);
+        return VirtualTransactionResponse.builder()
+                .userId(userId)
+                .paidAmount(withdrawAmount)
+                .type(withdrawTransaction.getType())
+                .status(withdrawTransaction.getStatus())
+                .transactionDate(withdrawTransaction.getTransactionDate())
+                .completedAt(withdrawTransaction.getCompletedAt())
+                .build();
     }
 }

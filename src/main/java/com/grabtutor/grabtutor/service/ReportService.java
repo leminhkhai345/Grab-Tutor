@@ -7,7 +7,8 @@ import com.grabtutor.grabtutor.dto.response.ReportResponse;
 public interface ReportService {
     ReportResponse createReport(ReportRequest request,String postId);
     ReportResponse getReportById(String id);
-    PageResponse<?> getReportByUserId(String userId, int pageNo, int pageSize, String... sortBy);
+    PageResponse<?> getReportByReceiverId(String receiverId, int pageNo, int pageSize, String... sortBy);
+    PageResponse<?> getReportBySenderId(String senderId, int pageNo, int pageSize, String... sortBy);
     ReportResponse resolveReport(String id);
     void deleteReport(String id);
 
