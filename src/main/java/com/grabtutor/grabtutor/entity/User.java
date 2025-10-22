@@ -71,4 +71,7 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<VirtualTransaction> virtualTransactions;
+
+    @OneToMany(mappedBy = "user")
+    List<TutorBid> tutorBids;
 }

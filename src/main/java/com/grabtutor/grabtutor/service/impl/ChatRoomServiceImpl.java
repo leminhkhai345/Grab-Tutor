@@ -99,6 +99,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         accountBalanceRepository.save(tutor.getAccountBalance());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public void inspectSolution(String roomId) {
         var room = chatRoomRepository.findById(roomId)

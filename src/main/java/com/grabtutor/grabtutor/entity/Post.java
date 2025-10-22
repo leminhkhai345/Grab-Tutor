@@ -44,4 +44,7 @@ public class Post extends BaseEntity {
     @OneToOne
     @JoinColumn(name = "userTransactionId")
     UserTransaction userTransaction;
+
+    @OneToMany(mappedBy = "post")
+    List<TutorBid> tutorBids;
 }

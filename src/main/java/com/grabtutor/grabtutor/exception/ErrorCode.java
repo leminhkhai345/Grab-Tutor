@@ -44,6 +44,8 @@ public enum ErrorCode {
     USER_ALREADY_ENROLLED_COURSE(11003, "User already enrolled in this course", HttpStatus.CONFLICT),
 
     VERIFICATION_REQUEST_NOT_FOUND(12001, "Verification request not found", HttpStatus.NOT_FOUND),
+
+    TUTOR_BID_NOT_FOUND(13001, "Tutor bid not found", HttpStatus.NOT_FOUND),
     FORBIDDEN(88888, "You do not have permission to access this resource", HttpStatus.FORBIDDEN),
     UNCATEGORIZED(99999, "Uncategorized", HttpStatus.BAD_REQUEST),
     MISSING_PARAMETER(77777, "Missing parameter: {parameterName}", HttpStatus.BAD_REQUEST)
