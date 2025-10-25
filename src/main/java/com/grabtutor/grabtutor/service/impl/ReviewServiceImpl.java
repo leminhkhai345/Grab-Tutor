@@ -42,8 +42,12 @@ public class ReviewServiceImpl implements ReviewService{
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXIST));
-        review.setUser(user);
+        review.setSender(user);
         review.setPost(post);
+        review.setReceiver(post.getUser());
+        if(review.getReceiver().getId().equals(userId)){
+            throw new AppException(ErrorCode.FORBIDDEN);
+        }
         return reviewMapper.toReviewResponse(reviewRepository.save(review));
     }
 
@@ -54,7 +58,7 @@ public class ReviewServiceImpl implements ReviewService{
         String userId = jwt.getClaimAsString("userId");
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_EXIST));
-        if(!review.getUser().getId().equals(userId)){
+        if(!review.getSender().getId().equals(userId)){
             throw new AppException(ErrorCode.FORBIDDEN);
         }
         reviewMapper.updateReviewFromRequest(reviewRequest, review);
@@ -90,7 +94,7 @@ public class ReviewServiceImpl implements ReviewService{
 
     @Override
     public List<ReviewResponse> getReviewsByUserId(String userId) {
-        var reviews = reviewRepository.findByUserIdAndIsDeletedFalse(userId);
+        var reviews = reviewRepository.findBySenderIdAndIsDeletedFalse(userId);
         return reviews.stream().map(reviewMapper::toReviewResponse).toList();
     }
 }

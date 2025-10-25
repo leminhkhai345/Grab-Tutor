@@ -1,9 +1,8 @@
 package com.grabtutor.grabtutor.controller;
 
 import com.grabtutor.grabtutor.dto.request.LoadMessagesRequest;
-import com.grabtutor.grabtutor.dto.request.MessageRequest;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
-import com.grabtutor.grabtutor.service.impl.ChatRoomServiceImpl;
+import com.grabtutor.grabtutor.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 public class ChatRoomController {
-    ChatRoomServiceImpl chatRoomService;
+    ChatRoomService chatRoomService;
 
     @GetMapping("/messages")
     public ApiResponse<?> loadMessages(LoadMessagesRequest request) {

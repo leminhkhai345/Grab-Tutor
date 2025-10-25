@@ -47,7 +47,8 @@ public class ServiceWorker {
 
         for (Object job : jobs) {
             try {
-                var post = postRepository.findById(job.toString()).orElseThrow(()-> new AppException(ErrorCode.POST_NOT_EXIST));
+                var post = postRepository.findById(job.toString())
+                        .orElseThrow(()-> new AppException(ErrorCode.POST_NOT_EXIST));
                 if (!post.isAccepted()){
                     post.setDeleted(true);
                     postRepository.save(post);
