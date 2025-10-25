@@ -34,18 +34,23 @@ public class MailSenderServiceImpl implements MailSenderService {
         Random random = new Random();
         int code = 100000 + random.nextInt(900000);
         SimpleMailMessage message = new SimpleMailMessage();
-        if(otpType == OtpType.REGISTER && !Objects.isNull(userRepository.findByEmail(request.getEmail()))) {
-            throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
+        if(otpType == OtpType.REGISTER ) {
+            var u = userRepository.findByEmail(request.getEmail()).orElse(null);
+            if(Objects.nonNull(u)) {
+                throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
+            }
         }
         var otp = otpRepository.findOtpByEmail(request.getEmail());
         if(Objects.isNull(otp)){
             var newOtp = Otp.builder()
                         .code(String.valueOf(code))
+                        .email(request.getEmail())
                         .expiryTime(LocalDateTime.now().plusSeconds(300))
                         .build();
             otpRepository.save(newOtp);
         } else{
             otp.setCode(String.valueOf(code));
+            otp.setEmail(request.getEmail());
             otp.setExpiryTime(LocalDateTime.now().plusSeconds(300));
             otp.setUsed(false);
             otpRepository.save(otp);
@@ -58,7 +63,7 @@ public class MailSenderServiceImpl implements MailSenderService {
 
     @Override
     public void verifyOtp(OTPVerificationRequest request) {
-        var otp = otpRepository.findOtpByEmail((request.getCode()));
+        var otp = otpRepository.findOtpByEmail((request.getEmail()));
         if(Objects.isNull(otp)){
             throw new AppException(ErrorCode.UNCATEGORIZED);
         }
@@ -68,7 +73,7 @@ public class MailSenderServiceImpl implements MailSenderService {
         if(otp.isUsed()){
             throw new AppException(ErrorCode.OTP_USED);
         }
-        if(!otp.getExpiryTime().isBefore(LocalDateTime.now())) {
+        if(otp.getExpiryTime().isBefore(LocalDateTime.now())) {
             throw new AppException(ErrorCode.OTP_EXPIRED);
         }
     }

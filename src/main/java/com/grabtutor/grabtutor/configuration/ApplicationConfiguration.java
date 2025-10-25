@@ -41,6 +41,7 @@ public class ApplicationConfiguration {
                 User user = User.builder()
                         .email(ADMIN_MAIL)
                         .password(passwordEncoder.encode(ADMIN_PASSWORD))
+                        .isActive(true)
                         .role(Role.ADMIN)
                         .build();
                 userRepository.save(user);

@@ -70,8 +70,10 @@ public class UserServiceImpl implements UserService {
             user.setUserStatus(UserStatus.PENDING);
         } else if(userRequest.getRole().equalsIgnoreCase(Role.ADMIN.name())){
             roles.add(Role.ADMIN);
+            user.setActive(true);
         } else {
             roles.add(Role.USER);
+            user.setActive(true);
         }
         user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
 

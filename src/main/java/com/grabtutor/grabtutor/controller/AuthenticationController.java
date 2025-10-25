@@ -75,7 +75,7 @@ public class AuthenticationController {
                 .build();
     }
     @PostMapping("/send-register-otp")
-    public ApiResponse<?> sendRegisterOtp(SendOTPRequest request){
+    public ApiResponse<?> sendRegisterOtp(@RequestBody SendOTPRequest request){
         sendMailService.sendOtp(request, OtpType.REGISTER);
         return ApiResponse.builder()
                 .success(true)
@@ -83,7 +83,7 @@ public class AuthenticationController {
                 .build();
     }
     @PostMapping("/send-forgot-password-otp")
-    public ApiResponse<?> sendForgotPasswordOtp(SendOTPRequest request){
+    public ApiResponse<?> sendForgotPasswordOtp(@RequestBody SendOTPRequest request){
         sendMailService.sendOtp(request, OtpType.FORGOT_PASSWORD);
         return ApiResponse.builder()
                 .success(true)
@@ -91,7 +91,7 @@ public class AuthenticationController {
                 .build();
     }
     @PostMapping("/verify-otp")
-    public ApiResponse<?> verifyOtp(OTPVerificationRequest request){
+    public ApiResponse<?> verifyOtp(@RequestBody OTPVerificationRequest request){
         sendMailService.verifyOtp(request);
         return ApiResponse.builder()
                 .success(true)
