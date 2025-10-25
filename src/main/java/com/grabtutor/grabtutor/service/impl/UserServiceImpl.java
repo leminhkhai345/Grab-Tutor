@@ -66,14 +66,11 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.toUser(userRequest);
         Set<Role> roles = new HashSet<>();
         if(userRequest.getRole().equalsIgnoreCase(Role.TUTOR.name())){
-            roles.add(Role.TUTOR);
-            user.setUserStatus(UserStatus.PENDING);
+            throw new AppException(ErrorCode.FORBIDDEN);
         } else if(userRequest.getRole().equalsIgnoreCase(Role.ADMIN.name())){
             roles.add(Role.ADMIN);
-            user.setActive(true);
         } else {
             roles.add(Role.USER);
-            user.setActive(true);
         }
         user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
 
@@ -171,10 +168,57 @@ public class UserServiceImpl implements UserService {
                 .items(users.stream().map(userMapper::toUserResponse).toList())
                 .build();
     }
-    @PreAuthorize("hasRole('TUTOR')")
     @Transactional
     @Override
-    public TutorInfoResponse submitInfo(TutorInfoRequest request) {
+    public TutorResponse addTutor(TutorRequest request){
+        if(userRepository.existsByEmail(request.getEmail())){
+            throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
+        }
+        User user = userMapper.toUser(request);
+        Set<Role> roles = new HashSet<>();
+        if(request.getRole().equalsIgnoreCase(Role.TUTOR.name())){
+            roles.add(Role.TUTOR);
+            user.setUserStatus(UserStatus.PENDING);
+        }
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        var balance = AccountBalance.builder()
+                .balance(0)
+                .build();
+        user.setAccountBalance(balance);
+
+        userRepository.save(user);
+
+        var info = tutorInfoMapper.toTutorInfo(request);
+        if(tutorInfoRepository.existsByNationalId(info.getNationalId()))
+            throw new AppException(ErrorCode.NATIONAL_ID_ALREADY_EXISTS);
+
+        var newRequest = VerificationRequest.builder()
+                .user(user)
+                .build();
+        verificationRequestRepository.save(newRequest);
+
+        return TutorResponse.builder()
+                .id(user.getId())
+                .fullName(user.getFullName())
+                .phoneNumber(user.getPhoneNumber())
+                .dob(user.getDob())
+                .email(user.getEmail())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .isActive(user.isActive())
+                .userStatus(user.getUserStatus().toString())
+                .nationalId(info.getNationalId())
+                .university(info.getUniversity())
+                .highestAcademicDegree(info.getHighestAcademicDegree())
+                .major(info.getMajor())
+                .build();
+    }
+
+    @Transactional
+    @Override
+    public TutorInfoResponse updateTutorInfo(TutorInfoRequest request) {
+
         var user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
@@ -183,20 +227,7 @@ public class UserServiceImpl implements UserService {
             tutorInfoMapper.updateTutorInfoFromRequest(request,existInfo);
             tutorInfoRepository.save(existInfo);
         }
-        else{
-            var info = tutorInfoMapper.toTutorInfo(request);
-            if(tutorInfoRepository.existsByNationalId(info.getNationalId()))
-                throw new AppException(ErrorCode.NATIONAL_ID_ALREADY_EXISTS);
-            tutorInfoRepository.save(info);
-        }
-
-        if(user.getRole() ==  Role.TUTOR && user.isActive())
-            throw new AppException(ErrorCode.ACCOUNT_ALREADY_VERIFIED);
-        var newRequest = VerificationRequest.builder()
-                .user(user)
-                .build();
-        verificationRequestRepository.save(newRequest);
-
+        else throw new AppException(ErrorCode.UNCATEGORIZED);
         return TutorInfoResponse.builder()
                 .userId(request.getUserId())
                 .nationalId(request.getNationalId())

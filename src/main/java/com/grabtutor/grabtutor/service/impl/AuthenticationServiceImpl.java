@@ -83,7 +83,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .findByEmail(request.getEmail())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         if(!user.isActive()){
-            throw new AppException(ErrorCode.USER_NOT_VERIFIED);
+            throw new AppException(ErrorCode.USER_BLOCKED);
         }
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
 
