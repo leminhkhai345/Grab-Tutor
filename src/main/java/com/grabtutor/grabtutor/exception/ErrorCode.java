@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatusCode;
 @Getter
 public enum ErrorCode {
     USER_NOT_FOUND(1001, "User not found", HttpStatus.NOT_FOUND),
+    USER_NOT_VERIFIED(1007, "User not verified", HttpStatus.FORBIDDEN),
     USERNAME_ALREADY_EXISTS(1002, "Username already exists", HttpStatus.CONFLICT),
     EMAIL_ALREADY_EXISTS(1003, "Email already exists", HttpStatus.CONFLICT),
     UNAUTHENTICATED(1004, "Unauthenticated", HttpStatus.UNAUTHORIZED),
@@ -44,6 +45,7 @@ public enum ErrorCode {
     USER_ALREADY_ENROLLED_COURSE(11003, "User already enrolled in this course", HttpStatus.CONFLICT),
 
     VERIFICATION_REQUEST_NOT_FOUND(12001, "Verification request not found", HttpStatus.NOT_FOUND),
+    INVALID_EMAIL_OR_PASSWORD(12002, "Invalid email or password", HttpStatus.UNAUTHORIZED),
 
     TUTOR_BID_NOT_FOUND(13001, "Tutor bid not found", HttpStatus.NOT_FOUND),
     FORBIDDEN(88888, "You do not have permission to access this resource", HttpStatus.FORBIDDEN),

@@ -16,13 +16,14 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CourseResponse {
+    String id;
     String name;
     String description;
     double price;
     String imageUrl;
     boolean isPublished;
     int totalLessons;
-    Set<Subject> subjects;
-    User tutor;
-    List<Lesson> lessons;
+    List<String> subjectIds;
+    String tutorId;
+    List<String> lessonIds;
 }

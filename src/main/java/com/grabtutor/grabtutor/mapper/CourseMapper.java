@@ -9,7 +9,23 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface CourseMapper {
     Course toCourse(CourseRequest request);
-    CourseResponse toCourseResponse(Course course);
+    default CourseResponse toCourseResponse(Course course){
+        if(course == null) {
+            return null;
+        }
+        return CourseResponse.builder()
+                .id(course.getId())
+                .name(course.getName())
+                .description(course.getDescription())
+                .price(course.getPrice())
+                .imageUrl(course.getImageUrl())
+                .isPublished(course.isPublished())
+                .totalLessons(course.getLessons() != null ? course.getLessons().size() : 0)
+                .subjectIds(course.getSubjects() != null ? course.getSubjects().stream().map(subject -> subject.getId()).toList() : null)
+                .tutorId(course.getTutor() != null ? course.getTutor().getId() : null)
+                .lessonIds(course.getLessons() != null ? course.getLessons().stream().map(lesson -> lesson.getId()).toList() : null)
+                .build();
+    }
     default void updateCourseFromRequest(CourseRequest request, @MappingTarget Course course){
         if(request.getName() != null) {
             course.setName(request.getName());
