@@ -21,6 +21,8 @@ public class ChatRoom extends BaseEntity{
     @Builder.Default
     boolean isSubmitted = false;
     @Builder.Default
+    boolean chatEnabled = true;
+    @Builder.Default
     RoomStatus status = RoomStatus.IN_PROGRESS;
     @OneToOne(mappedBy = "chatRoom")
     Post post;

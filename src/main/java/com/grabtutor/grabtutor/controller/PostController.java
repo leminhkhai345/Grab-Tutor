@@ -6,6 +6,8 @@ import com.grabtutor.grabtutor.dto.request.PostRequest;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
 import com.grabtutor.grabtutor.service.FileUploadService;
 import com.grabtutor.grabtutor.service.PostService;
+import com.grabtutor.grabtutor.service.TutorBidService;
+import com.grabtutor.grabtutor.service.impl.TutorBidServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,7 @@ import java.io.IOException;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 public class PostController {
     PostService postService;
+    TutorBidServiceImpl tutorBidService;
     ObjectMapper objectMapper;
     FileUploadService fileUploadService;
 
@@ -96,9 +99,9 @@ public class PostController {
                 .data(postService.getAllPosts(pageNo, pageSize))
                 .build();
         }
-    @PutMapping("/accept")
-    public ApiResponse<?> acceptPost(AcceptPostRequest request){
-        postService.acceptPost(request);
+    @PutMapping("/acceptTutor/{tutorBidId}")
+    public ApiResponse<?> acceptPost(@PathVariable String tutorBidId){
+        tutorBidService.acceptTutor(tutorBidId);
         return ApiResponse.builder()
                 .message("accept post successfully")
                 .build();

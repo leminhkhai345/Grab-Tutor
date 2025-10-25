@@ -1,8 +1,10 @@
 package com.grabtutor.grabtutor.service.impl;
 
 import com.grabtutor.grabtutor.dto.request.LoadMessagesRequest;
+import com.grabtutor.grabtutor.dto.request.MessageRequest;
 import com.grabtutor.grabtutor.dto.response.LoadChatRoomsResponse;
 import com.grabtutor.grabtutor.dto.response.LoadMessagesResponse;
+import com.grabtutor.grabtutor.dto.response.MessageResponse;
 import com.grabtutor.grabtutor.entity.User;
 import com.grabtutor.grabtutor.enums.RoomStatus;
 import com.grabtutor.grabtutor.enums.TransactionStatus;
@@ -33,6 +35,15 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     UserTransactionRepository userTransactionRepository;
     AccountBalanceRepository  accountBalanceRepository;
 
+    @PreAuthorize("hasRole('USER') or hasRole('TUTOR')")
+    @Override
+    public MessageResponse saveMessage(MessageRequest request) {
+        var message = messageMapper.ToMessage(request);
+        message.setChatRoom(chatRoomRepository.findById(request.getRoomId()).orElseThrow(()-> new AppException(ErrorCode.CHAT_ROOM_NOT_FOUND)));
+        message.setUser(userRepository.findById(request.getUserId()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)));
+        messageRepository.save(message);
+        return messageMapper.ToMessageResponse(message);
+    }
     @Override
     public LoadMessagesResponse loadMessages(LoadMessagesRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -65,10 +76,18 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
-    public LoadChatRoomsResponse loadRooms() {
+    public LoadChatRoomsResponse loadMyRooms() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) auth.getPrincipal();
-        String userId = jwt.getClaim("userId");
+        String userId = jwt.getClaimAsString("userId");
+        var user = userRepository.findById(userId).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
+        return LoadChatRoomsResponse.builder()
+                .rooms(user.getChatRooms().stream().map(chatRoomMapper::toChatRoomResponse).toList())
+                .build();
+    }
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public LoadChatRoomsResponse loadRooms(String userId) {
         var user = userRepository.findById(userId).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
         return LoadChatRoomsResponse.builder()
                 .rooms(user.getChatRooms().stream().map(chatRoomMapper::toChatRoomResponse).toList())
@@ -90,6 +109,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         var room = chatRoomRepository.findById(roomId)
                 .orElseThrow(()-> new AppException(ErrorCode.CHAT_ROOM_NOT_FOUND));
         room.setStatus(RoomStatus.CONFIRMED);
+        room.setChatEnabled(false);
         chatRoomRepository.save(room);
 
         var transaction = room.getPost().getUserTransaction();
@@ -105,6 +125,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         var room = chatRoomRepository.findById(roomId)
                 .orElseThrow(()-> new AppException(ErrorCode.CHAT_ROOM_NOT_FOUND));
         room.setStatus(RoomStatus.DISPUTED);
+        room.setChatEnabled(false);
         chatRoomRepository.save(room);
         //ADMIN thực hiện kiểm tra tin nhắn
     }

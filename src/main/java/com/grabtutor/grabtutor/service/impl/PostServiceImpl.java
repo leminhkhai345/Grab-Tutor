@@ -45,12 +45,7 @@ public class PostServiceImpl implements PostService {
     PostMapper postMapper;
     UserRepository userRepository;
     SubjectRepository subjectRepository;
-    ChatRoomRepository chatRoomRepository;
-    AccountBalanceRepository  accountBalanceRepository;
     RedisTemplate<String, String> redisTemplate;
-
-    double acceptFee = 100;
-
 
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Override
@@ -73,11 +68,12 @@ public class PostServiceImpl implements PostService {
         post.setSubject(subject);
 
         //Add vào queue -> tự động xóa bài sau 6 giờ
-//        redisTemplate.opsForZSet().add("post:expire", post.getId(),
-//                post.getCreatedAt()
-//                    .atZone(ZoneId.systemDefault())
-//                    .toInstant()
-//                    .toEpochMilli() + 3600000*6);
+        //Lúc này worker sẽ phải gửi thông báo cho user -> post đã được gỡ rồi
+        redisTemplate.opsForZSet().add("post:expire", post.getId(),
+                post.getCreatedAt()
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant()
+                    .toEpochMilli() + 3600000*6);
         return postMapper.toPostResponse(postRepository.save(post));
     }
 
@@ -163,44 +159,6 @@ public class PostServiceImpl implements PostService {
                 .totalPages(posts.getTotalPages())
                 .items(posts.stream().map(postMapper::toPostResponse).toList())
                 .build();
-
-    }
-    //Tutor accept post -> bị trừ phí + add vào room chat
-    @Override
-    @PreAuthorize("hasRole('TUTOR')")
-    @Transactional
-    public void acceptPost(AcceptPostRequest request) {
-        var post  = postRepository.findById(request.getPostId()).orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXIST));
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Jwt jwt = (Jwt) auth.getPrincipal();
-        String userId = jwt.getClaim("userId");
-        var tutor = userRepository.findById(userId).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
-        var postUser = post.getUser();
-        List<User> users = List.of(tutor,  postUser);
-
-        var tutorAccountBalance = accountBalanceRepository.findByUserId(userId)
-                .orElseThrow(()-> new AppException(ErrorCode.ACCOUNT_BALANCE_NOT_FOUND));
-        if(tutorAccountBalance.getBalance() < acceptFee) {
-            throw new AppException(ErrorCode.ACCOUNT_DONT_HAVE_ENOUGH_MONEY);
-        }
-        else {
-            tutorAccountBalance.setBalance(tutorAccountBalance.getBalance() - acceptFee);
-            accountBalanceRepository.save(tutorAccountBalance);
-        }
-        var newRoom = ChatRoom.builder()
-                .users(users)
-                .build();
-        chatRoomRepository.save(newRoom);
-
-        post.setAccepted(true);
-        postRepository.save(post);
-
-//        redisTemplate.opsForZSet().add("chatroom:submit", newRoom.getId(),
-//                newRoom.getCreatedAt()
-//                .atZone(ZoneId.systemDefault())
-//                .toInstant()
-//                .toEpochMilli() + 60000*30);
 
     }
 
