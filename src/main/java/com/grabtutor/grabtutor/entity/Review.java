@@ -18,8 +18,12 @@ public class Review extends BaseEntity {
     int stars;
     String description;
     @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
-    User user;
+    @JoinColumn(name = "senderId", nullable = false)
+    User sender;
+
+    @ManyToOne
+    @JoinColumn(name = "receiverId", nullable = false)
+    User receiver;
 
     @ManyToOne
     @JoinColumn(name = "postId", nullable = false)

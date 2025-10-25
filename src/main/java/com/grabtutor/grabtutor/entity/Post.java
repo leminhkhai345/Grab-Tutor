@@ -30,6 +30,8 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     User user;
 
+
+
     @ManyToOne
     @JoinColumn(name = "subject_id", nullable = false)
     Subject subject;

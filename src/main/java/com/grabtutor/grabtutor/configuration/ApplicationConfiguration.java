@@ -43,6 +43,7 @@ public class ApplicationConfiguration {
                         .password(passwordEncoder.encode(ADMIN_PASSWORD))
                         .isActive(true)
                         .role(Role.ADMIN)
+                        .isActive(true)
                         .build();
                 userRepository.save(user);
                 log.warn("admin user has been created with default password: admin, please change it");

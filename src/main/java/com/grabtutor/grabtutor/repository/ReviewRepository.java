@@ -8,5 +8,5 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<Review, String> {
     Review findByIdAndIsDeletedFalse(String id);
     List<Review> findByPostIdAndIsDeletedFalse(String postId);
-    List<Review> findByUserIdAndIsDeletedFalse(String userId);
+    List<Review> findBySenderIdAndIsDeletedFalse(String senderId);
 }

@@ -1,7 +1,6 @@
 package com.grabtutor.grabtutor.controller;
 
 import com.grabtutor.grabtutor.dto.request.MessageRequest;
-import com.grabtutor.grabtutor.entity.ChatRoom;
 import com.grabtutor.grabtutor.mapper.MessageMapper;
 import com.grabtutor.grabtutor.service.impl.ChatRoomServiceImpl;
 import lombok.RequiredArgsConstructor;

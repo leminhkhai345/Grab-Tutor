@@ -7,10 +7,9 @@ import com.grabtutor.grabtutor.dto.response.IntrospectResponse;
 import com.grabtutor.grabtutor.enums.OtpType;
 import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
-import com.grabtutor.grabtutor.service.impl.AuthenticationServiceImpl;
-import com.grabtutor.grabtutor.service.impl.MailSenderServiceImpl;
+import com.grabtutor.grabtutor.service.AuthenticationService;
+import com.grabtutor.grabtutor.service.MailSenderService;
 import com.nimbusds.jose.JOSEException;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +26,8 @@ import java.text.ParseException;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationController {
-    AuthenticationServiceImpl authenticationService;
-    MailSenderServiceImpl sendMailService;
+    AuthenticationService authenticationService;
+    MailSenderService sendMailService;
 
     @PostMapping("/login")
     ApiResponse<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
@@ -51,7 +50,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
-    ApiResponse<Void> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
+    ApiResponse<Void> logout(@RequestBody LogoutRequest request){
         authenticationService.logout(request);
         return ApiResponse.<Void>builder().build();
     }

@@ -45,6 +45,12 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<Report> reportsReceived;
 
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<Review> reviewSent;
+
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<Review> reviewReceived;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "tutorInfoId")
     TutorInfo tutorInfo;

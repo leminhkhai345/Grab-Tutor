@@ -1,12 +1,10 @@
 package com.grabtutor.grabtutor.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.grabtutor.grabtutor.dto.request.AcceptPostRequest;
 import com.grabtutor.grabtutor.dto.request.PostRequest;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
 import com.grabtutor.grabtutor.service.FileUploadService;
 import com.grabtutor.grabtutor.service.PostService;
-import com.grabtutor.grabtutor.service.TutorBidService;
 import com.grabtutor.grabtutor.service.impl.TutorBidServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
