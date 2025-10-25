@@ -28,7 +28,7 @@ public class TutorBid extends BaseEntity{
     @JoinColumn(name = "senderId")
     User user;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "postId")
     Post post;
 }

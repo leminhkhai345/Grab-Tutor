@@ -44,7 +44,6 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<Report> reportsReceived;
-    
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "tutorInfoId")
@@ -72,6 +71,6 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<VirtualTransaction> virtualTransactions;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade =  CascadeType.ALL, fetch = FetchType.LAZY)
     List<TutorBid> tutorBids;
 }

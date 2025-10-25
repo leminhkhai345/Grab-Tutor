@@ -16,6 +16,5 @@ public interface PostService {
     void deletePost(String postId);
     List<PostResponse> getPostByUserId(String userId);
     PageResponse<?> getAllPosts(int pageNo, int pageSize, String... sorts);
-    void acceptPost(AcceptPostRequest request);
 
 }
