@@ -238,6 +238,7 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public PageResponse<?> getRequests(int pageNo, int pageSize, String... sorts) {
         List<Sort.Order> orders = new ArrayList<>();

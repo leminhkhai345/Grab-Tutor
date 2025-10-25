@@ -22,7 +22,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/grabtutor_db
     username: root
-    password: ${DB_PASSWORD:}
+    password: ${DB_PASSWORD:123456}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -48,6 +48,6 @@ jwt:
 cloudinary:
   cloud_name: dk3pmg0tr
   api_key: 746891315239322
-  api_secret: ${CLOUDINARY_API_SECRET:}
+  api_secret: ${CLOUDINARY_API_SECRET:bRSqau7RN7Ji8TUo_nYilGk7pK0}
 
 

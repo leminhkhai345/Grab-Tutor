@@ -1,5 +1,6 @@
 package com.grabtutor.grabtutor.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -39,6 +40,7 @@ public class Course extends BaseEntity {
     User tutor;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+
     List<Lesson> lessons;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)

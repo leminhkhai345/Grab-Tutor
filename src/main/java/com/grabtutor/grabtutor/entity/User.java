@@ -50,8 +50,7 @@ public class User extends BaseEntity {
     @JoinColumn(name = "tutorInfoId")
     TutorInfo tutorInfo;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "accountBalanceId")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     AccountBalance accountBalance;
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
