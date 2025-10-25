@@ -1,6 +1,7 @@
 package com.grabtutor.grabtutor.mapper;
 
 
+import com.grabtutor.grabtutor.dto.request.TutorRequest;
 import com.grabtutor.grabtutor.dto.request.UserRequest;
 import com.grabtutor.grabtutor.dto.response.UserResponse;
 import com.grabtutor.grabtutor.entity.User;
@@ -11,7 +12,7 @@ import org.mapstruct.MappingTarget;
 public interface UserMapper {
     User toUser(UserRequest userRequest);
     void updateUserFromRequest(UserRequest userRequest,@MappingTarget User user);
-
+    User toUser(TutorRequest tutorRequest);
     default UserResponse toUserResponse(User user){
         if ( user == null ) {
             return null;

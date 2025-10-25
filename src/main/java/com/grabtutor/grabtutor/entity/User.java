@@ -32,7 +32,7 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     Role role;
     @Builder.Default
-    boolean isActive = false;
+    boolean isActive = true;
     @Enumerated(EnumType.STRING)
     @Builder.Default
     UserStatus userStatus = UserStatus.NORMAL;

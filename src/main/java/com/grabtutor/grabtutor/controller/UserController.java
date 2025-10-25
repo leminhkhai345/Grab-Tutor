@@ -3,6 +3,7 @@ package com.grabtutor.grabtutor.controller;
 import com.grabtutor.grabtutor.dto.request.*;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
 import com.grabtutor.grabtutor.service.UserService;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -82,11 +83,12 @@ public class UserController {
                 .data(userService.changeActive(userId, active))
                 .build();
     }
-    @PostMapping("/submitInfo")
-    public ApiResponse<?> submitInfo(@RequestBody @Valid TutorInfoRequest request){
+    @PostMapping("/addTutor")
+    public ApiResponse<?> addTutor(@RequestBody @Valid TutorRequest request){
+
         return ApiResponse.builder()
                 .success(true)
-                .data(userService.submitInfo(request))
+                .data(userService.addTutor(request))
                 .message("Tutor info added and verification request sent successfully")
                 .build();
     }
