@@ -28,19 +28,20 @@ import org.springframework.web.filter.CorsFilter;
 @RequiredArgsConstructor
 public class SecurityConfiguration {
     private final String[] PUBLIC_ENDPOINTS = {
-            "/users", "/users/sendmail","/auth/login", "/auth/introspect", "/auth/logout", "/auth/refresh",
-            "/upload"
+            "/users", "/users/sendmail", "/upload","/auth/**"
     };
     private CustomJwtDecoder customJwtDecoder;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.cors(Customizer.withDefaults()).authorizeHttpRequests(request ->
-                request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+                request
+                        .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/users")
                         .hasAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated());
+//                        .requestMatchers("/**").permitAll());
 
         httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
                         .decoder(customJwtDecoder)

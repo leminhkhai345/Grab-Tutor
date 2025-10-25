@@ -202,6 +202,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
         userRepository.save(user);
     }
+    //Thiếu kiểm tra confirmed password với new password
 
     @Override
     public void changeForgotPassword(ChangeForgotPasswordRequest request) {
@@ -214,6 +215,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new AppException(ErrorCode.SESSION_END);
         }
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 
     @Override
