@@ -21,7 +21,6 @@ import java.util.List;
 @AllArgsConstructor
 public class User extends BaseEntity {
 
-
     @Column(unique = true)
     String email;
     @Column(nullable = false)
@@ -32,7 +31,7 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     Role role;
     @Builder.Default
-    boolean isActive = false;
+    boolean isActive = true;
     @Enumerated(EnumType.STRING)
     @Builder.Default
     UserStatus userStatus = UserStatus.NORMAL;
@@ -55,9 +54,9 @@ public class User extends BaseEntity {
     @JoinColumn(name = "tutorInfoId")
     TutorInfo tutorInfo;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "accountBalanceId")
     AccountBalance accountBalance;
-
 
     @ManyToMany
     @JoinTable(
@@ -73,6 +72,6 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<VirtualTransaction> virtualTransactions;
 
-    @OneToMany(mappedBy = "user", cascade =  CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade =  CascadeType.ALL)
     List<TutorBid> tutorBids;
 }
