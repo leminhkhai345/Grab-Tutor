@@ -20,11 +20,10 @@ public interface UserService {
     PageResponse<?> getAllUsers(int pageNo, int pageSize, String... sortBy);
 
     UserResponse getMyInfo();
-    public TutorResponse addTutor(TutorRequest request);
+
+    TutorResponse addTutor(TutorRequest request);
 
     TutorInfoResponse updateTutorInfo(TutorInfoRequest tutorInfoRequest);
-
-//    AccountVerificationResponse submitRequest(AccountVerificationRequest request);
 
     ApproveResponse approveRequest(ApproveRequest request);
 
