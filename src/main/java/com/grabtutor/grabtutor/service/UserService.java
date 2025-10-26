@@ -22,9 +22,9 @@ public interface UserService {
     UserResponse getMyInfo();
     TutorResponse addTutor(TutorRequest request);
 
-    TutorInfoResponse updateTutorInfo(TutorInfoRequest tutorInfoRequest);
+    TutorResponse addTutor(TutorRequest request);
 
-//    AccountVerificationResponse submitRequest(AccountVerificationRequest request);
+    TutorInfoResponse updateTutorInfo(TutorInfoRequest tutorInfoRequest);
 
     ApproveResponse approveRequest(ApproveRequest request);
 
