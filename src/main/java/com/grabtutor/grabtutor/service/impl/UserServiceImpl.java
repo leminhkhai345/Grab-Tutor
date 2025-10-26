@@ -57,6 +57,7 @@ public class UserServiceImpl implements UserService {
     JavaMailSender mailSender;
     VirtualTransactionMapper virtualTransactionMapper;
     VirtualTransactionRepository virtualTransactionRepository;
+    private final AccountBalanceRepository accountBalanceRepository;
 
     @Override
     public UserResponse addUser(UserRequest userRequest){
@@ -167,9 +168,9 @@ public class UserServiceImpl implements UserService {
             throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
         User user = userMapper.toUser(request);
-        if(request.getRole().equalsIgnoreCase(Role.TUTOR.name())){
-            user.setUserStatus(UserStatus.PENDING);
-        }
+        user.setRole(Role.TUTOR);
+        user.setUserStatus(UserStatus.PENDING);
+
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         var balance = AccountBalance.builder()
@@ -177,11 +178,12 @@ public class UserServiceImpl implements UserService {
                 .build();
         user.setAccountBalance(balance);
 
-        userRepository.save(user);
-
         var info = tutorInfoMapper.toTutorInfo(request);
         if(tutorInfoRepository.existsByNationalId(info.getNationalId()))
             throw new AppException(ErrorCode.NATIONAL_ID_ALREADY_EXISTS);
+        user.setTutorInfo(info);
+
+        userRepository.save(user);
 
         var newRequest = VerificationRequest.builder()
                 .user(user)

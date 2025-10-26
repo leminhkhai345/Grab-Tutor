@@ -33,8 +33,6 @@ public class TutorRequest {
     @Size(min = 10, max = 10, message = "phone number must be 10 characters")
     String phoneNumber;
 
-    String role;
-
     @NotBlank(message = "national id must not be blank")
     @Size(min = 12, max = 12, message = "need exactly 12 digits")
     String nationalId;

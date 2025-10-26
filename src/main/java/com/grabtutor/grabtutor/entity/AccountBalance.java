@@ -21,7 +21,6 @@ public class AccountBalance extends BaseEntity{
     @OneToMany(mappedBy = "accountBalance", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<Transaction> transactions;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
+    @OneToOne(mappedBy = "accountBalance", cascade = CascadeType.ALL)
     User user;
 }

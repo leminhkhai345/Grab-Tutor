@@ -22,7 +22,7 @@ public class Transaction extends BaseEntity {
     PaymentMethod paymentMethod = PaymentMethod.VN_PAY;
     //Đây là tiền thật
     long amount;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "accountBalanceId", nullable = false)
     AccountBalance accountBalance;
 }

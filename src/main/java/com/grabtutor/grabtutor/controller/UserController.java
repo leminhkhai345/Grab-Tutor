@@ -2,6 +2,7 @@ package com.grabtutor.grabtutor.controller;
 
 import com.grabtutor.grabtutor.dto.request.*;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
+import com.grabtutor.grabtutor.entity.TutorInfo;
 import com.grabtutor.grabtutor.service.UserService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -89,9 +90,19 @@ public class UserController {
         return ApiResponse.builder()
                 .success(true)
                 .data(userService.addTutor(request))
-                .message("Tutor info added and verification request sent successfully")
+                .message("Tutor added and verification request sent successfully")
                 .build();
     }
+    @PutMapping("/updateTutorInfo")
+    public ApiResponse<?> updateTutorInfo(@RequestBody @Valid TutorInfoRequest request){
+
+        return ApiResponse.builder()
+                .success(true)
+                .data(userService.updateTutorInfo(request))
+                .message("Tutor info updated successfully")
+                .build();
+    }
+
     @GetMapping("/requests")
     public ApiResponse<?> getAllRequests(@RequestParam(defaultValue = "0") int pageNo,
                                          @RequestParam(defaultValue = "10") int pageSize, String... sorts){
@@ -101,6 +112,7 @@ public class UserController {
                 .message("Get all requests successfully")
                 .build();
     }
+
     @PostMapping("/approve")
     public ApiResponse<?> approveRequest(@RequestBody ApproveRequest request){
         return ApiResponse.builder()
