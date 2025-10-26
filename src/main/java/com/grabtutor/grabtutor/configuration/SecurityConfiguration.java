@@ -28,7 +28,7 @@ import org.springframework.web.filter.CorsFilter;
 @RequiredArgsConstructor
 public class SecurityConfiguration {
     private final String[] PUBLIC_ENDPOINTS = {
-            "/users", "/users/sendmail", "/upload","/auth/**"
+            "/users", "/users/sendmail", "/upload","/auth/**", "/users/addTutor"
     };
     private CustomJwtDecoder customJwtDecoder;
 

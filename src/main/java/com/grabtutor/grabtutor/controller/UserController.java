@@ -102,7 +102,7 @@ public class UserController {
                 .build();
     }
     @PostMapping("/approve")
-    public ApiResponse<?> approveRequest(ApproveRequest request){
+    public ApiResponse<?> approveRequest(@RequestBody ApproveRequest request){
         return ApiResponse.builder()
                 .success(true)
                 .data(userService.approveRequest(request))
@@ -110,7 +110,7 @@ public class UserController {
                 .build();
     }
     @PostMapping("/reject")
-    public ApiResponse<?> rejectRequest(RejectRequest request){
+    public ApiResponse<?> rejectRequest(@RequestBody RejectRequest request){
         return ApiResponse.builder()
                 .success(true)
                 .data(userService.rejectRequest(request))

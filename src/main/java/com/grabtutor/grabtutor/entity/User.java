@@ -32,7 +32,7 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     Role role;
     @Builder.Default
-    boolean isActive = true;
+    boolean isActive = false;
     @Enumerated(EnumType.STRING)
     @Builder.Default
     UserStatus userStatus = UserStatus.NORMAL;
@@ -58,9 +58,6 @@ public class User extends BaseEntity {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     AccountBalance accountBalance;
 
-    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
-    @Enumerated(EnumType.STRING)
-    Set<Role> roles;
 
     @ManyToMany
     @JoinTable(
