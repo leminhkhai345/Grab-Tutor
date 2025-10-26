@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -45,7 +46,7 @@ public class CourseServiceImpl implements CourseService {
     VirtualTransactionRepository virtualTransactionRepository;
     VirtualTransactionMapper virtualTransactionMapper;
 
-
+    @PreAuthorize("hasRole('TUTOR')")
     @Override
     public CourseResponse createCourse(CourseRequest request, Set<String> subjectIds) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -63,7 +64,7 @@ public class CourseServiceImpl implements CourseService {
         return courseMapper.toCourseResponse(courseRepository.save(course));
     }
 
-
+    @PreAuthorize("hasRole('TUTOR')")
     @Override
     public CourseResponse updateCourse(String courseId, CourseRequest request,
                                        Set<String> subjectIds) {
@@ -86,6 +87,7 @@ public class CourseServiceImpl implements CourseService {
         }
         return courseMapper.toCourseResponse(courseRepository.save(course));
     }
+
 
     @Override
     public CourseResponse getCourseById(String courseId) {
