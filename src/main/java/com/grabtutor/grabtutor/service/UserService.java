@@ -20,6 +20,7 @@ public interface UserService {
     PageResponse<?> getAllUsers(int pageNo, int pageSize, String... sortBy);
 
     UserResponse getMyInfo();
+    TutorResponse addTutor(TutorRequest request);
 
     TutorResponse addTutor(TutorRequest request);
 

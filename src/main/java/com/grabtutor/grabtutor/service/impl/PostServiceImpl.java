@@ -1,6 +1,5 @@
 package com.grabtutor.grabtutor.service.impl;
 
-import com.grabtutor.grabtutor.dto.request.AcceptPostRequest;
 import com.grabtutor.grabtutor.dto.request.PostRequest;
 import com.grabtutor.grabtutor.dto.response.PageResponse;
 import com.grabtutor.grabtutor.dto.response.PostResponse;
@@ -8,7 +7,6 @@ import com.grabtutor.grabtutor.entity.*;
 import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.PostMapper;
-import com.grabtutor.grabtutor.mapper.TutorBidMapper;
 import com.grabtutor.grabtutor.repository.*;
 import com.grabtutor.grabtutor.service.PostService;
 import jakarta.transaction.Transactional;
@@ -27,12 +25,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,8 +45,7 @@ public class PostServiceImpl implements PostService {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @Override
     @Transactional
-    public PostResponse addPost(String subjectId, PostRequest request)
-            throws IOException {
+    public PostResponse addPost(String subjectId, PostRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) auth.getPrincipal();
         String userId = jwt.getClaimAsString("userId");
@@ -66,7 +60,7 @@ public class PostServiceImpl implements PostService {
                 .findById(subjectId).orElseThrow(() -> new AppException(ErrorCode.SUBJECT_NOT_FOUND));
 
         post.setSubject(subject);
-
+        postRepository.save(post);
         //Add vào queue -> tự động xóa bài sau 6 giờ
         //Lúc này worker sẽ phải gửi thông báo cho user -> post đã được gỡ rồi
         redisTemplate.opsForZSet().add("post:expire", post.getId(),
@@ -74,7 +68,7 @@ public class PostServiceImpl implements PostService {
                     .atZone(ZoneId.systemDefault())
                     .toInstant()
                     .toEpochMilli() + 3600000*6);
-        return postMapper.toPostResponse(postRepository.save(post));
+        return postMapper.toPostResponse(post);
     }
 
     @Override
@@ -90,7 +84,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostResponse updatePost(String postId, PostRequest postRequest,
-                                   String subjectId) throws IOException {
+                                   String subjectId){
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) auth.getPrincipal();

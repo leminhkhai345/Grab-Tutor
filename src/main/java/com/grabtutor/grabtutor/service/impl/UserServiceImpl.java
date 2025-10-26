@@ -64,14 +64,6 @@ public class UserServiceImpl implements UserService {
             throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
         User user = userMapper.toUser(userRequest);
-        Set<Role> roles = new HashSet<>();
-        if(userRequest.getRole().equalsIgnoreCase(Role.TUTOR.name())){
-            throw new AppException(ErrorCode.FORBIDDEN);
-        } else if(userRequest.getRole().equalsIgnoreCase(Role.ADMIN.name())){
-            roles.add(Role.ADMIN);
-        } else {
-            roles.add(Role.USER);
-        }
         user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
 
         var balance = AccountBalance.builder()
@@ -175,9 +167,7 @@ public class UserServiceImpl implements UserService {
             throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
         User user = userMapper.toUser(request);
-        Set<Role> roles = new HashSet<>();
         if(request.getRole().equalsIgnoreCase(Role.TUTOR.name())){
-            roles.add(Role.TUTOR);
             user.setUserStatus(UserStatus.PENDING);
         }
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -204,6 +194,7 @@ public class UserServiceImpl implements UserService {
                 .phoneNumber(user.getPhoneNumber())
                 .dob(user.getDob())
                 .email(user.getEmail())
+                .role(user.getRole())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .isActive(user.isActive())

@@ -1,5 +1,6 @@
 package com.grabtutor.grabtutor.dto.response;
 
+import com.grabtutor.grabtutor.enums.Role;
 import com.grabtutor.grabtutor.enums.UserStatus;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +22,7 @@ public class TutorResponse {
     String userStatus;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
-    String role;
+    Role role;
     String nationalId;
     String university;
     String highestAcademicDegree;
