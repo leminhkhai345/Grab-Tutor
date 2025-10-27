@@ -18,9 +18,6 @@ import java.util.List;
 public class AccountBalance extends BaseEntity{
     double balance = 0;
 
-    @OneToMany(mappedBy = "accountBalance", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<Transaction> transactions;
-
     @OneToOne(mappedBy = "accountBalance", cascade = CascadeType.ALL)
     User user;
 }

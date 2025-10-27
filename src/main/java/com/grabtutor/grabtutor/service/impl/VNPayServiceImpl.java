@@ -1,12 +1,9 @@
 package com.grabtutor.grabtutor.service.impl;
 
 import com.grabtutor.grabtutor.dto.response.DepositResponse;
-import com.grabtutor.grabtutor.entity.Transaction;
-import com.grabtutor.grabtutor.enums.PaymentMethod;
 import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.repository.AccountBalanceRepository;
-import com.grabtutor.grabtutor.repository.TransactionRepository;
 import com.grabtutor.grabtutor.repository.UserRepository;
 import com.grabtutor.grabtutor.service.VNPayService;
 import com.grabtutor.grabtutor.service.config.VNPayConfig;
@@ -30,8 +27,7 @@ import java.util.*;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class VNPayServiceImpl implements VNPayService {
-
-    TransactionRepository transactionRepository;
+    
     AccountBalanceRepository accountBalanceRepository;
     UserRepository userRepository;
     double addFundRate = 0.1;
@@ -145,13 +141,13 @@ public class VNPayServiceImpl implements VNPayService {
             var addAmount = Double.parseDouble(totalAmount)*addFundRate;
             accountBalance.setBalance(accountBalance.getBalance() + addAmount);
 
-            var transaction = Transaction.builder()
-                    .transactionNo(transactionId)
-                    .paymentMethod(PaymentMethod.VN_PAY)
-                    .amount(Long.parseLong(totalAmount))
-                    .accountBalance(accountBalance)
-                    .build();
-            transactionRepository.save(transaction);
+//            var transaction = Transaction.builder()
+//                    .transactionNo(transactionId)
+//                    .paymentMethod(PaymentMethod.VN_PAY)
+//                    .amount(Long.parseLong(totalAmount))
+//                    .accountBalance(accountBalance)
+//                    .build();
+//            transactionRepository.save(transaction);
         }
         return DepositResponse.builder()
                 .transactionNo(transactionId)
