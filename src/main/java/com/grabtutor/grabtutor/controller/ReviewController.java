@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class ReviewController {
     ReviewService reviewService;
 
-    @PostMapping("/post/{postId}/")
+    @PostMapping("/post/{postId}")
     public ApiResponse<?> createReview(@PathVariable String postId,
                                        @RequestBody @Valid ReviewRequest request){
         return  ApiResponse.builder()
@@ -65,6 +65,13 @@ public class ReviewController {
         return ApiResponse.builder()
                 .message("Reviews fetched successfully")
                 .data(reviewService.getReviewsByUserId(userId))
+                .build();
+    }
+    @GetMapping("/me")
+    public ApiResponse<?> getMyReviews() {
+        return ApiResponse.builder()
+                .message("My reviews fetched successfully")
+                .data(reviewService.getMyReviews())
                 .build();
     }
 }

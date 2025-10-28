@@ -18,7 +18,8 @@ public class ReviewResponse {
     boolean isDeleted;
     int stars;
     String description;
-    String userId;
-    Post post;
+    String senderId;
+    String receiverId;
+    String postId;
 
 }

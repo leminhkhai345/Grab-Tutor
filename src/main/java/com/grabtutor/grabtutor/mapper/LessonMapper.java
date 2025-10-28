@@ -9,7 +9,17 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface LessonMapper {
     Lesson toLesson(LessonRequest lessonRequest);
-    LessonResponse toLessonResponse(Lesson lesson);
+    default LessonResponse toLessonResponse(Lesson lesson){
+        return LessonResponse.builder()
+                .lessonNumber(lesson.getLessonNumber())
+                .title(lesson.getTitle())
+                .content(lesson.getContent())
+                .videoUrl(lesson.getVideoUrl())
+                .imageUrl(lesson.getImageUrl())
+                .isPublished(lesson.isPublished())
+                .courseId(lesson.getCourse().getId())
+                .build();
+    }
     default void updateLessonFromRequest(LessonRequest lessonRequest, @MappingTarget Lesson lesson){
         if (lessonRequest.getLessonNumber() != null) {
             lesson.setLessonNumber(lessonRequest.getLessonNumber());
