@@ -16,5 +16,5 @@ public class LessonResponse {
     String videoUrl;
     String imageUrl;
     boolean isPublished;
-    Course course;
+    String courseId;
 }

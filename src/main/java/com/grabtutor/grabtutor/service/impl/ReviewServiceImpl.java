@@ -15,6 +15,7 @@ import com.grabtutor.grabtutor.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -67,10 +68,16 @@ public class ReviewServiceImpl implements ReviewService{
 
     @Override
     public void deleteReview(String reviewId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String userId = jwt.getClaimAsString("userId");
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_EXIST));
         if(review.isDeleted()){
             throw new AppException(ErrorCode.REVIEW_NOT_EXIST);
+        }
+        if(!review.getSender().getId().equals(userId)){
+            throw new AppException(ErrorCode.FORBIDDEN);
         }
         review.setDeleted(true);
         reviewRepository.save(review);
@@ -86,14 +93,25 @@ public class ReviewServiceImpl implements ReviewService{
         return reviewMapper.toReviewResponse(review);
     }
 
+
     @Override
     public List<ReviewResponse> getReviewsByPostId(String postId) {
         var reviews = reviewRepository.findByPostIdAndIsDeletedFalse(postId);
         return reviews.stream().map(reviewMapper::toReviewResponse).toList();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public List<ReviewResponse> getReviewsByUserId(String userId) {
+        var reviews = reviewRepository.findBySenderIdAndIsDeletedFalse(userId);
+        return reviews.stream().map(reviewMapper::toReviewResponse).toList();
+    }
+
+    @Override
+    public List<ReviewResponse> getMyReviews() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String userId = jwt.getClaimAsString("userId");
         var reviews = reviewRepository.findBySenderIdAndIsDeletedFalse(userId);
         return reviews.stream().map(reviewMapper::toReviewResponse).toList();
     }
