@@ -10,7 +10,8 @@ public interface ReviewService {
     void deleteReview(String reviewId);
     ReviewResponse getReviewById(String reviewId);
     List<ReviewResponse> getReviewsByPostId(String postId);
-    List<ReviewResponse> getReviewsByUserId(String userId);
+    List<ReviewResponse> getReviewsBySenderId(String userId);
+    List<ReviewResponse> getReviewsByReceiverId(String userId);
     List<ReviewResponse> getMyReviews();
 
 }

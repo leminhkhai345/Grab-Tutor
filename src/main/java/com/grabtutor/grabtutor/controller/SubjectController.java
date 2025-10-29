@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class SubjectController {
     SubjectService subjectService;
 
-    @PreAuthorize("hasRole('ADMIN')")
+
     @PostMapping
     public ApiResponse<?> createSubject(@RequestBody @Valid SubjectRequest subjectRequest) {
         return ApiResponse.builder()
@@ -25,7 +25,7 @@ public class SubjectController {
                 .build();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+
     @PostMapping("{id}")
     public ApiResponse<?> updateSubject(@PathVariable String id,
                                         @RequestBody @Valid SubjectRequest subjectRequest) {

@@ -1,10 +1,9 @@
 package com.grabtutor.grabtutor.controller;
 
+import com.cloudinary.Api;
 import com.grabtutor.grabtutor.dto.request.*;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
-import com.grabtutor.grabtutor.entity.TutorInfo;
 import com.grabtutor.grabtutor.service.UserService;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -28,12 +27,11 @@ public class UserController {
                 .build();
     }
 
-    @PutMapping("/{userId}")
-    public ApiResponse<?> updateUser(@PathVariable String userId,
-                                     @RequestBody @Valid UserRequest userRequest){
+    @PutMapping()
+    public ApiResponse<?> updateUser(@RequestBody @Valid UserUpdateRequest userRequest){
         return ApiResponse.builder()
                 .message("User updated successfully")
-                .data(userService.updateUser(userId, userRequest))
+                .data(userService.updateUser(userRequest))
                 .build();
     }
 
@@ -100,6 +98,15 @@ public class UserController {
                 .success(true)
                 .data(userService.updateTutorInfo(request))
                 .message("Tutor info updated successfully")
+                .build();
+    }
+
+    @GetMapping("/tutorInfo/{userId}")
+    public ApiResponse<?> getTutorInfoByUserId(@PathVariable String userId){
+        return ApiResponse.builder()
+                .success(true)
+                .data(userService.getTutorInfoByUserId(userId))
+                .message("Get tutor info successfully")
                 .build();
     }
 

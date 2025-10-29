@@ -27,7 +27,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,9 +35,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -74,14 +71,14 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
-    @PostAuthorize("returnObject.email == authentication.name or hasRole('ADMIN')")
+
     @Override
     public UserResponse getUserById(String id){
         User user = getUser(id);
         return userMapper.toUserResponse(user);
     }
 
-    @PostAuthorize("returnObject.email == authentication.name")
+
     @Override
     public UserResponse getMyInfo(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -92,18 +89,16 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserResponse(user);
     }
 
-    @PostAuthorize("returnObject.email == authentication.name or hasRole('ADMIN')")
+
     @Override
-    public UserResponse updateUser(String id, UserRequest userRequest) {
+    public UserResponse updateUser(UserUpdateRequest userRequest) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String id = jwt.getClaimAsString("userId");
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        if (!user.getEmail().equals(userRequest.getEmail())
-                && userRepository.existsByEmail(userRequest.getEmail())) {
-            throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
-        }
         userMapper.updateUserFromRequest(userRequest, user);
-        user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
@@ -182,7 +177,7 @@ public class UserServiceImpl implements UserService {
         if(tutorInfoRepository.existsByNationalId(info.getNationalId()))
             throw new AppException(ErrorCode.NATIONAL_ID_ALREADY_EXISTS);
         user.setTutorInfo(info);
-
+        tutorInfoRepository.save(info);
         userRepository.save(user);
 
         var newRequest = VerificationRequest.builder()
@@ -220,7 +215,15 @@ public class UserServiceImpl implements UserService {
             tutorInfoMapper.updateTutorInfoFromRequest(request,existInfo);
             tutorInfoRepository.save(existInfo);
         }
-        else throw new AppException(ErrorCode.UNCATEGORIZED);
+        else {
+            var newInfo = tutorInfoMapper.toTutorInfo(request);
+            if(tutorInfoRepository.existsByNationalId(newInfo.getNationalId()))
+                throw new AppException(ErrorCode.NATIONAL_ID_ALREADY_EXISTS);
+            newInfo.setUser(user);
+            tutorInfoRepository.save(newInfo);
+            user.setTutorInfo(newInfo);
+            userRepository.save(user);
+        }
         return TutorInfoResponse.builder()
                 .userId(request.getUserId())
                 .nationalId(request.getNationalId())
@@ -229,6 +232,21 @@ public class UserServiceImpl implements UserService {
                 .major(request.getMajor())
                 .build();
     }
+
+    @Override
+    public TutorInfoResponse getTutorInfoByUserId(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        if(!user.getRole().equals(Role.TUTOR)){
+            throw new AppException(ErrorCode.USER_IS_NOT_TUTOR);
+        }
+        var info = user.getTutorInfo();
+        if(info == null){
+            throw new AppException(ErrorCode.TUTOR_INFO_NOT_FOUND);
+        }
+        return tutorInfoMapper.toTutorInfoResponse(info);
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     @Override

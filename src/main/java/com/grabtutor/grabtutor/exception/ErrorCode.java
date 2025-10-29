@@ -8,12 +8,14 @@ import org.springframework.http.HttpStatusCode;
 public enum ErrorCode {
     USER_NOT_FOUND(1001, "User not found", HttpStatus.NOT_FOUND),
     USER_BLOCKED(1007, "User blocked", HttpStatus.FORBIDDEN),
+    USER_IS_NOT_TUTOR(1010, "User is not a tutor", HttpStatus.BAD_REQUEST),
     USERNAME_ALREADY_EXISTS(1002, "Username already exists", HttpStatus.CONFLICT),
     EMAIL_ALREADY_EXISTS(1003, "Email already exists", HttpStatus.CONFLICT),
     UNAUTHENTICATED(1004, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     NATIONAL_ID_ALREADY_EXISTS(1005, "National id already exists", HttpStatus.CONFLICT),
     ACCOUNT_ALREADY_VERIFIED(1006, "Account already verified", HttpStatus.CONFLICT),
     POST_NOT_EXIST(2001, "Post does not exist", HttpStatus.NOT_FOUND),
+    TUTOR_INFO_NOT_FOUND(2002, "Tutor info not found", HttpStatus.NOT_FOUND),
 
     SUBJECT_ALREADY_EXISTS(3001, "Subject already exists", HttpStatus.CONFLICT),
     SUBJECT_NOT_FOUND(3002, "Subject not found", HttpStatus.NOT_FOUND),
@@ -29,7 +31,7 @@ public enum ErrorCode {
     OTP_USED(5003, "OTP used", HttpStatus.BAD_REQUEST),
     SESSION_END(5004, "Session ended", HttpStatus.BAD_REQUEST),
 
-
+    POST_NOT_SOLVED(6000, "Post is not solved yet", HttpStatus.BAD_REQUEST),
     REPORT_NOT_EXIST(6001, "Report does not exist", HttpStatus.NOT_FOUND),
 
     REVIEW_NOT_EXIST(7001, "Review does not exist", HttpStatus.NOT_FOUND),

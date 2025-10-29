@@ -60,13 +60,22 @@ public class ReviewController {
                 .build();
     }
 
-    @GetMapping("/user/{userId}")
-    public ApiResponse<?> getReviewsByUserId(@PathVariable String userId) {
+    @GetMapping("/sender/{senderId}")
+    public ApiResponse<?> getReviewsBySenderId(@PathVariable String senderId) {
         return ApiResponse.builder()
                 .message("Reviews fetched successfully")
-                .data(reviewService.getReviewsByUserId(userId))
+                .data(reviewService.getReviewsBySenderId(senderId))
                 .build();
     }
+
+    @GetMapping("/receiver/{receiverId}")
+    public ApiResponse<?> getReviewsByReceiverId(@PathVariable String receiverId) {
+        return ApiResponse.builder()
+                .message("Reviews fetched successfully")
+                .data(reviewService.getReviewsByReceiverId(receiverId))
+                .build();
+    }
+
     @GetMapping("/me")
     public ApiResponse<?> getMyReviews() {
         return ApiResponse.builder()

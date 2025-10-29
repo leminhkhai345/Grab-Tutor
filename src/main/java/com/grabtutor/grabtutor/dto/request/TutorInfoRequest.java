@@ -18,7 +18,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TutorInfoRequest {
-
     String userId;
     String nationalId;
     String university;
