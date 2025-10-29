@@ -1,5 +1,6 @@
 package com.grabtutor.grabtutor.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -18,6 +19,7 @@ import java.util.List;
 public class AccountBalance extends BaseEntity{
     double balance = 0;
 
-    @OneToOne(mappedBy = "accountBalance", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "accountBalance")
+    @JsonIgnore
     User user;
 }

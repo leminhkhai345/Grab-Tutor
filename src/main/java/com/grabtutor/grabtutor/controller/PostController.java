@@ -2,6 +2,7 @@ package com.grabtutor.grabtutor.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grabtutor.grabtutor.dto.request.PostRequest;
+import com.grabtutor.grabtutor.dto.request.TutorBidRequest;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
 import com.grabtutor.grabtutor.service.FileUploadService;
 import com.grabtutor.grabtutor.service.PostService;
@@ -98,10 +99,24 @@ public class PostController {
                 .build();
         }
     @PutMapping("/acceptTutor/{tutorBidId}")
-    public ApiResponse<?> acceptPost(@PathVariable String tutorBidId){
+    public ApiResponse<?> acceptTutor(@PathVariable String tutorBidId){
         tutorBidService.acceptTutor(tutorBidId);
         return ApiResponse.builder()
                 .message("accept post successfully")
+                .build();
+    }
+    @PostMapping("/tutorBid")
+    public ApiResponse<?> addTutorBid(@RequestBody TutorBidRequest request){
+        return ApiResponse.builder()
+                .data(tutorBidService.addTutorBid(request))
+                .message("add tutor bid successfully")
+                .build();
+    }
+    @GetMapping("/{postId}/tutorBid")
+    public ApiResponse<?> getAllTutorBid(@PathVariable String postId){
+        return ApiResponse.builder()
+                .data(tutorBidService.getAllTutorBid(postId))
+                .message("get all tutor bid successfully")
                 .build();
     }
 }
