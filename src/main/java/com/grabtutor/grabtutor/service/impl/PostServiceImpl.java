@@ -63,11 +63,11 @@ public class PostServiceImpl implements PostService {
         postRepository.save(post);
         //Add vào queue -> tự động xóa bài sau 6 giờ
         //Lúc này worker sẽ phải gửi thông báo cho user -> post đã được gỡ rồi
-        redisTemplate.opsForZSet().add("post:expire", post.getId(),
-                post.getCreatedAt()
-                    .atZone(ZoneId.systemDefault())
-                    .toInstant()
-                    .toEpochMilli() + 3600000*6);
+//        redisTemplate.opsForZSet().add("post:expire", post.getId(),
+//                post.getCreatedAt()
+//                    .atZone(ZoneId.systemDefault())
+//                    .toInstant()
+//                    .toEpochMilli() + 3600000*6);
         return postMapper.toPostResponse(post);
     }
 

@@ -1,6 +1,5 @@
 package com.grabtutor.grabtutor.controller;
 
-import com.grabtutor.grabtutor.dto.request.LoadMessagesRequest;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
 import com.grabtutor.grabtutor.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +15,10 @@ import org.springframework.web.bind.annotation.*;
 public class ChatRoomController {
     ChatRoomService chatRoomService;
 
-    @GetMapping("/messages")
-    public ApiResponse<?> loadMessages(LoadMessagesRequest request) {
+    @GetMapping("/{roomId}")
+    public ApiResponse<?> loadMessages(@PathVariable String roomId) {
         return ApiResponse.builder()
-                .data(chatRoomService.loadMessages(request))
+                .data(chatRoomService.loadMessages(roomId))
                 .message("Load message successfully")
                 .build();
     }
