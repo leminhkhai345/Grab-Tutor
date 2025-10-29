@@ -2,7 +2,6 @@ package com.grabtutor.grabtutor.service.impl;
 
 import com.grabtutor.grabtutor.dto.request.ReviewRequest;
 import com.grabtutor.grabtutor.dto.response.ReviewResponse;
-import com.grabtutor.grabtutor.dto.response.TutorInfoResponse;
 import com.grabtutor.grabtutor.entity.Post;
 import com.grabtutor.grabtutor.entity.Review;
 import com.grabtutor.grabtutor.entity.TutorBid;
