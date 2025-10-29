@@ -2,9 +2,11 @@ package com.grabtutor.grabtutor.service.impl;
 
 import com.grabtutor.grabtutor.dto.request.ReviewRequest;
 import com.grabtutor.grabtutor.dto.response.ReviewResponse;
+import com.grabtutor.grabtutor.dto.response.TutorInfoResponse;
 import com.grabtutor.grabtutor.entity.Post;
 import com.grabtutor.grabtutor.entity.Review;
 import com.grabtutor.grabtutor.entity.TutorBid;
+import com.grabtutor.grabtutor.entity.TutorInfo;
 import com.grabtutor.grabtutor.enums.BiddingStatus;
 import com.grabtutor.grabtutor.enums.PostStatus;
 import com.grabtutor.grabtutor.exception.AppException;
@@ -12,6 +14,7 @@ import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.ReviewMapper;
 import com.grabtutor.grabtutor.repository.PostRepository;
 import com.grabtutor.grabtutor.repository.ReviewRepository;
+import com.grabtutor.grabtutor.repository.TutorInfoRepository;
 import com.grabtutor.grabtutor.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -29,6 +32,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 public class ReviewServiceImpl implements ReviewService{
+    private final TutorInfoRepository tutorInfoRepository;
     ReviewRepository reviewRepository;
     ReviewMapper reviewMapper;
     PostRepository postRepository;
@@ -38,7 +42,7 @@ public class ReviewServiceImpl implements ReviewService{
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) auth.getPrincipal();
         String userId = jwt.getClaimAsString("userId");
-        Review review = reviewMapper.toReview(reviewRequest);
+
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXIST));
         if(post.isDeleted()){
@@ -51,17 +55,41 @@ public class ReviewServiceImpl implements ReviewService{
         if(!post.getUser().getId().equals(userId)){
             throw new AppException(ErrorCode.FORBIDDEN);
         }
-         var tutorBid = post.getTutorBids().stream()
+
+        TutorBid tutorBid = post.getTutorBids().stream()
                 .filter(bid -> bid.getStatus().equals(BiddingStatus.ACCEPTED))
-                .findFirst();
-        review.setSender(post.getUser());
-        review.setPost(post);
-        review.setReceiver(tutorBid.get().getUser());
-        if(review.getReceiver().getId().equals(userId)){
+                .findFirst()
+                .orElseThrow(() -> new AppException(ErrorCode.TUTOR_BID_NOT_FOUND));
+
+        if(tutorBid.getUser().getId().equals(userId)){
             throw new AppException(ErrorCode.FORBIDDEN);
         }
-        return reviewMapper.toReviewResponse(reviewRepository.save(review));
+
+        // Kiểm tra đã review chưa
+        if(reviewRepository.existsByPostIdAndSenderIdAndIsDeletedFalse(postId, userId)){
+            throw new AppException(ErrorCode.REVIEW_ALREADY_EXISTS);
+        }
+
+        Review review = reviewMapper.toReview(reviewRequest);
+        review.setSender(post.getUser());
+        review.setPost(post);
+        review.setReceiver(tutorBid.getUser());
+        reviewRepository.save(review);
+
+        TutorInfo tutorInfo = tutorBid.getUser().getTutorInfo();
+        if(tutorInfo == null) {
+            throw new AppException(ErrorCode.TUTOR_INFO_NOT_FOUND);
+        }
+        tutorInfo.setAverageStars(
+                (tutorInfo.getAverageStars() * tutorInfo.getProblemSolved() + review.getStars())
+                        / (tutorInfo.getProblemSolved() + 1)
+        );
+        tutorInfo.setProblemSolved(tutorInfo.getProblemSolved() + 1);
+        tutorInfoRepository.save(tutorInfo);
+
+        return reviewMapper.toReviewResponse(review);
     }
+
 
     @Override
     public ReviewResponse updateReview(String reviewId, ReviewRequest reviewRequest) {

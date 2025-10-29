@@ -10,4 +10,5 @@ public interface ReviewRepository extends JpaRepository<Review, String> {
     List<Review> findByPostIdAndIsDeletedFalse(String postId);
     List<Review> findBySenderIdAndIsDeletedFalse(String senderId);
     List<Review> findByReceiverIdAndIsDeletedFalse(String receiverId);
+    boolean existsByPostIdAndSenderIdAndIsDeletedFalse(String postId, String userId);
 }

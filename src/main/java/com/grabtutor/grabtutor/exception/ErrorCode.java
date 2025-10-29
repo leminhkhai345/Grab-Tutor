@@ -16,6 +16,7 @@ public enum ErrorCode {
     ACCOUNT_ALREADY_VERIFIED(1006, "Account already verified", HttpStatus.CONFLICT),
     POST_NOT_EXIST(2001, "Post does not exist", HttpStatus.NOT_FOUND),
     TUTOR_INFO_NOT_FOUND(2002, "Tutor info not found", HttpStatus.NOT_FOUND),
+    REVIEW_ALREADY_EXISTS(2003, "Review already exists", HttpStatus.CONFLICT),
 
     SUBJECT_ALREADY_EXISTS(3001, "Subject already exists", HttpStatus.CONFLICT),
     SUBJECT_NOT_FOUND(3002, "Subject not found", HttpStatus.NOT_FOUND),

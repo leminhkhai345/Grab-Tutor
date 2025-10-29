@@ -25,6 +25,8 @@ public interface TutorInfoMapper {
         tutorInfoResponse.university( tutorInfo.getUniversity() );
         tutorInfoResponse.highestAcademicDegree( tutorInfo.getHighestAcademicDegree() );
         tutorInfoResponse.major( tutorInfo.getMajor() );
+        tutorInfoResponse.averageStars( tutorInfo.getAverageStars() );
+        tutorInfoResponse.problemSolved( tutorInfo.getProblemSolved() );
 
         return tutorInfoResponse.build();
     }
