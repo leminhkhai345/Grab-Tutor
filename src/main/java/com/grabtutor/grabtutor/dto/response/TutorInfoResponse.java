@@ -13,4 +13,8 @@ public class TutorInfoResponse {
     String university;
     String highestAcademicDegree;
     String major;
+    double averageStars;
+    int problemSolved;
+
+
 }
