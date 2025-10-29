@@ -37,7 +37,7 @@ public class SecurityConfiguration {
         httpSecurity.cors(Customizer.withDefaults()).authorizeHttpRequests(request ->
                 request
                         .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
-                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/ws/chat").permitAll()
                         .requestMatchers(HttpMethod.GET, "/users")
                         .hasAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated());
