@@ -18,6 +18,9 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneId;
@@ -38,12 +41,22 @@ public class TutorBidServiceImpl implements TutorBidService {
     RedisTemplate<String, String> redisTemplate;
 
     @Override
+    @Transactional
+    @PreAuthorize("hasRole('TUTOR')")
     public TutorBidResponse addTutorBid(TutorBidRequest request) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String userId = jwt.getClaimAsString("userId");
+
         var bid = tutorBidMapper.toTutorBid(request);
         var post  = postRepository.findById(request.getPostId())
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXIST));
+        var sender = userRepository.findById(userId)
+                .orElseThrow(()->new AppException(ErrorCode.USER_NOT_FOUND));
         bid.setPost(post);
-        postRepository.save(post);
+        bid.setUser(sender);
+
+        tutorBidRepository.save(bid);
         return tutorBidMapper.toTutorBidResponse(bid);
     }
 

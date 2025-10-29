@@ -1,6 +1,5 @@
 package com.grabtutor.grabtutor.service.impl;
 
-import com.grabtutor.grabtutor.dto.request.LoadMessagesRequest;
 import com.grabtutor.grabtutor.dto.request.MessageRequest;
 import com.grabtutor.grabtutor.dto.response.LoadChatRoomsResponse;
 import com.grabtutor.grabtutor.dto.response.LoadMessagesResponse;
@@ -45,14 +44,14 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         return messageMapper.ToMessageResponse(message);
     }
     @Override
-    public LoadMessagesResponse loadMessages(LoadMessagesRequest request) {
+    public LoadMessagesResponse loadMessages(String roomId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) auth.getPrincipal();
         String userId = jwt.getClaim("userId");
 
         String role =  jwt.getClaim("role");
 
-        var room = chatRoomRepository.findById(request.getRoomId())
+        var room = chatRoomRepository.findById(roomId)
                 .orElseThrow(()-> new AppException(ErrorCode.CHAT_ROOM_NOT_FOUND));
         boolean valid = false;
 
@@ -69,7 +68,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
             throw new AppException(ErrorCode.FORBIDDEN);
         }
 
-        var messages = messageRepository.findByChatRoomId(request.getRoomId());
+        var messages = messageRepository.findByChatRoomId(roomId);
         return LoadMessagesResponse.builder()
                 .messages(messages.stream().map(messageMapper::ToMessageResponse).toList())
                 .build();

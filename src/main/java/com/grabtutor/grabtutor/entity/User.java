@@ -58,12 +58,7 @@ public class User extends BaseEntity {
     @JoinColumn(name = "accountBalanceId")
     AccountBalance accountBalance;
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_group", // bảng trung gian
-            joinColumns = @JoinColumn(name = "userId"), // khóa ngoại đến User
-            inverseJoinColumns = @JoinColumn(name = "roomId") // khóa ngoại đến Group
-    )
+    @ManyToMany(mappedBy = "users")
     private List<ChatRoom> chatRooms;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
