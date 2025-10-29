@@ -2,6 +2,7 @@ package com.grabtutor.grabtutor.websocket;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grabtutor.grabtutor.dto.request.MessageRequest;
 import com.grabtutor.grabtutor.dto.response.MessageResponse;
+import com.grabtutor.grabtutor.mapper.MessageMapper;
 import com.grabtutor.grabtutor.service.ChatRoomService;
 import com.grabtutor.grabtutor.service.impl.ChatRoomServiceImpl;
 import lombok.Builder;
@@ -32,6 +33,8 @@ public class WebSocketSessionRegistry {
     Map<String, Set<Session>> roomSessions = new ConcurrentHashMap<>();
 
     ObjectMapper objectMapper;
+
+    MessageMapper messageMapper;
 
     ChatRoomService chatRoomService;
     /**
@@ -103,8 +106,8 @@ public class WebSocketSessionRegistry {
             log.warn("No sessions found for room {}", roomId);
             return;
         }
-
-        String messageJson = serializeMessage(chatRoomService.saveMessage(messageDto));
+//        var response = chatRoomService.saveMessage(messageDto);
+        String messageJson = serializeMessage(messageMapper.ToMessageResponse(messageDto));
         sessionsInRoom.forEach(session -> sendMessage(session, messageJson));
     }
 

@@ -34,7 +34,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     UserTransactionRepository userTransactionRepository;
     AccountBalanceRepository  accountBalanceRepository;
 
-    @PreAuthorize("hasRole('USER') or hasRole('TUTOR')")
     @Override
     public MessageResponse saveMessage(MessageRequest request) {
         var message = messageMapper.ToMessage(request);
