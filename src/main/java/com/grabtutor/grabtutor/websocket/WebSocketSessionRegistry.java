@@ -49,9 +49,12 @@ public class WebSocketSessionRegistry {
     public void removeSession(Session session) {
         String userId = (String) session.getUserProperties().get("userId");
         if (userId != null) {
-            userSessions.getOrDefault(userId, new CopyOnWriteArraySet<>()).remove(session);
-            if (userSessions.get(userId).isEmpty()) {
-                userSessions.remove(userId);
+            Set<Session> userSet = userSessions.get(userId);
+            if (userSet != null) {
+                userSet.remove(session);
+                if (userSet.isEmpty()) {
+                    userSessions.remove(userId);
+                }
             }
             log.info("User {} disconnected from session {}", userId, session.getId());
         }
@@ -59,9 +62,12 @@ public class WebSocketSessionRegistry {
         // Xóa session khỏi phòng chat (nếu có)
         String roomId = (String) session.getUserProperties().get("roomId");
         if (roomId != null) {
-            roomSessions.getOrDefault(roomId, new CopyOnWriteArraySet<>()).remove(session);
-            if (roomSessions.get(roomId).isEmpty()) {
-                roomSessions.remove(roomId);
+            Set<Session> roomSet = roomSessions.get(roomId);
+            if (roomSet != null) {
+                roomSet.remove(session);
+                if (roomSet.isEmpty()) {
+                    roomSessions.remove(roomId);
+                }
             }
             log.info("Session {} removed from room {}", session.getId(), roomId);
         }
