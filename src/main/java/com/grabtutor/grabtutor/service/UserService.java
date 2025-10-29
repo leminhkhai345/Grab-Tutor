@@ -11,7 +11,7 @@ public interface UserService {
 
     UserResponse getUserById(String id);
 
-    UserResponse updateUser(String id, UserRequest userRequest);
+    UserResponse updateUser(UserUpdateRequest userRequest);
 
     void deleteUser(String id);
 
@@ -24,6 +24,8 @@ public interface UserService {
     TutorResponse addTutor(TutorRequest request);
 
     TutorInfoResponse updateTutorInfo(TutorInfoRequest tutorInfoRequest);
+
+    TutorInfoResponse getTutorInfoByUserId(String userId);
 
     ApproveResponse approveRequest(ApproveRequest request);
 

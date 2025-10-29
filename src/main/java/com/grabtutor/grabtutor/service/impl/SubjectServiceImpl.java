@@ -9,8 +9,6 @@ import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.SubjectMapper;
 import com.grabtutor.grabtutor.repository.SubjectRepository;
 import com.grabtutor.grabtutor.service.SubjectService;
-import lombok.Builder;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +42,7 @@ public class SubjectServiceImpl implements SubjectService {
         return subjectMapper.toSubjectResponse(subjectRepository.save(subject));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public SubjectResponse updateSubject(String id, SubjectRequest subjectRequest) {
         var subject = subjectRepository.findById(id)

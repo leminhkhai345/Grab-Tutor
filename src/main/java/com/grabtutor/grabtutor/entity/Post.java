@@ -20,8 +20,9 @@ public class Post extends BaseEntity {
 
     String imageUrl;
     String description;
-    double reward;
+
     @Builder.Default
+    @Enumerated(EnumType.STRING)
     PostStatus status =  PostStatus.OPEN;
     @Builder.Default
     boolean isAccepted = false;

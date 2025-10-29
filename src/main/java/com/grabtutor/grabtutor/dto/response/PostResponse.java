@@ -17,4 +17,5 @@ public class PostResponse {
     boolean isDeleted;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
+    String status;
 }

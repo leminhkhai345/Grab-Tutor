@@ -14,9 +14,7 @@ public interface PostMapper {
         if(postRequest.getDescription() != null && !postRequest.getDescription().isEmpty()){
             post.setDescription(postRequest.getDescription());
         }
-        if(postRequest.getReward() > 0){
-            post.setReward(postRequest.getReward());
-        }
+
         if(postRequest.getImageUrl() != null && !postRequest.getImageUrl().isEmpty()){
             post.setImageUrl(postRequest.getImageUrl());
         }

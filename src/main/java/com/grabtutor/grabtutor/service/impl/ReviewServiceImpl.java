@@ -4,13 +4,14 @@ import com.grabtutor.grabtutor.dto.request.ReviewRequest;
 import com.grabtutor.grabtutor.dto.response.ReviewResponse;
 import com.grabtutor.grabtutor.entity.Post;
 import com.grabtutor.grabtutor.entity.Review;
-import com.grabtutor.grabtutor.entity.User;
+import com.grabtutor.grabtutor.entity.TutorBid;
+import com.grabtutor.grabtutor.enums.BiddingStatus;
+import com.grabtutor.grabtutor.enums.PostStatus;
 import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.ReviewMapper;
 import com.grabtutor.grabtutor.repository.PostRepository;
 import com.grabtutor.grabtutor.repository.ReviewRepository;
-import com.grabtutor.grabtutor.repository.UserRepository;
 import com.grabtutor.grabtutor.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -30,7 +31,6 @@ import java.util.List;
 public class ReviewServiceImpl implements ReviewService{
     ReviewRepository reviewRepository;
     ReviewMapper reviewMapper;
-    UserRepository userRepository;
     PostRepository postRepository;
 
     @Override
@@ -39,13 +39,24 @@ public class ReviewServiceImpl implements ReviewService{
         Jwt jwt = (Jwt) auth.getPrincipal();
         String userId = jwt.getClaimAsString("userId");
         Review review = reviewMapper.toReview(reviewRequest);
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXIST));
-        review.setSender(user);
+        if(post.isDeleted()){
+            throw new AppException(ErrorCode.POST_NOT_EXIST);
+        }
+        if(!post.getStatus().equals(PostStatus.SOLVED))
+        {
+            throw new AppException(ErrorCode.POST_NOT_SOLVED);
+        }
+        if(!post.getUser().getId().equals(userId)){
+            throw new AppException(ErrorCode.FORBIDDEN);
+        }
+         var tutorBid = post.getTutorBids().stream()
+                .filter(bid -> bid.getStatus().equals(BiddingStatus.ACCEPTED))
+                .findFirst();
+        review.setSender(post.getUser());
         review.setPost(post);
-        review.setReceiver(post.getUser());
+        review.setReceiver(tutorBid.get().getUser());
         if(review.getReceiver().getId().equals(userId)){
             throw new AppException(ErrorCode.FORBIDDEN);
         }
@@ -100,13 +111,19 @@ public class ReviewServiceImpl implements ReviewService{
         return reviews.stream().map(reviewMapper::toReviewResponse).toList();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @Override
-    public List<ReviewResponse> getReviewsByUserId(String userId) {
+    public List<ReviewResponse> getReviewsBySenderId(String userId) {
         var reviews = reviewRepository.findBySenderIdAndIsDeletedFalse(userId);
         return reviews.stream().map(reviewMapper::toReviewResponse).toList();
     }
 
+    @Override
+    public List<ReviewResponse> getReviewsByReceiverId(String userId) {
+        var reviews = reviewRepository.findByReceiverIdAndIsDeletedFalse(userId);
+        return reviews.stream().map(reviewMapper::toReviewResponse).toList();
+    }
+
+    @PreAuthorize("hasRole('TUTOR')")
     @Override
     public List<ReviewResponse> getMyReviews() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

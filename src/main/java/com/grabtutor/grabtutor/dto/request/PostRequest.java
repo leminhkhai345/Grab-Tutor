@@ -16,6 +16,5 @@ import lombok.experimental.FieldDefaults;
 public class PostRequest {
     @NotBlank(message = "Description must be not blank")
     String description;
-    int reward;
     String imageUrl;
 }

@@ -4,4 +4,7 @@ public enum PostStatus {
     OPEN,
     CLOSED,
     SOLVED
+
+    ;
+
 }
