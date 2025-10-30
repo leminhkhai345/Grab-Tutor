@@ -4,6 +4,7 @@ import com.grabtutor.grabtutor.dto.request.PostRequest;
 import com.grabtutor.grabtutor.dto.response.PageResponse;
 import com.grabtutor.grabtutor.dto.response.PostResponse;
 import com.grabtutor.grabtutor.entity.*;
+import com.grabtutor.grabtutor.enums.PostStatus;
 import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.PostMapper;
@@ -60,6 +61,7 @@ public class PostServiceImpl implements PostService {
                 .findById(subjectId).orElseThrow(() -> new AppException(ErrorCode.SUBJECT_NOT_FOUND));
 
         post.setSubject(subject);
+        post.setStatus(PostStatus.OPEN);
         postRepository.save(post);
         //Add vào queue -> tự động xóa bài sau 6 giờ
         //Lúc này worker sẽ phải gửi thông báo cho user -> post đã được gỡ rồi
