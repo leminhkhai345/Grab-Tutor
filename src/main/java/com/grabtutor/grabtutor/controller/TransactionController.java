@@ -1,5 +1,6 @@
 package com.grabtutor.grabtutor.controller;
 
+import com.grabtutor.grabtutor.dto.response.ApiResponse;
 import com.grabtutor.grabtutor.service.impl.VNPayServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
@@ -16,18 +17,23 @@ import org.springframework.web.bind.annotation.*;
 public class TransactionController {
     VNPayServiceImpl vnPayService;
 
-//    @PostMapping("/deposit")
-//    public String deposit(@RequestParam("amount") int orderTotal,
-//                              @RequestParam("orderInfo") String orderInfo,
-//                              HttpServletRequest request){
-//        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-//        String vnpayUrl = vnPayService.createOrder( orderTotal, orderInfo, baseUrl);
-//        return vnpayUrl;
-//    }
-//    @GetMapping("/vnpay-payment-return")
-//    public DepositResponse paymentCompleted(HttpServletRequest request){
-//        int paymentStatus = vnPayService.orderReturn(request);
-//
-//
-//    }
+    @PostMapping
+    public ApiResponse<?> deposit(@RequestParam("amount") int orderTotal,
+                               @RequestParam("orderInfo") String orderInfo,
+                               HttpServletRequest request){
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+
+        String vnpayUrl = vnPayService.addFund( orderTotal, orderInfo, baseUrl);
+        return ApiResponse.builder()
+                .message("Deposited Successfully")
+                .data(vnpayUrl)
+                .build();
+    }
+    @GetMapping("/vnpay-payment-return")
+    public ApiResponse<?> paymentCompleted(HttpServletRequest request){
+        return ApiResponse.builder()
+                .message("Deposited Successfully")
+                .data(vnPayService.transactionReturn(request))
+                .build();
+    }
 }

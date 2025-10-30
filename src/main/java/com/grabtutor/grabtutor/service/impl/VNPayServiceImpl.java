@@ -14,9 +14,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -27,34 +30,36 @@ import java.util.*;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class VNPayServiceImpl implements VNPayService {
-    
+
     AccountBalanceRepository accountBalanceRepository;
     UserRepository userRepository;
     double addFundRate = 0.1;
 
     @PreAuthorize("hasRole('USER') or hasRole('TUTOR')")
-    public String addFunds(int total, String orderInfor, String urlReturn){
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        var userEmail = authentication.getName();
-        var user = userRepository.findByEmail(userEmail).orElseThrow(()->new AppException(ErrorCode.USER_NOT_FOUND));
-
+    public String addFund(int total, String orderInfor, String urlReturn){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String userId = jwt.getClaimAsString("userId");
+        var user = userRepository.findById(userId).orElseThrow(()->new AppException(ErrorCode.USER_NOT_FOUND));
 
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String vnp_TxnRef = VNPayConfig.getRandomNumber(8);
         String vnp_IpAddr = "127.0.0.1";
         String vnp_TmnCode = VNPayConfig.vnp_TmnCode;
-        String orderType = "order-type";
-        
+        String orderType = "other";
+
         Map<String, String> vnp_Params = new HashMap<>();
         vnp_Params.put("vnp_Version", vnp_Version);
         vnp_Params.put("vnp_Command", vnp_Command);
         vnp_Params.put("vnp_TmnCode", vnp_TmnCode);
         vnp_Params.put("vnp_Amount", String.valueOf(total*100));
         vnp_Params.put("vnp_CurrCode", "VND");
-        
+
         vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
-        vnp_Params.put("vnp_OrderInfo", orderInfor + " AB_" + user.getAccountBalance().getId());
+        vnp_Params.put("vnp_OrderInfo", orderInfor
+//                + " AB_" + user.getAccountBalance().getId()
+        );
         vnp_Params.put("vnp_OrderType", orderType);
 
         String locate = "vn";
@@ -100,6 +105,7 @@ public class VNPayServiceImpl implements VNPayService {
         String vnp_SecureHash = VNPayConfig.hmacSHA512(VNPayConfig.vnp_HashSecret, hashData.toString());
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
         return VNPayConfig.vnp_PayUrl + "?" + queryUrl;
+
     }
     @Transactional
     public DepositResponse transactionReturn(HttpServletRequest request){
@@ -132,6 +138,9 @@ public class VNPayServiceImpl implements VNPayService {
         } else {
             success = false;
         }
+
+        log.info(request.getParameter("vnp_TransactionStatus"));
+
         String transactionInfo = request.getParameter("vnp_OrderInfo");
         String transactionId = request.getParameter("vnp_TransactionNo");
         String totalAmount = request.getParameter("vnp_Amount");
