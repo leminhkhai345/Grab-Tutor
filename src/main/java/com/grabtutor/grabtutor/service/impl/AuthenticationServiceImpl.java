@@ -212,7 +212,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if(Objects.isNull(otp)){
             throw new AppException(ErrorCode.UNCATEGORIZED);
         }
-        if(!otp.getExpiryTime().isBefore(LocalDateTime.now())){
+        if(otp.getExpiryTime().isBefore(LocalDateTime.now())){
             throw new AppException(ErrorCode.SESSION_END);
         }
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
