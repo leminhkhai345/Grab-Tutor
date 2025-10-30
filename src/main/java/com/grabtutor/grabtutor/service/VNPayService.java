@@ -4,6 +4,6 @@ import com.grabtutor.grabtutor.dto.response.DepositResponse;
 import jakarta.servlet.http.HttpServletRequest;
 
 public interface VNPayService {
-    String addFunds(int total, String orderInfor, String urlReturn);
+    String addFund(int total, String orderInfor, String urlReturn);
     DepositResponse transactionReturn(HttpServletRequest request);
 }
