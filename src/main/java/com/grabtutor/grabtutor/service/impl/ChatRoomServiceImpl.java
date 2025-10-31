@@ -78,7 +78,9 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) auth.getPrincipal();
         String userId = jwt.getClaimAsString("userId");
-        var user = userRepository.findById(userId).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         return LoadChatRoomsResponse.builder()
                 .rooms(user.getChatRooms().stream().map(chatRoomMapper::toChatRoomResponse).toList())
                 .build();

@@ -68,6 +68,7 @@ public class UserServiceImpl implements UserService {
                 .user(user)
                 .build();
         user.setAccountBalance(balance);
+
         userRepository.save(user);
         return userMapper.toUserResponse(user);
     }
