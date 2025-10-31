@@ -42,7 +42,7 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "chatRoomId")
     ChatRoom chatRoom;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "userTransactionId")
     UserTransaction userTransaction;
 

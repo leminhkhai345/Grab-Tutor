@@ -30,9 +30,9 @@ public class ChatRoomController {
                 .build();
     }
     @GetMapping
-    public ApiResponse<?> loadRooms(@RequestParam String roomId){
+    public ApiResponse<?> loadRooms(@RequestParam String userId){
         return ApiResponse.builder()
-                .data(chatRoomService.loadRooms(roomId))
+                .data(chatRoomService.loadRooms(userId))
                 .message("Load rooms successfully")
                 .build();
     }

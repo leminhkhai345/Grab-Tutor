@@ -63,9 +63,12 @@ public class TutorBidServiceImpl implements TutorBidService {
                 throw new AppException(ErrorCode.ALREADY_PROPOSE_BID);
             }
         });
+
         var sender = userRepository.findById(userId)
                 .orElseThrow(()->new AppException(ErrorCode.USER_NOT_FOUND));
+        post.getTutorBids().add(bid);
         bid.setPost(post);
+
         bid.setUser(sender);
 
         tutorBidRepository.save(bid);
@@ -149,22 +152,21 @@ public class TutorBidServiceImpl implements TutorBidService {
                 .users(users)
                 .build();
 
-        post.setChatRoom(room);
-
         var transaction = UserTransaction.builder()
                 .post(post)
                 .sender(sender)
                 .receiver(receiver)
                 .amount(bid.getProposedPrice())
                 .build();
-        chatRoomRepository.save(room);
-        postRepository.save(post);
-        userTransactionRepository.save(transaction);
-                redisTemplate.opsForZSet().add("chatroom:submit", room.getId(),
-                room.getCreatedAt()
-                .atZone(ZoneId.systemDefault())
-                .toInstant()
-                .toEpochMilli() + 60000*30);
+        post.setChatRoom(room);
+        post.setUserTransaction(transaction);
+
+//        postRepository.save(post);
+//        redisTemplate.opsForZSet().add("chatroom:submit", room.getId(),
+//        room.getCreatedAt()
+//        .atZone(ZoneId.systemDefault())
+//        .toInstant()
+//        .toEpochMilli() + 60000*30);
     }
 
     @Override
