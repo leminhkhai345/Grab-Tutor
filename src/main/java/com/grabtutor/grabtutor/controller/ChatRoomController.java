@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.*;
 public class ChatRoomController {
     ChatRoomService chatRoomService;
 
-    @GetMapping("/{roomId}")
-    public ApiResponse<?> loadMessages(@PathVariable String roomId) {
+    @GetMapping("/message")
+    public ApiResponse<?> loadMessages(@RequestParam String roomId) {
         return ApiResponse.builder()
                 .data(chatRoomService.loadMessages(roomId))
                 .message("Load message successfully")
@@ -29,36 +29,36 @@ public class ChatRoomController {
                 .message("Load rooms successfully")
                 .build();
     }
-    @GetMapping("/{userId}")
-    public ApiResponse<?> loadRooms(@PathVariable String userId){
+    @GetMapping
+    public ApiResponse<?> loadRooms(@RequestParam String roomId){
         return ApiResponse.builder()
-                .data(chatRoomService.loadMyRooms())
+                .data(chatRoomService.loadRooms(roomId))
                 .message("Load rooms successfully")
                 .build();
     }
-    @PutMapping("/submit/{roomId}")
-    public ApiResponse<?> submitSolution(@PathVariable String roomId){
+    @PutMapping("/submit")
+    public ApiResponse<?> submitSolution(@RequestParam String roomId){
         chatRoomService.submitSolution(roomId);
         return ApiResponse.builder()
                 .message("Submit solution successfully")
                 .build();
     }
-    @PutMapping("/confirm/{roomId}")
-    public ApiResponse<?> confirmSolution(@PathVariable String roomId){
+    @PutMapping("/confirm")
+    public ApiResponse<?> confirmSolution(@RequestParam String roomId){
         chatRoomService.confirmedSolution(roomId);
         return ApiResponse.builder()
                 .message("Submit solution successfully")
                 .build();
     }
-    @PutMapping("/inspect/{roomId}")
-    public ApiResponse<?> inspectSolution(@PathVariable String roomId){
+    @PutMapping("/inspect")
+    public ApiResponse<?> inspectSolution(@RequestParam String roomId){
         chatRoomService.inspectSolution(roomId);
         return ApiResponse.builder()
                 .message("Submit solution successfully")
                 .build();
     }
-    @PutMapping("/resolve/{roomId}")
-    public ApiResponse<?> submitSolution(@PathVariable String roomId, @RequestParam boolean isNormal){
+    @PutMapping("/resolve")
+    public ApiResponse<?> submitSolution(@RequestParam String roomId, @RequestParam boolean isNormal){
         chatRoomService.resolveSolution(roomId, isNormal);
         return ApiResponse.builder()
                 .message("Submit solution successfully")

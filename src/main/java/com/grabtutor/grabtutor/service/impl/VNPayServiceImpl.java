@@ -1,10 +1,15 @@
 package com.grabtutor.grabtutor.service.impl;
 
-import com.grabtutor.grabtutor.dto.response.DepositResponse;
+import com.grabtutor.grabtutor.dto.response.TransactionResponse;
+import com.grabtutor.grabtutor.entity.VirtualTransaction;
+import com.grabtutor.grabtutor.enums.TransactionStatus;
+import com.grabtutor.grabtutor.enums.TransactionType;
 import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
+import com.grabtutor.grabtutor.mapper.VirtualTransactionMapper;
 import com.grabtutor.grabtutor.repository.AccountBalanceRepository;
 import com.grabtutor.grabtutor.repository.UserRepository;
+import com.grabtutor.grabtutor.repository.VirtualTransactionRepository;
 import com.grabtutor.grabtutor.service.VNPayService;
 import com.grabtutor.grabtutor.service.config.VNPayConfig;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -32,11 +38,14 @@ import java.util.*;
 public class VNPayServiceImpl implements VNPayService {
 
     AccountBalanceRepository accountBalanceRepository;
+    VirtualTransactionRepository  virtualTransactionRepository;
     UserRepository userRepository;
-    double addFundRate = 0.1;
+    VirtualTransactionMapper  virtualTransactionMapper;
 
-    @PreAuthorize("hasRole('USER') or hasRole('TUTOR')")
-    public String addFund(int total, String orderInfor, String urlReturn){
+    double addFundRate = 0.1;
+    @Override
+    @PreAuthorize("hasRole('USER')")
+    public String addFund(int total, String urlReturn){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) auth.getPrincipal();
         String userId = jwt.getClaimAsString("userId");
@@ -57,9 +66,7 @@ public class VNPayServiceImpl implements VNPayService {
         vnp_Params.put("vnp_CurrCode", "VND");
 
         vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
-        vnp_Params.put("vnp_OrderInfo", orderInfor
-//                + " AB_" + user.getAccountBalance().getId()
-        );
+        vnp_Params.put("vnp_OrderInfo", user.getId());
         vnp_Params.put("vnp_OrderType", orderType);
 
         String locate = "vn";
@@ -107,11 +114,9 @@ public class VNPayServiceImpl implements VNPayService {
         return VNPayConfig.vnp_PayUrl + "?" + queryUrl;
 
     }
+    @Override
     @Transactional
-    public DepositResponse transactionReturn(HttpServletRequest request){
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        var userEmail = authentication.getName();
-        var user = userRepository.findByEmail(userEmail).orElseThrow(()->new AppException(ErrorCode.USER_NOT_FOUND));
+    public TransactionResponse transactionReturn(HttpServletRequest request){
 
         Map fields = new HashMap();
         for (Enumeration<String> params = request.getParameterNames(); params.hasMoreElements();) {
@@ -123,47 +128,35 @@ public class VNPayServiceImpl implements VNPayService {
                 fields.put(fieldName, fieldValue);
             }
         }
+        String userId = request.getParameter("vnp_OrderInfo");
+        var user = userRepository.findById(userId).orElseThrow(()->new AppException(ErrorCode.USER_NOT_FOUND));
 
         String vnp_SecureHash = request.getParameter("vnp_SecureHash");
         fields.remove("vnp_SecureHashType");
         fields.remove("vnp_SecureHash");
         String signValue = VNPayConfig.hashAllFields(fields);
         boolean success;
-        if (signValue.equals(vnp_SecureHash)) {
-            if ("00".equals(request.getParameter("vnp_TransactionStatus"))) {
-                success = true;
-            } else {
-                success = false;
-            }
-        } else {
-            success = false;
+        if (!signValue.equals(vnp_SecureHash)||!"00".equals(request.getParameter("vnp_TransactionStatus"))){
+            throw new AppException(ErrorCode.TRANSACTION_FAILED);
         }
 
-        log.info(request.getParameter("vnp_TransactionStatus"));
-
-        String transactionInfo = request.getParameter("vnp_OrderInfo");
-        String transactionId = request.getParameter("vnp_TransactionNo");
         String totalAmount = request.getParameter("vnp_Amount");
-        if(success){
-            var accountBalance = user.getAccountBalance();
-            //Quy tắc cộng tiền tính sau
-            var addAmount = Double.parseDouble(totalAmount)*addFundRate;
-            accountBalance.setBalance(accountBalance.getBalance() + addAmount);
 
-//            var transaction = Transaction.builder()
-//                    .transactionNo(transactionId)
-//                    .paymentMethod(PaymentMethod.VN_PAY)
-//                    .amount(Long.parseLong(totalAmount))
-//                    .accountBalance(accountBalance)
-//                    .build();
-//            transactionRepository.save(transaction);
-        }
-        return DepositResponse.builder()
-                .transactionNo(transactionId)
-                .transactionInfo(transactionInfo)
-                .isSuccess(success)
-                .totalAmount(totalAmount)
+        var accountBalance = user.getAccountBalance();
+        //Quy tắc cộng tiền tính sau
+        var addAmount = Double.parseDouble(totalAmount)*addFundRate*0.01;
+        accountBalance.setBalance(accountBalance.getBalance() + addAmount);
+        var transaction = VirtualTransaction.builder()
+                .type(TransactionType.ADD_FUND)
+                .completedAt(LocalDateTime.now())
+                .status(TransactionStatus.SUCCESS)
+                .paidAmount(addAmount)
+                .user(user)
                 .build();
+        accountBalanceRepository.save(accountBalance);
+        transaction = virtualTransactionRepository.save(transaction);
+
+        return virtualTransactionMapper.toTransactionResponse(transaction);
 
     }
 

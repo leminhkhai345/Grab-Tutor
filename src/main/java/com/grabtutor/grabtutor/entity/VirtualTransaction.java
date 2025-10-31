@@ -4,6 +4,7 @@ import com.grabtutor.grabtutor.enums.TransactionStatus;
 import com.grabtutor.grabtutor.enums.TransactionType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -43,7 +44,7 @@ public class VirtualTransaction extends BaseEntity {
 
 
     @ManyToOne
-    @JoinColumn(name = "course_id", nullable = false)
+    @JoinColumn(name = "course_id")
     Course course;
 
 

@@ -34,6 +34,7 @@ public enum ErrorCode {
 
     POST_NOT_SOLVED(6000, "Post is not solved yet", HttpStatus.BAD_REQUEST),
     REPORT_NOT_EXIST(6001, "Report does not exist", HttpStatus.NOT_FOUND),
+    POST_ALREADY_ACCEPTED(6002, "Post already accepted", HttpStatus.CONFLICT),
 
     REVIEW_NOT_EXIST(7001, "Review does not exist", HttpStatus.NOT_FOUND),
     COURSE_NOT_FOUND(8001, "Course not found", HttpStatus.NOT_FOUND),
@@ -51,6 +52,11 @@ public enum ErrorCode {
     INVALID_EMAIL_OR_PASSWORD(12002, "Invalid email or password", HttpStatus.UNAUTHORIZED),
 
     TUTOR_BID_NOT_FOUND(13001, "Tutor bid not found", HttpStatus.NOT_FOUND),
+    BID_NOT_PENDING(13002, "Cant accept non pending tutor bid", HttpStatus.BAD_REQUEST),
+    ALREADY_PROPOSE_BID(13003, "Already propose bid to this post", HttpStatus.CONFLICT),
+
+    TRANSACTION_FAILED(14001, "Transaction failed", HttpStatus.BAD_REQUEST),
+
     FORBIDDEN(88888, "You do not have permission to access this resource", HttpStatus.FORBIDDEN),
     UNCATEGORIZED(99999, "Uncategorized", HttpStatus.BAD_REQUEST),
     MISSING_PARAMETER(77777, "Missing parameter: {parameterName}", HttpStatus.BAD_REQUEST)
