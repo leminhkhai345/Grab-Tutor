@@ -54,8 +54,7 @@ public class User extends BaseEntity {
     @JoinColumn(name = "tutorInfoId")
     TutorInfo tutorInfo;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "accountBalanceId")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     AccountBalance accountBalance;
 
     @ManyToMany(mappedBy = "users")
@@ -69,4 +68,7 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade =  CascadeType.ALL)
     List<TutorBid> tutorBids;
+
+    @ManyToMany(mappedBy = "enrolledUsers")
+    Set<Course> enrolledCourses;
 }

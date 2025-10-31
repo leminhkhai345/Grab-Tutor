@@ -25,6 +25,9 @@ public class VirtualTransaction extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     User user;
 
+    @Column(nullable = false)
+    Double amount; // Số tiền đã thanh toán
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     TransactionStatus status; // PENDING, SUCCESS, FAILED

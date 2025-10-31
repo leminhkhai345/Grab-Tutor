@@ -90,6 +90,14 @@ public class PostController {
                 .build();
     }
 
+    @GetMapping("/myPosts")
+    public ApiResponse<?> getMyPosts(){
+        return ApiResponse.builder()
+                .message("get my posts")
+                .data(postService.getPostMyPost())
+                .build();
+    }
+
     @GetMapping("/all")
     public ApiResponse<?> getALlPosts(@RequestParam(defaultValue = "0") int pageNo,
                                       @RequestParam(defaultValue = "10") int pageSize){

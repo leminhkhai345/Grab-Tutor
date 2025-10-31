@@ -6,9 +6,7 @@ import com.grabtutor.grabtutor.entity.AccountBalance;
 import com.grabtutor.grabtutor.entity.User;
 import com.grabtutor.grabtutor.entity.VerificationRequest;
 import com.grabtutor.grabtutor.entity.VirtualTransaction;
-import com.grabtutor.grabtutor.enums.RequestStatus;
-import com.grabtutor.grabtutor.enums.Role;
-import com.grabtutor.grabtutor.enums.UserStatus;
+import com.grabtutor.grabtutor.enums.*;
 import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.TutorInfoMapper;
@@ -34,6 +32,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -66,9 +65,11 @@ public class UserServiceImpl implements UserService {
 
         var balance = AccountBalance.builder()
                 .balance(0)
+                .user(user)
                 .build();
         user.setAccountBalance(balance);
-        return userMapper.toUserResponse(userRepository.save(user));
+        userRepository.save(user);
+        return userMapper.toUserResponse(user);
     }
 
 
@@ -106,6 +107,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(String id){
         User user = getUser(id);
+        AccountBalance accountBalance = user.getAccountBalance();
+        if(accountBalance != null) {
+            accountBalance.setDeleted(true);
+            accountBalanceRepository.save(accountBalance);
+        }
         user.setDeleted(true);
         userRepository.save(user);
     }
@@ -170,6 +176,7 @@ public class UserServiceImpl implements UserService {
 
         var balance = AccountBalance.builder()
                 .balance(0)
+                .user(user)
                 .build();
         user.setAccountBalance(balance);
 
@@ -331,12 +338,15 @@ public class UserServiceImpl implements UserService {
         }
         VirtualTransaction withdrawTransaction = virtualTransactionMapper.toVirtualTransaction(withdrawAmount);
         withdrawTransaction.setUser(user);
-        withdrawTransaction.setPaidAmount(withdrawAmount);
+        withdrawTransaction.setAmount(withdrawAmount);
+        withdrawTransaction.setType(TransactionType.WITHDRAW);
+        withdrawTransaction.setStatus(TransactionStatus.SUCCESS);
+        withdrawTransaction.setCompletedAt(LocalDateTime.now());
         user.getAccountBalance().setBalance(user.getAccountBalance().getBalance() - withdrawAmount);
         virtualTransactionRepository.save(withdrawTransaction);
         return VirtualTransactionResponse.builder()
                 .userId(userId)
-                .paidAmount(withdrawAmount)
+                .amount(withdrawAmount)
                 .type(withdrawTransaction.getType())
                 .status(withdrawTransaction.getStatus())
                 .transactionDate(withdrawTransaction.getTransactionDate())

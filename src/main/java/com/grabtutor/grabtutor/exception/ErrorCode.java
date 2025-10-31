@@ -34,7 +34,8 @@ public enum ErrorCode {
 
     POST_NOT_SOLVED(6000, "Post is not solved yet", HttpStatus.BAD_REQUEST),
     REPORT_NOT_EXIST(6001, "Report does not exist", HttpStatus.NOT_FOUND),
-    POST_ALREADY_ACCEPTED(6002, "Post already accepted", HttpStatus.CONFLICT),
+    POST_ALREADY_ACCEPTED(6003, "Post already accepted", HttpStatus.CONFLICT),
+    REPORT_ALREADY_RESOLVED(6002, "Report already resolved", HttpStatus.CONFLICT),
 
     REVIEW_NOT_EXIST(7001, "Review does not exist", HttpStatus.NOT_FOUND),
     COURSE_NOT_FOUND(8001, "Course not found", HttpStatus.NOT_FOUND),
