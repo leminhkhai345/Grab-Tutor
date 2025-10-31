@@ -124,9 +124,12 @@ public class TutorBidServiceImpl implements TutorBidService {
         var post = bid.getPost();
 
         if(!Objects.equals(post.getUser().getId(), userId)) throw new AppException(ErrorCode.FORBIDDEN);
+
         if(!bid.getStatus().equals(BiddingStatus.PENDING)) throw new AppException(ErrorCode.BID_NOT_PENDING);
 
-        var balance = bid.getUser().getAccountBalance();
+        var balance = accountBalanceRepository.findByUserId(userId)
+                .orElseThrow(()->new AppException(ErrorCode.ACCOUNT_BALANCE_NOT_FOUND));
+
         if(balance.getBalance() < bid.getProposedPrice()){
             throw new AppException(ErrorCode.ACCOUNT_DONT_HAVE_ENOUGH_MONEY);
         }
@@ -161,7 +164,9 @@ public class TutorBidServiceImpl implements TutorBidService {
         post.setChatRoom(room);
         post.setUserTransaction(transaction);
 
-//        postRepository.save(post);
+        postRepository.save(post);
+        chatRoomRepository.save(room);
+
 //        redisTemplate.opsForZSet().add("chatroom:submit", room.getId(),
 //        room.getCreatedAt()
 //        .atZone(ZoneId.systemDefault())
