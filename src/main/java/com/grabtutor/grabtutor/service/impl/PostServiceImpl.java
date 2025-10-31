@@ -131,6 +131,17 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public List<PostResponse> getPostMyPost() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String userId = jwt.getClaimAsString("userId");
+        List<Post> posts = postRepository.findByUserId(userId);
+        posts.removeIf(Post::isDeleted);
+        return posts.stream().map(postMapper::toPostResponse).toList();
+    }
+
+
+    @Override
     public PageResponse<?> getAllPosts(int pageNo, int pageSize, String... sorts) {
         List<Sort.Order> orders = new ArrayList<>();
         for(String sortBy : sorts){

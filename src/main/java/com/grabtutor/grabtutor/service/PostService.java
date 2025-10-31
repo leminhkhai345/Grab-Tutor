@@ -14,6 +14,7 @@ public interface PostService {
     PostResponse getPostByPostId(String postId);
     PostResponse updatePost(String postId, PostRequest postRequest, String subjectId) throws IOException;
     void deletePost(String postId);
+    List<PostResponse> getPostMyPost();
     List<PostResponse> getPostByUserId(String userId);
     PageResponse<?> getAllPosts(int pageNo, int pageSize, String... sorts);
 

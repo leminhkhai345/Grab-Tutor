@@ -8,5 +8,20 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface ReportMapper {
     Report toReport(ReportRequest request);
-    ReportResponse toReportResponse(Report report);
+    default ReportResponse toReportResponse(Report report){
+        if (report == null) {
+            return null;
+        }
+        return ReportResponse.builder()
+                .id(report.getId())
+                .reportStatus(report.getStatus().name())
+                .detail(report.getDetail())
+                .senderId(report.getSender() != null ? report.getSender().getId() : null)
+                .receiverId(report.getReceiver() != null ? report.getReceiver().getId() : null)
+                .postId(report.getPost() != null ? report.getPost().getId() : null)
+                .createdAt(report.getCreatedAt())
+                .updatedAt(report.getUpdatedAt())
+                .isDeleted(report.isDeleted())
+                .build();
+    }
 }

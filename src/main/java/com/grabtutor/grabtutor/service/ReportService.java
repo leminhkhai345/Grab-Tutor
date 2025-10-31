@@ -9,7 +9,7 @@ public interface ReportService {
     ReportResponse getReportById(String id);
     PageResponse<?> getReportByReceiverId(String receiverId, int pageNo, int pageSize, String... sortBy);
     PageResponse<?> getReportBySenderId(String senderId, int pageNo, int pageSize, String... sortBy);
-    ReportResponse resolveReport(String id);
+    ReportResponse resolveReport(String id, boolean accept);
     void deleteReport(String id);
 
 }

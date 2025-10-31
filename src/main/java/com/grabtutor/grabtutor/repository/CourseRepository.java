@@ -13,4 +13,6 @@ public interface CourseRepository extends JpaRepository<Course, String> {
 
     @EntityGraph(attributePaths = {"tutor"})
     Optional<Course> findById(String id);
+    Page<Course>  findByEnrolledUsersIdAndIsDeletedFalse(String userId, Pageable pageable);
+
 }

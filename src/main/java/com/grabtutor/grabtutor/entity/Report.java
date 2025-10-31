@@ -1,5 +1,6 @@
 package com.grabtutor.grabtutor.entity;
 
+import com.grabtutor.grabtutor.enums.ReportStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -18,6 +19,7 @@ import java.time.LocalDate;
 public class Report extends BaseEntity {
 
     String detail;
+    ReportStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "senderId")

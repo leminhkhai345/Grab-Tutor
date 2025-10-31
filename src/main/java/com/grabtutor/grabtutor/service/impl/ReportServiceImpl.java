@@ -6,6 +6,8 @@ import com.grabtutor.grabtutor.dto.response.ReportResponse;
 import com.grabtutor.grabtutor.entity.Post;
 import com.grabtutor.grabtutor.entity.Report;
 import com.grabtutor.grabtutor.entity.User;
+import com.grabtutor.grabtutor.enums.PostStatus;
+import com.grabtutor.grabtutor.enums.ReportStatus;
 import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.ReportMapper;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -40,6 +43,7 @@ public class ReportServiceImpl implements ReportService {
     UserRepository userRepository;
     PostRepository postRepository;
 
+    @PreAuthorize("hasRole('USER')")
     @Override
     public ReportResponse createReport(ReportRequest request, String postId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -48,11 +52,13 @@ public class ReportServiceImpl implements ReportService {
         Report report = reportMapper.toReport(request);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        report.setSender(user);
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXIST));
+        post.setStatus(PostStatus.REPORTED);
+        report.setSender(user);
         report.setReceiver(post.getUser());
         report.setPost(post);
+        report.setStatus(ReportStatus.PENDING);
         return reportMapper.toReportResponse(reportRepository.save(report));
     }
 
@@ -122,15 +128,42 @@ public class ReportServiceImpl implements ReportService {
                 .build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
-    public ReportResponse resolveReport(String id) {
-        return null;
+    public ReportResponse resolveReport(String reportId, boolean accept) {
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new AppException(ErrorCode.REPORT_NOT_EXIST));
+        if(report.isDeleted()){
+            throw new AppException(ErrorCode.REPORT_NOT_EXIST);
+        }
+        if(report.getStatus() != ReportStatus.PENDING){
+            throw new AppException(ErrorCode.REPORT_ALREADY_RESOLVED);
+        }
+        if(accept) {
+            report.setStatus(ReportStatus.ACCEPTED);
+        }
+        else {
+            report.setStatus(ReportStatus.REJECTED);
+        }
+        reportRepository.save(report);
+        Post post = report.getPost();
+        if(accept) {
+            post.setStatus(PostStatus.CLOSED);
+        }
+        else {
+            post.setStatus(PostStatus.SOLVED);
+        }
+        postRepository.save(post);
+        return reportMapper.toReportResponse(report);
     }
 
     @Override
-    public void deleteReport(String id) {
-        Report report = reportRepository.findById(id)
+    public void deleteReport(String reportId) {
+        Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new AppException(ErrorCode.REPORT_NOT_EXIST));
+        if (report.isDeleted()) {
+            throw new AppException(ErrorCode.REPORT_NOT_EXIST);
+        }
         report.setDeleted(true);
         reportRepository.save(report);
     }
