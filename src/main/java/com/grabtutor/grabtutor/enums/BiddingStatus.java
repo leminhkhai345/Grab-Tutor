@@ -4,6 +4,5 @@ public enum BiddingStatus {
     PENDING,
     ACCEPTED,
     REJECTED,
-    CANCELED,
-    SOLVED
+    CANCELED
 }

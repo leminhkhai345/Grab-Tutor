@@ -6,5 +6,13 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface ChatRoomMapper {
-    ChatRoomResponse toChatRoomResponse(ChatRoom chatRoom);
+    default ChatRoomResponse toChatRoomResponse(ChatRoom chatRoom){
+        return ChatRoomResponse.builder()
+                .chatEnabled(chatRoom.isChatEnabled())
+                .createdAt(chatRoom.getCreatedAt())
+                .updatedAt(chatRoom.getUpdatedAt())
+                .id(chatRoom.getId())
+                .postId(chatRoom.getPost().getId())
+                .build();
+    }
 }

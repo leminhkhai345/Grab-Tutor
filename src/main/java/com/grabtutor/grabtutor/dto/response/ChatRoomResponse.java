@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 @Builder
 public class ChatRoomResponse {
     String id;
+    String postId;
+    boolean chatEnabled;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
 }

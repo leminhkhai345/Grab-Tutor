@@ -1,5 +1,6 @@
 package com.grabtutor.grabtutor.mapper;
 
+import com.grabtutor.grabtutor.dto.response.TransactionResponse;
 import com.grabtutor.grabtutor.dto.response.VirtualTransactionResponse;
 import com.grabtutor.grabtutor.entity.VirtualTransaction;
 import com.grabtutor.grabtutor.enums.TransactionStatus;
@@ -30,5 +31,17 @@ public interface VirtualTransactionMapper {
 
     VirtualTransactionResponse toVirtualTransactionResponse(VirtualTransaction virtualTransaction);
 
-
+    default TransactionResponse toTransactionResponse(VirtualTransaction virtualTransaction){
+        return TransactionResponse.builder()
+                .id(virtualTransaction.getId())
+                .transactionDate(virtualTransaction.getTransactionDate())
+                .completedAt(virtualTransaction.getCompletedAt())
+                .type(virtualTransaction.getType())
+                .amount(virtualTransaction.getPaidAmount())
+                .status(virtualTransaction.getStatus())
+                .userId(virtualTransaction.getUser().getId())
+                .createdAt(virtualTransaction.getCreatedAt())
+                .updatedAt(virtualTransaction.getUpdatedAt())
+                .build();
+    }
 }

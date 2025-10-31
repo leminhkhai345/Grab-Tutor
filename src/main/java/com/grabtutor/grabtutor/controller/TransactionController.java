@@ -18,21 +18,19 @@ public class TransactionController {
     VNPayServiceImpl vnPayService;
 
     @PostMapping
-    public ApiResponse<?> deposit(@RequestParam("amount") int orderTotal,
-                               @RequestParam("orderInfo") String orderInfo,
-                               HttpServletRequest request){
-        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+    public ApiResponse<?> addFund(@RequestParam("amount") int orderTotal,HttpServletRequest request){
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() +"/grabtutor/transaction";
 
-        String vnpayUrl = vnPayService.addFund( orderTotal, orderInfo, baseUrl);
+        String vnpayUrl = vnPayService.addFund(orderTotal, baseUrl);
         return ApiResponse.builder()
-                .message("Deposited Successfully")
+                .message("Start transaction successfully!")
                 .data(vnpayUrl)
                 .build();
     }
     @GetMapping("/vnpay-payment-return")
     public ApiResponse<?> paymentCompleted(HttpServletRequest request){
         return ApiResponse.builder()
-                .message("Deposited Successfully")
+                .message("Transaction completed")
                 .data(vnPayService.transactionReturn(request))
                 .build();
     }
