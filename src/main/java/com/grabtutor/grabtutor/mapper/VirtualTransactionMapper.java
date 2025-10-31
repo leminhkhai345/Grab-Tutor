@@ -37,7 +37,7 @@ public interface VirtualTransactionMapper {
                 .transactionDate(virtualTransaction.getTransactionDate())
                 .completedAt(virtualTransaction.getCompletedAt())
                 .type(virtualTransaction.getType())
-                .amount(virtualTransaction.getPaidAmount())
+                .amount(virtualTransaction.getAmount())
                 .status(virtualTransaction.getStatus())
                 .userId(virtualTransaction.getUser().getId())
                 .createdAt(virtualTransaction.getCreatedAt())
