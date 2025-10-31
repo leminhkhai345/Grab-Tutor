@@ -42,10 +42,6 @@ public class VirtualTransaction extends BaseEntity {
 
     LocalDateTime completedAt;
 
-    @Column(nullable = false)
-    Double paidAmount; // Số tiền đã thanh toán
-
-
     @ManyToOne
     @JoinColumn(name = "course_id")
     Course course;

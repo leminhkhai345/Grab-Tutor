@@ -151,21 +151,20 @@ public class TutorBidServiceImpl implements TutorBidService {
         users.add(sender);
         users.add(receiver);
         ChatRoom room = ChatRoom.builder()
-                .post(post)
                 .users(users)
                 .build();
 
         var transaction = UserTransaction.builder()
-                .post(post)
                 .sender(sender)
                 .receiver(receiver)
                 .amount(bid.getProposedPrice())
                 .build();
         post.setChatRoom(room);
         post.setUserTransaction(transaction);
+        room.setPost(post);
+        transaction.setPost(post);
 
         postRepository.save(post);
-        chatRoomRepository.save(room);
 
 //        redisTemplate.opsForZSet().add("chatroom:submit", room.getId(),
 //        room.getCreatedAt()
