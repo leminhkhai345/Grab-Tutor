@@ -4,6 +4,7 @@ import com.grabtutor.grabtutor.dto.request.MessageRequest;
 import com.grabtutor.grabtutor.dto.response.LoadChatRoomsResponse;
 import com.grabtutor.grabtutor.dto.response.LoadMessagesResponse;
 import com.grabtutor.grabtutor.dto.response.MessageResponse;
+import com.grabtutor.grabtutor.entity.ChatRoom;
 import com.grabtutor.grabtutor.entity.User;
 import com.grabtutor.grabtutor.enums.RoomStatus;
 import com.grabtutor.grabtutor.enums.TransactionStatus;
@@ -16,6 +17,7 @@ import com.grabtutor.grabtutor.service.ChatRoomService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class ChatRoomServiceImpl implements ChatRoomService {
     MessageMapper messageMapper;
     ChatRoomMapper chatRoomMapper;
@@ -81,6 +84,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
         return LoadChatRoomsResponse.builder()
                 .rooms(user.getChatRooms().stream().map(chatRoomMapper::toChatRoomResponse).toList())
                 .build();
