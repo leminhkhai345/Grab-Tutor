@@ -1,5 +1,6 @@
 package com.grabtutor.grabtutor.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.grabtutor.grabtutor.enums.RoomStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,6 +24,7 @@ public class ChatRoom extends BaseEntity{
     @Builder.Default
     RoomStatus status = RoomStatus.IN_PROGRESS;
     @OneToOne(mappedBy = "chatRoom")
+    @JsonIgnore
     Post post;
     // bên này là "bị ánh xạ"
     @ManyToMany
