@@ -43,6 +43,13 @@ public class Course extends BaseEntity {
 
     List<Lesson> lessons;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
-    Set<VirtualTransaction> virtualTransactions = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_course",
+            joinColumns = @JoinColumn(name = "course_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    @JsonBackReference
+    Set<User> enrolledUsers;
 }

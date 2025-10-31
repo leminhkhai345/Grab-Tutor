@@ -59,10 +59,10 @@ public class CourseController {
     }
 
     @GetMapping("/{courseId}")
-    public ApiResponse<?> getCourseById(@PathVariable String courseId) {
+    public ApiResponse<?> getCourseByCourseId(@PathVariable String courseId) {
         return ApiResponse.builder()
                 .message("Course fetched successfully")
-                .data(courseService.getCourseById(courseId))
+                .data(courseService.getCourseByCourseId(courseId))
                 .build();
     }
 
@@ -91,6 +91,17 @@ public class CourseController {
         return ApiResponse.builder()
                 .message("Course enrolled successfully")
                 .data(courseService.enrollCourse(courseId))
+                .build();
+    }
+
+    @GetMapping("/myEnrolledCourses")
+    public ApiResponse<?> getMyEnrolledCourses(
+            @RequestParam(defaultValue = "0") int pageNo,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(defaultValue = "createdAt") String... sorts) {
+        return ApiResponse.builder()
+                .message("Enrolled courses fetched successfully")
+                .data(courseService.getMyEnrolledCourses(pageNo, pageSize, sorts))
                 .build();
     }
 }

@@ -1,20 +1,18 @@
 package com.grabtutor.grabtutor.dto.response;
 
 
-import com.grabtutor.grabtutor.entity.Lesson;
-import com.grabtutor.grabtutor.entity.Subject;
-import com.grabtutor.grabtutor.entity.User;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
 import java.util.List;
-import java.util.Set;
+
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CourseResponse {
     String id;
     String name;
@@ -26,4 +24,5 @@ public class CourseResponse {
     List<String> subjectIds;
     String tutorId;
     List<String> lessonIds;
+    boolean isEnrolled;
 }

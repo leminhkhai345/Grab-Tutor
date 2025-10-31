@@ -13,10 +13,12 @@ import java.time.LocalDateTime;
 @Builder
 public class ReportResponse {
     String id;
+    String reportStatus;
+    String detail;
+    String senderId;
+    String receiverId;
+    String postId;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     boolean isDeleted;
-    String detail;
-    String userId;
-    Post post;
 }

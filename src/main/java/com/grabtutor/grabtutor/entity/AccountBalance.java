@@ -19,7 +19,8 @@ import java.util.List;
 public class AccountBalance extends BaseEntity{
     double balance = 0;
 
-    @OneToOne(mappedBy = "accountBalance")
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     User user;
 }
