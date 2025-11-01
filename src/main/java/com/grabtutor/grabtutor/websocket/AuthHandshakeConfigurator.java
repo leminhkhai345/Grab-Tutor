@@ -7,6 +7,8 @@ import jakarta.websocket.server.ServerEndpointConfig;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
@@ -39,11 +41,9 @@ public class AuthHandshakeConfigurator extends ServerEndpointConfig.Configurator
         if (tokens != null && !tokens.isEmpty()) {
             String tokenValue = tokens.get(0);
             try {
-                // Dùng JwtDecoder để giải mã
                 Jwt jwt = jwtDecoder.decode(tokenValue);
 
-                // Lấy userId từ claim 'sub' (hoặc claim nào bạn dùng)
-                String userId = jwt.getSubject();
+                String userId = jwt.getClaimAsString("userId");
 
                 if (userId != null) {
                     // Lưu userId đã xác thực vào session properties

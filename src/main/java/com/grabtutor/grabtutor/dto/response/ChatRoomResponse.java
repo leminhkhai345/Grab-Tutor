@@ -1,5 +1,6 @@
 package com.grabtutor.grabtutor.dto.response;
 
+import com.grabtutor.grabtutor.enums.RoomStatus;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -12,6 +13,7 @@ public class ChatRoomResponse {
     String id;
     String postId;
     boolean chatEnabled;
+    RoomStatus status;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
 }

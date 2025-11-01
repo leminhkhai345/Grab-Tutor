@@ -15,6 +15,7 @@ import com.grabtutor.grabtutor.mapper.VerificationRequestMapper;
 import com.grabtutor.grabtutor.mapper.VirtualTransactionMapper;
 import com.grabtutor.grabtutor.repository.*;
 import com.grabtutor.grabtutor.service.UserService;
+import com.grabtutor.grabtutor.websocket.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -53,7 +54,7 @@ public class UserServiceImpl implements UserService {
     JavaMailSender mailSender;
     VirtualTransactionMapper virtualTransactionMapper;
     VirtualTransactionRepository virtualTransactionRepository;
-    private final AccountBalanceRepository accountBalanceRepository;
+    AccountBalanceRepository accountBalanceRepository;
 
     @Override
     public UserResponse addUser(UserRequest userRequest){
@@ -88,6 +89,7 @@ public class UserServiceImpl implements UserService {
         String userId = jwt.getClaimAsString("userId");
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
         return userMapper.toUserResponse(user);
     }
 

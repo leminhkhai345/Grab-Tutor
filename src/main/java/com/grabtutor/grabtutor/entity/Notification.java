@@ -16,6 +16,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Notification extends BaseEntity{
+    String title;
     String content;
 
     @ManyToOne

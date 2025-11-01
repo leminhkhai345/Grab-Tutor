@@ -72,4 +72,7 @@ public class User extends BaseEntity {
 
     @ManyToMany(mappedBy = "enrolledUsers")
     Set<Course> enrolledCourses;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    List<Notification> notifications;
 }

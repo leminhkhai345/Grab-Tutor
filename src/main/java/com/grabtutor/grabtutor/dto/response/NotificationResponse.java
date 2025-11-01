@@ -1,5 +1,6 @@
 package com.grabtutor.grabtutor.dto.response;
 
+import com.grabtutor.grabtutor.entity.BaseEntity;
 import com.grabtutor.grabtutor.enums.MessageType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -15,15 +15,12 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
-public class MessageResponse {
+public class NotificationResponse extends BaseEntity {
     String id;
     String userId;
     MessageType type;
-    String email;
-    String roomId;
-    String message;
-    String fileName;
-    String fileUrl;
+    String title;
+    String content;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
 }
