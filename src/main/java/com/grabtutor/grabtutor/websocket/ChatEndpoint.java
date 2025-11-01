@@ -4,7 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grabtutor.grabtutor.dto.request.MessageRequest;
 import com.grabtutor.grabtutor.enums.MessageType;
+import com.grabtutor.grabtutor.mapper.MessageMapper;
+import com.grabtutor.grabtutor.service.ChatRoomService;
 import com.grabtutor.grabtutor.websocket.AuthHandshakeConfigurator;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,21 +20,24 @@ import java.io.IOException;
 
 @Component
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 // 1. Dùng URL /ws/chat
 // 2. Chỉ định Configurator đã tạo
 @ServerEndpoint(value = "/ws/chat", configurator = AuthHandshakeConfigurator.class)
 public class ChatEndpoint {
 
     // === Static Injection Hack (bắt buộc) ===
-    private static WebSocketSessionRegistry sessionRegistry;
+    static WebSocketSessionRegistry sessionRegistry;
 
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    ChatRoomService chatRoomService;
     @Autowired
     public void setSessionRegistry(WebSocketSessionRegistry registry) {
         ChatEndpoint.sessionRegistry = registry;
     }
     // =====================================
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @OnOpen
     public void onOpen(Session session) throws IOException {
@@ -59,7 +67,8 @@ public class ChatEndpoint {
 
             case MessageType.MESSAGE:
                 // Gửi toàn bộ object JSON cho các thành viên
-                sessionRegistry.sendMessageToRoom(request.getRoomId(), request);
+                var response = chatRoomService.saveMessage(request);
+                sessionRegistry.sendMessageToRoom(request.getRoomId(), response);
                 break;
 
             default:
@@ -78,4 +87,5 @@ public class ChatEndpoint {
         log.error("onError: {}", session.getId(), throwable);
         sessionRegistry.removeSession(session);
     }
+
 }

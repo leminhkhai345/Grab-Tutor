@@ -10,6 +10,7 @@ import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.TutorBidMapper;
 import com.grabtutor.grabtutor.repository.*;
 import com.grabtutor.grabtutor.service.TutorBidService;
+import com.grabtutor.grabtutor.websocket.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -39,12 +40,12 @@ import java.util.regex.Pattern;
 public class TutorBidServiceImpl implements TutorBidService {
     PostRepository postRepository;
     TutorBidRepository tutorBidRepository;
-    UserTransactionRepository userTransactionRepository;
     AccountBalanceRepository  accountBalanceRepository;
-    ChatRoomRepository chatRoomRepository;
     UserRepository userRepository;
     TutorBidMapper tutorBidMapper;
+    NotificationService notificationService;
     RedisTemplate<String, String> redisTemplate;
+
 
     @Override
     @Transactional
@@ -72,6 +73,11 @@ public class TutorBidServiceImpl implements TutorBidService {
         bid.setUser(sender);
 
         tutorBidRepository.save(bid);
+
+        notificationService.sendNotification(post.getUser().getId()
+                , "Post" + post.getId()
+                , "User "+ sender.getEmail() +" just offered to solve your problem.");
+
         return tutorBidMapper.toTutorBidResponse(bid);
     }
 
@@ -166,6 +172,9 @@ public class TutorBidServiceImpl implements TutorBidService {
 
         postRepository.save(post);
 
+        notificationService.sendNotification(receiver.getId()
+                , "Post " + post.getId()
+                , "User "+ sender.getEmail() +" has accepted your offer.");
 //        redisTemplate.opsForZSet().add("chatroom:submit", room.getId(),
 //        room.getCreatedAt()
 //        .atZone(ZoneId.systemDefault())
@@ -186,5 +195,8 @@ public class TutorBidServiceImpl implements TutorBidService {
         if(!bid.getStatus().equals(BiddingStatus.PENDING)) throw new AppException(ErrorCode.BID_NOT_PENDING);
         bid.setStatus(BiddingStatus.CANCELED);
         tutorBidRepository.save(bid);
+        notificationService.sendNotification(bid.getUser().getId()
+                , "Post" + bid.getPost().getId()
+                , "User "+ bid.getUser().getEmail() +" has cancel their offer.");
     }
 }
