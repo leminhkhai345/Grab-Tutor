@@ -12,6 +12,7 @@ import com.grabtutor.grabtutor.repository.UserRepository;
 import com.grabtutor.grabtutor.repository.VirtualTransactionRepository;
 import com.grabtutor.grabtutor.service.VNPayService;
 import com.grabtutor.grabtutor.service.config.VNPayConfig;
+import com.grabtutor.grabtutor.websocket.NotificationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -41,6 +42,7 @@ public class VNPayServiceImpl implements VNPayService {
     VirtualTransactionRepository  virtualTransactionRepository;
     UserRepository userRepository;
     VirtualTransactionMapper  virtualTransactionMapper;
+    NotificationService notificationService;
 
     double addFundRate = 0.1;
     @Override
@@ -143,7 +145,6 @@ public class VNPayServiceImpl implements VNPayService {
         String totalAmount = request.getParameter("vnp_Amount");
 
         var accountBalance = user.getAccountBalance();
-        //Quy tắc cộng tiền tính sau
         var addAmount = Double.parseDouble(totalAmount)*addFundRate*0.01;
         accountBalance.setBalance(accountBalance.getBalance() + addAmount);
         var transaction = VirtualTransaction.builder()

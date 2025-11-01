@@ -44,9 +44,10 @@ public enum ErrorCode {
     TUTOR_NOT_AUTHORIZED(9002, "Tutor not authorized", HttpStatus.FORBIDDEN),
 
     CHAT_ROOM_NOT_FOUND(10001, "Chat room not found", HttpStatus.NOT_FOUND),
+    CHAT_ROOM_NOT_IN_DISPUTED(10002,"Chatroom status not in DISPUTED ", HttpStatus.CONFLICT),
 
     ACCOUNT_BALANCE_NOT_FOUND(11001, "Account balance not found", HttpStatus.NOT_FOUND),
-    ACCOUNT_DONT_HAVE_ENOUGH_MONEY(11002, "Account don't have enough money", HttpStatus.BAD_REQUEST),
+    ACCOUNT_DONT_HAVE_ENOUGH_MONEY(11002, "Account doesn't have enough money", HttpStatus.BAD_REQUEST),
     USER_ALREADY_ENROLLED_COURSE(11003, "User already enrolled in this course", HttpStatus.CONFLICT),
 
     VERIFICATION_REQUEST_NOT_FOUND(12001, "Verification request not found", HttpStatus.NOT_FOUND),

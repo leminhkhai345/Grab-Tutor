@@ -6,6 +6,7 @@ import com.grabtutor.grabtutor.dto.response.LoadMessagesResponse;
 import com.grabtutor.grabtutor.dto.response.MessageResponse;
 import com.grabtutor.grabtutor.entity.ChatRoom;
 import com.grabtutor.grabtutor.entity.User;
+import com.grabtutor.grabtutor.enums.PostStatus;
 import com.grabtutor.grabtutor.enums.RoomStatus;
 import com.grabtutor.grabtutor.enums.TransactionStatus;
 import com.grabtutor.grabtutor.exception.AppException;
@@ -33,6 +34,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     ChatRoomMapper chatRoomMapper;
     UserRepository userRepository;
     ChatRoomRepository chatRoomRepository;
+    PostRepository postRepository;
     MessageRepository messageRepository;
     UserTransactionRepository userTransactionRepository;
     AccountBalanceRepository  accountBalanceRepository;
@@ -102,6 +104,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     public void submitSolution(String roomId) {
         var room = chatRoomRepository.findById(roomId)
                 .orElseThrow(()-> new AppException(ErrorCode.CHAT_ROOM_NOT_FOUND));
+        if(!room.getStatus().equals(RoomStatus.IN_PROGRESS)) throw new AppException(ErrorCode.FORBIDDEN);
         room.setStatus(RoomStatus.SUBMITTED);
         chatRoomRepository.save(room);
     }
@@ -110,24 +113,31 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Override
     @Transactional
     public void confirmedSolution(String roomId) {
-        var room = chatRoomRepository.findById(roomId)
-                .orElseThrow(()-> new AppException(ErrorCode.CHAT_ROOM_NOT_FOUND));
+        var post = postRepository.findByChatRoomId(roomId).orElseThrow(()-> new AppException(ErrorCode.POST_NOT_EXIST));
+        var room = post.getChatRoom();
+
+        if(!room.getStatus().equals(RoomStatus.SUBMITTED)) throw new AppException(ErrorCode.FORBIDDEN);
         room.setStatus(RoomStatus.CONFIRMED);
         room.setChatEnabled(false);
-        chatRoomRepository.save(room);
+        post.setStatus(PostStatus.SOLVED);
+        postRepository.save(post);
 
         var transaction = room.getPost().getUserTransaction();
         var tutor = transaction.getReceiver();
         transaction.setStatus(TransactionStatus.SUCCESS);
         tutor.getAccountBalance().setBalance(tutor.getAccountBalance().getBalance() + transaction.getAmount());
+
         accountBalanceRepository.save(tutor.getAccountBalance());
+        userTransactionRepository.save(transaction);
     }
+
 
     @PreAuthorize("hasRole('ADMIN')")
     @Override
     public void inspectSolution(String roomId) {
         var room = chatRoomRepository.findById(roomId)
                 .orElseThrow(()-> new AppException(ErrorCode.CHAT_ROOM_NOT_FOUND));
+        if(!room.getStatus().equals(RoomStatus.SUBMITTED)) throw new AppException(ErrorCode.FORBIDDEN);
         room.setStatus(RoomStatus.DISPUTED);
         room.setChatEnabled(false);
         chatRoomRepository.save(room);
@@ -138,21 +148,27 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Override
     @Transactional
     public void resolveSolution(String roomId, boolean isNormal) {
-        var room = chatRoomRepository.findById(roomId)
-                .orElseThrow(()-> new AppException(ErrorCode.CHAT_ROOM_NOT_FOUND));
-        RoomStatus status = isNormal ? RoomStatus.RESOLVED_NORMAL :  RoomStatus.RESOLVED_REFUND;
+        var post = postRepository.findByChatRoomId(roomId).orElseThrow(()-> new AppException(ErrorCode.POST_NOT_EXIST));
+        var room = post.getChatRoom();
 
+        if(!room.getStatus().equals(RoomStatus.DISPUTED)) throw new AppException(ErrorCode.CHAT_ROOM_NOT_IN_DISPUTED);
+        RoomStatus status = isNormal ? RoomStatus.RESOLVED_NORMAL :  RoomStatus.RESOLVED_REFUND;
         room.setStatus(status);
-        chatRoomRepository.save(room);
+        room.setChatEnabled(false);
+        postRepository.save(post);
 
         var transaction = room.getPost().getUserTransaction();
         User receiver;
         if(isNormal){
             receiver = transaction.getReceiver();
-        } else receiver = transaction.getSender();
-
-        transaction.setStatus(TransactionStatus.FAILED);
+            transaction.setStatus(TransactionStatus.SUCCESS);
+        } else{
+            receiver = transaction.getSender();
+            transaction.setStatus(TransactionStatus.FAILED);
+        }
         receiver.getAccountBalance().setBalance(receiver.getAccountBalance().getBalance() + transaction.getAmount());
+
         accountBalanceRepository.save(receiver.getAccountBalance());
+        userTransactionRepository.save(transaction);
     }
 }

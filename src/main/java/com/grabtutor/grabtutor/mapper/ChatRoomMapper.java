@@ -13,6 +13,7 @@ public interface ChatRoomMapper {
                 .updatedAt(chatRoom.getUpdatedAt())
                 .id(chatRoom.getId())
                 .postId(chatRoom.getPost().getId())
+                .status(chatRoom.getStatus())
                 .build();
     }
 }

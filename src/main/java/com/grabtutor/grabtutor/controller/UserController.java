@@ -45,6 +45,7 @@ public class UserController {
 
     @GetMapping("/myInfo")
     public ApiResponse<?> getMyInfo(){
+
         return ApiResponse.builder()
                 .message("get my info successfully")
                 .data(userService.getMyInfo())

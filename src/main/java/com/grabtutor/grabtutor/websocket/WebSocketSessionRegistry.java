@@ -2,7 +2,9 @@ package com.grabtutor.grabtutor.websocket;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grabtutor.grabtutor.dto.request.MessageRequest;
 import com.grabtutor.grabtutor.dto.response.MessageResponse;
+import com.grabtutor.grabtutor.entity.Notification;
 import com.grabtutor.grabtutor.mapper.MessageMapper;
+import com.grabtutor.grabtutor.mapper.NotificationMapper;
 import com.grabtutor.grabtutor.service.ChatRoomService;
 import com.grabtutor.grabtutor.service.impl.ChatRoomServiceImpl;
 import lombok.Builder;
@@ -35,8 +37,9 @@ public class WebSocketSessionRegistry {
     ObjectMapper objectMapper;
 
     MessageMapper messageMapper;
-
+    NotificationMapper notificationMapper;
     ChatRoomService chatRoomService;
+
     /**
      * Khi user kết nối (mở tab)
      */
@@ -106,22 +109,22 @@ public class WebSocketSessionRegistry {
             log.warn("No sessions found for room {}", roomId);
             return;
         }
-//        var response = chatRoomService.saveMessage(messageDto);
-        String messageJson = serializeMessage(messageMapper.ToMessageResponse(messageDto));
+        var response = chatRoomService.saveMessage(messageDto);
+        String messageJson = serializeMessage(response);
         sessionsInRoom.forEach(session -> sendMessage(session, messageJson));
     }
 
     /**
      * Gửi thông báo đến TẤT CẢ các tab của 1 user
      */
-    public void sendNotificationToUser(String userId, Object notificationDto) {
+    public void sendNotificationToUser(String userId, Notification notification) {
         Set<Session> sessionsForUser = userSessions.get(userId);
         if (sessionsForUser == null) {
             log.warn("No sessions found for user {}", userId);
             return;
         }
-        String messageJson = serializeMessage(notificationDto);
-        sessionsForUser.forEach(session -> sendMessage(session, messageJson));
+        String notificationJson = serializeMessage(notificationMapper.toNotificationResponse(notification));
+        sessionsForUser.forEach(session -> sendMessage(session, notificationJson));
     }
 
     // --- Helper Methods ---
