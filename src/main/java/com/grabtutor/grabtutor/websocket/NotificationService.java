@@ -2,6 +2,7 @@ package com.grabtutor.grabtutor.websocket;
 
 import com.grabtutor.grabtutor.dto.response.NotificationResponse;
 import com.grabtutor.grabtutor.entity.Notification;
+import com.grabtutor.grabtutor.enums.MessageType;
 import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.repository.NotificationRepository;
@@ -41,6 +42,9 @@ public class NotificationService {
                 .build();
         notificationRepository.save(notification);
         sessionRegistry.sendNotificationToUser(userId, notification);
+    }
+    public void sendSignal(String roomId, MessageType type,String title , String message) {
+        sessionRegistry.sendSignalToRoom(roomId, type, title, message);
     }
 
 }

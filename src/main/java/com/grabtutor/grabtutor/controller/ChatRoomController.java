@@ -1,6 +1,8 @@
 package com.grabtutor.grabtutor.controller;
 
+import com.grabtutor.grabtutor.dto.request.UpdateMessageRequest;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
+import com.grabtutor.grabtutor.entity.Message;
 import com.grabtutor.grabtutor.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,6 +24,27 @@ public class ChatRoomController {
                 .message("Load message successfully")
                 .build();
     }
+    @GetMapping("/message/{messageId}")
+    public ApiResponse<?> getMessage(@PathVariable String messageId) {
+        return ApiResponse.builder()
+                .data(chatRoomService.getMessage(messageId))
+                .message("Get message successfully")
+                .build();
+    }
+    @PutMapping("/message")
+    public ApiResponse<?> updateMessage(@RequestBody UpdateMessageRequest request) {
+        return ApiResponse.builder()
+                .data(chatRoomService.updateMessage(request.getMessageId(), request.getContent()))
+                .message("Updated message successfully")
+                .build();
+    }
+    @DeleteMapping("/message")
+    public ApiResponse<?> deleteMessage(@RequestParam String messageId) {
+        chatRoomService.deleteMessage(messageId);
+        return ApiResponse.builder()
+                .message("Deleted message successfully")
+                .build();
+    }
     @GetMapping("/myRooms")
     public ApiResponse<?> loadMyRooms(){
         return ApiResponse.builder()
@@ -40,28 +63,28 @@ public class ChatRoomController {
     public ApiResponse<?> submitSolution(@RequestParam String roomId){
         chatRoomService.submitSolution(roomId);
         return ApiResponse.builder()
-                .message("Submit solution successfully")
+                .message("Submitted solution successfully")
                 .build();
     }
     @PutMapping("/confirm")
     public ApiResponse<?> confirmSolution(@RequestParam String roomId){
         chatRoomService.confirmedSolution(roomId);
         return ApiResponse.builder()
-                .message("Submit solution successfully")
+                .message("Confirmed solution successfully")
                 .build();
     }
     @PutMapping("/inspect")
     public ApiResponse<?> inspectSolution(@RequestParam String roomId){
         chatRoomService.inspectSolution(roomId);
         return ApiResponse.builder()
-                .message("Submit solution successfully")
+                .message("Inspected solution successfully")
                 .build();
     }
     @PutMapping("/resolve")
     public ApiResponse<?> submitSolution(@RequestParam String roomId, @RequestParam boolean isNormal){
         chatRoomService.resolveSolution(roomId, isNormal);
         return ApiResponse.builder()
-                .message("Submit solution successfully")
+                .message("Resolved dispute successfully")
                 .build();
     }
 

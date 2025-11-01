@@ -2,7 +2,11 @@ package com.grabtutor.grabtutor.websocket;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grabtutor.grabtutor.dto.request.MessageRequest;
 import com.grabtutor.grabtutor.dto.response.MessageResponse;
+import com.grabtutor.grabtutor.dto.response.SignalResponse;
+import com.grabtutor.grabtutor.entity.Message;
 import com.grabtutor.grabtutor.entity.Notification;
+import com.grabtutor.grabtutor.enums.MessageType;
+import com.grabtutor.grabtutor.enums.RoomStatus;
 import com.grabtutor.grabtutor.mapper.MessageMapper;
 import com.grabtutor.grabtutor.mapper.NotificationMapper;
 import com.grabtutor.grabtutor.service.ChatRoomService;
@@ -38,7 +42,6 @@ public class WebSocketSessionRegistry {
 
     MessageMapper messageMapper;
     NotificationMapper notificationMapper;
-    ChatRoomService chatRoomService;
 
     /**
      * Khi user kết nối (mở tab)
@@ -103,14 +106,13 @@ public class WebSocketSessionRegistry {
     /**
      * Gửi tin nhắn chat đến tất cả user trong phòng
      */
-    public void sendMessageToRoom(String roomId, MessageRequest messageDto) {
+    public void sendMessageToRoom(String roomId, MessageResponse message) {
         Set<Session> sessionsInRoom = roomSessions.get(roomId);
         if (sessionsInRoom == null) {
             log.warn("No sessions found for room {}", roomId);
             return;
         }
-        var response = chatRoomService.saveMessage(messageDto);
-        String messageJson = serializeMessage(response);
+        String messageJson = serializeMessage(message);
         sessionsInRoom.forEach(session -> sendMessage(session, messageJson));
     }
 
@@ -125,6 +127,20 @@ public class WebSocketSessionRegistry {
         }
         String notificationJson = serializeMessage(notificationMapper.toNotificationResponse(notification));
         sessionsForUser.forEach(session -> sendMessage(session, notificationJson));
+    }
+    public void sendSignalToRoom(String roomId, MessageType type, String title, String message) {
+        Set<Session> sessionsInRoom = roomSessions.get(roomId);
+        if (sessionsInRoom == null) {
+            log.warn("No sessions found for room {}", roomId);
+            return;
+        }
+        var signal = SignalResponse.builder()
+                .type(type)
+                .title(title)
+                .message(message)
+                .build();
+        String signalJson = serializeMessage(signal);
+        sessionsInRoom.forEach(session -> sendMessage(session, signalJson));
     }
 
     // --- Helper Methods ---

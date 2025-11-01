@@ -1,11 +1,13 @@
 package com.grabtutor.grabtutor.service.impl;
 
 import com.grabtutor.grabtutor.dto.request.MessageRequest;
+import com.grabtutor.grabtutor.dto.response.ChatRoomResponse;
 import com.grabtutor.grabtutor.dto.response.LoadChatRoomsResponse;
 import com.grabtutor.grabtutor.dto.response.LoadMessagesResponse;
 import com.grabtutor.grabtutor.dto.response.MessageResponse;
 import com.grabtutor.grabtutor.entity.ChatRoom;
 import com.grabtutor.grabtutor.entity.User;
+import com.grabtutor.grabtutor.enums.MessageType;
 import com.grabtutor.grabtutor.enums.PostStatus;
 import com.grabtutor.grabtutor.enums.RoomStatus;
 import com.grabtutor.grabtutor.enums.TransactionStatus;
@@ -15,6 +17,7 @@ import com.grabtutor.grabtutor.mapper.ChatRoomMapper;
 import com.grabtutor.grabtutor.mapper.MessageMapper;
 import com.grabtutor.grabtutor.repository.*;
 import com.grabtutor.grabtutor.service.ChatRoomService;
+import com.grabtutor.grabtutor.websocket.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,6 +27,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +43,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     MessageRepository messageRepository;
     UserTransactionRepository userTransactionRepository;
     AccountBalanceRepository  accountBalanceRepository;
+    NotificationService notificationService;
 
     @Override
     public MessageResponse saveMessage(MessageRequest request) {
@@ -53,13 +59,13 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         Jwt jwt = (Jwt) auth.getPrincipal();
         String userId = jwt.getClaim("userId");
 
-        String role =  jwt.getClaim("role");
+        String role =  jwt.getClaim("scope");
 
         var room = chatRoomRepository.findById(roomId)
                 .orElseThrow(()-> new AppException(ErrorCode.CHAT_ROOM_NOT_FOUND));
         boolean valid = false;
 
-        if(role == "ADMIN"){
+        if(Objects.equals(role, "ROLE_ADMIN")){
             valid = true;
         }
         for(User user : room.getUsers() ){
@@ -91,6 +97,74 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .rooms(user.getChatRooms().stream().map(chatRoomMapper::toChatRoomResponse).toList())
                 .build();
     }
+
+    @Override
+    public ChatRoomResponse getChatRoom(String roomId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String userId = jwt.getClaimAsString("userId");
+        String role =  jwt.getClaim("scope");
+
+        var room = chatRoomRepository.findById(roomId).orElseThrow(()-> new AppException(ErrorCode.CHAT_ROOM_NOT_FOUND));
+
+        boolean valid = room.getUsers()
+                .stream()
+                .anyMatch(user -> user.getId().equals(userId));
+        if(Objects.equals(role, "ROLE_ADMIN")) valid = true;
+        if(!valid){
+            throw new AppException(ErrorCode.FORBIDDEN);
+        }
+        return chatRoomMapper.toChatRoomResponse(room);
+    }
+
+    @Override
+    public MessageResponse getMessage(String messageId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String userId = jwt.getClaimAsString("userId");
+        String role =  jwt.getClaim("scope");
+
+        var message = messageRepository.findById(messageId).orElseThrow(()->new AppException(ErrorCode.MESSAGE_NOT_FOUND));
+        boolean valid = message.getChatRoom()
+                .getUsers()
+                .stream()
+                .anyMatch(user -> user.getId().equals(userId));
+        if(Objects.equals(role, "ROLE_ADMIN")) valid = true;
+        if(!valid){
+            throw new AppException(ErrorCode.FORBIDDEN);
+        }
+        return messageMapper.ToMessageResponse(message);
+    }
+
+    @Override
+    public void deleteMessage(String messageId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String userId = jwt.getClaimAsString("userId");
+
+        var message = messageRepository.findById(messageId).orElseThrow(()->new AppException(ErrorCode.MESSAGE_NOT_FOUND));
+        if(!message.getUser().getId().equals(userId)){
+            throw new AppException(ErrorCode.FORBIDDEN);
+        }
+        message.setDeleted(true);
+        messageRepository.save(message);
+    }
+
+    @Override
+    public MessageResponse updateMessage(String messageId, String content) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String userId = jwt.getClaimAsString("userId");
+
+        var message = messageRepository.findById(messageId).orElseThrow(()->new AppException(ErrorCode.MESSAGE_NOT_FOUND));
+        if(!message.getUser().getId().equals(userId)){
+            throw new AppException(ErrorCode.FORBIDDEN);
+        }
+        message.setMessage(content);
+        messageRepository.save(message);
+        return messageMapper.ToMessageResponse(message);
+    }
+
     @Override
     @PreAuthorize("hasRole('ADMIN')")
     public LoadChatRoomsResponse loadRooms(String userId) {
@@ -99,6 +173,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .rooms(user.getChatRooms().stream().map(chatRoomMapper::toChatRoomResponse).toList())
                 .build();
     }
+
     @PreAuthorize("hasRole('TUTOR')")
     @Override
     public void submitSolution(String roomId) {
@@ -107,6 +182,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         if(!room.getStatus().equals(RoomStatus.IN_PROGRESS)) throw new AppException(ErrorCode.FORBIDDEN);
         room.setStatus(RoomStatus.SUBMITTED);
         chatRoomRepository.save(room);
+        notificationService.sendSignal(roomId, MessageType.SUBMIT, "Solution submitted", "");
     }
 
     @PreAuthorize("hasRole('USER')")
@@ -129,6 +205,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         accountBalanceRepository.save(tutor.getAccountBalance());
         userTransactionRepository.save(transaction);
+        notificationService.sendSignal(roomId, MessageType.CONFIRM, "Solution confirmed", "");
+        notificationService.sendNotification(tutor.getId(),"Account balance", "+"+transaction.getAmount());
     }
 
 
@@ -142,6 +220,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         room.setChatEnabled(false);
         chatRoomRepository.save(room);
         //ADMIN thực hiện kiểm tra tin nhắn
+
+        notificationService.sendSignal(roomId, MessageType.DISPUTE
+                , "ChatRoom is in dispute"
+                , "Admin is checking the solution, please wait.");
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -170,5 +252,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         accountBalanceRepository.save(receiver.getAccountBalance());
         userTransactionRepository.save(transaction);
+
+        notificationService.sendSignal(roomId, MessageType.RESOLVE
+                , "ChatRoom resolved"
+                , "The report has been reviewed. "+receiver.getEmail() +" were found to be in the right.");
+        notificationService.sendNotification(receiver.getId(),"Account balance", "+"+transaction.getAmount());
     }
 }

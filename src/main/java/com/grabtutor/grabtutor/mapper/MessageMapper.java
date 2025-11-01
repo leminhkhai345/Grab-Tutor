@@ -15,6 +15,7 @@ public interface MessageMapper {
             return null;
         }
         return MessageResponse.builder()
+                .id(message.getId())
                 .roomId(message.getChatRoom().getId())
                 .userId(message.getUser().getId())
                 .fileUrl(message.getFileUrl())
@@ -24,9 +25,11 @@ public interface MessageMapper {
                 .createdAt(message.getCreatedAt())
                 .message(message.getMessage())
                 .email(message.getUser().getEmail())
+                .isDeleted(message.isDeleted())
                 .build();
     }
     Message ToMessage(MessageRequest message);
+
     default MessageResponse ToMessageResponse(MessageRequest message){
         if(message == null){
             return null;

@@ -24,6 +24,7 @@ public class MessageResponse {
     String message;
     String fileName;
     String fileUrl;
+    boolean isDeleted;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
 }
