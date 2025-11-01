@@ -115,7 +115,7 @@ public class CourseServiceImpl implements CourseService {
         response.setEnrolled(isEnrolled);
         return response;
     }
-
+    @PreAuthorize("hasRole('TUTOR')")
     @Override
     public void deleteCourse(String courseId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -190,7 +190,7 @@ public class CourseServiceImpl implements CourseService {
                 .build();
 
     }
-
+    @PreAuthorize("hasRole('USER')")
     @Override
     public PageResponse<?> getMyEnrolledCourses(int pageNo, int pageSize, String... sorts) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

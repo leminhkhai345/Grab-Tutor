@@ -100,6 +100,7 @@ public class SubjectServiceImpl implements SubjectService {
                 .build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public void deleteSubject(String id) {
         subjectRepository.deleteById(id);

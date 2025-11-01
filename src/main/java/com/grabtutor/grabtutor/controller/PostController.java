@@ -100,10 +100,11 @@ public class PostController {
 
     @GetMapping("/all")
     public ApiResponse<?> getALlPosts(@RequestParam(defaultValue = "0") int pageNo,
-                                      @RequestParam(defaultValue = "10") int pageSize){
+                                      @RequestParam(defaultValue = "10") int pageSize,
+                                      @RequestParam String... sorts){
         return ApiResponse.builder()
                 .message("get all posts")
-                .data(postService.getAllPosts(pageNo, pageSize))
+                .data(postService.getAllPosts(pageNo, pageSize, sorts))
                 .build();
         }
     @PutMapping("/acceptTutor")

@@ -15,7 +15,6 @@ import com.grabtutor.grabtutor.mapper.VerificationRequestMapper;
 import com.grabtutor.grabtutor.mapper.VirtualTransactionMapper;
 import com.grabtutor.grabtutor.repository.*;
 import com.grabtutor.grabtutor.service.UserService;
-import com.grabtutor.grabtutor.websocket.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -106,7 +105,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
     @Override
     public void deleteUser(String id){
         User user = getUser(id);
@@ -136,7 +135,6 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public PageResponse<?> getAllUsers(int pageNo, int pageSize, String ... sorts){
 

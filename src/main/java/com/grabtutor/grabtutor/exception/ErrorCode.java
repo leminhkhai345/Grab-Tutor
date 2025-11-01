@@ -52,11 +52,12 @@ public enum ErrorCode {
 
     VERIFICATION_REQUEST_NOT_FOUND(12001, "Verification request not found", HttpStatus.NOT_FOUND),
     INVALID_EMAIL_OR_PASSWORD(12002, "Invalid email or password", HttpStatus.UNAUTHORIZED),
+    LESSON_NOT_ACCESSIBLE(12003, "Lesson not accessible", HttpStatus.FORBIDDEN),
 
     TUTOR_BID_NOT_FOUND(13001, "Tutor bid not found", HttpStatus.NOT_FOUND),
     BID_NOT_PENDING(13002, "Cant accept non pending tutor bid", HttpStatus.BAD_REQUEST),
     ALREADY_PROPOSE_BID(13003, "Already propose bid to this post", HttpStatus.CONFLICT),
-
+    UNAUTHORIZED_ACCESS(13004, "You are not authorized to access this resource", HttpStatus.FORBIDDEN),
     TRANSACTION_FAILED(14001, "Transaction failed", HttpStatus.BAD_REQUEST),
 
     FORBIDDEN(88888, "You do not have permission to access this resource", HttpStatus.FORBIDDEN),

@@ -55,7 +55,7 @@ public class User extends BaseEntity {
     TutorInfo tutorInfo;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "accountBalanceId", nullable = false)
+    @JoinColumn(name = "accountBalanceId")
     AccountBalance accountBalance;
 
     @ManyToMany(mappedBy = "users")
