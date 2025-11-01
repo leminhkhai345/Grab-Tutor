@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +37,7 @@ public class ReviewServiceImpl implements ReviewService{
     ReviewMapper reviewMapper;
     PostRepository postRepository;
 
+    @PreAuthorize("hasRole('USER')")
     @Override
     public ReviewResponse createReview(String postId, ReviewRequest reviewRequest) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -89,7 +91,7 @@ public class ReviewServiceImpl implements ReviewService{
         return reviewMapper.toReviewResponse(review);
     }
 
-
+    @PreAuthorize("hasRole('USER')")
     @Override
     public ReviewResponse updateReview(String reviewId, ReviewRequest reviewRequest) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -97,6 +99,9 @@ public class ReviewServiceImpl implements ReviewService{
         String userId = jwt.getClaimAsString("userId");
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_EXIST));
+        if(review.isDeleted()){
+            throw new AppException(ErrorCode.REVIEW_NOT_EXIST);
+        }
         if(!review.getSender().getId().equals(userId)){
             throw new AppException(ErrorCode.FORBIDDEN);
         }
@@ -104,6 +109,7 @@ public class ReviewServiceImpl implements ReviewService{
         return reviewMapper.toReviewResponse(reviewRepository.save(review));
     }
 
+    @PreAuthorize("hasRole('USER')")
     @Override
     public void deleteReview(String reviewId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

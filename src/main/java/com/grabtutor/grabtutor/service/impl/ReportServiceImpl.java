@@ -66,12 +66,21 @@ public class ReportServiceImpl implements ReportService {
     public ReportResponse getReportById(String id) {
         Report report = reportRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.REPORT_NOT_EXIST));
-        if(report.isDeleted()){
+        if (report.isDeleted()) {
             throw new AppException(ErrorCode.REPORT_NOT_EXIST);
+        }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String userId = jwt.getClaimAsString("userId");
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        if (!report.getReceiver().getId().equals(userId) && !report.getSender().getId().equals(userId)
+                && !user.getRole().name().equals("ADMIN")) {
+            throw new AppException(ErrorCode.UNAUTHORIZED_ACCESS);
         }
         return reportMapper.toReportResponse(report);
     }
-
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TUTOR')")
     @Override
     public PageResponse<?> getReportByReceiverId(String receiverId, int pageNo, int pageSize, String... sorts) {
         List<Sort.Order> orders = new ArrayList<>();
@@ -99,7 +108,7 @@ public class ReportServiceImpl implements ReportService {
                 .items(reports.stream().map(reportMapper::toReportResponse).toList())
                 .build();
     }
-
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @Override
     public PageResponse<?> getReportBySenderId(String senderId, int pageNo, int pageSize, String... sorts) {
         List<Sort.Order> orders = new ArrayList<>();
@@ -156,13 +165,19 @@ public class ReportServiceImpl implements ReportService {
         postRepository.save(post);
         return reportMapper.toReportResponse(report);
     }
-
+    @PreAuthorize("hasRole('USER')")
     @Override
     public void deleteReport(String reportId) {
         Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new AppException(ErrorCode.REPORT_NOT_EXIST));
         if (report.isDeleted()) {
             throw new AppException(ErrorCode.REPORT_NOT_EXIST);
+        }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String userId = jwt.getClaimAsString("userId");
+        if (!report.getSender().getId().equals(userId)) {
+            throw new AppException(ErrorCode.FORBIDDEN);
         }
         report.setDeleted(true);
         reportRepository.save(report);

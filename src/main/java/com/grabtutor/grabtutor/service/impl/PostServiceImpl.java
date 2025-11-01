@@ -43,7 +43,7 @@ public class PostServiceImpl implements PostService {
     SubjectRepository subjectRepository;
     RedisTemplate<String, String> redisTemplate;
 
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER')")
     @Override
     @Transactional
     public PostResponse addPost(String subjectId, PostRequest request) {
@@ -84,6 +84,7 @@ public class PostServiceImpl implements PostService {
         return postMapper.toPostResponse(post);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @Override
     public PostResponse updatePost(String postId, PostRequest postRequest,
                                    String subjectId){
@@ -110,7 +111,7 @@ public class PostServiceImpl implements PostService {
 
         return postMapper.toPostResponse(postRepository.save(post));
     }
-
+    @PreAuthorize("hasRole('USER')")
     @Override
     public void deletePost(String postId) {
         Post post = postRepository.findById(postId)
@@ -118,6 +119,12 @@ public class PostServiceImpl implements PostService {
 
         if(post.isDeleted()) {
             throw new AppException(ErrorCode.POST_NOT_EXIST);
+        }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String userId = jwt.getClaimAsString("userId");
+        if(!post.getUser().getId().equals(userId)){
+            throw new AppException(ErrorCode.FORBIDDEN);
         }
         post.setDeleted(true);
         postRepository.save(post);

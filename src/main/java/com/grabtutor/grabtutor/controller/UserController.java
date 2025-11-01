@@ -1,6 +1,5 @@
 package com.grabtutor.grabtutor.controller;
 
-import com.cloudinary.Api;
 import com.grabtutor.grabtutor.dto.request.*;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
 import com.grabtutor.grabtutor.service.UserService;
