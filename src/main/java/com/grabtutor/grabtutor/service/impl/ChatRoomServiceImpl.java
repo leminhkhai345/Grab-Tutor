@@ -257,5 +257,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 , "ChatRoom resolved"
                 , "The report has been reviewed. "+receiver.getEmail() +" were found to be in the right.");
         notificationService.sendNotification(receiver.getId(),"Account balance", "+"+transaction.getAmount());
+
     }
 }
