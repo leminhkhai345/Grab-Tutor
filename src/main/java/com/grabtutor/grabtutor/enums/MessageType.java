@@ -4,9 +4,6 @@ public enum MessageType {
     JOIN,
     MESSAGE,
     NOTIFICATION,
-    SUBMIT,
-    CONFIRM,
-    DISPUTE,
-    RESOLVE,
-    TIMEOUT
+    TIMEOUT,
+    UPDATE
 }

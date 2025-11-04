@@ -5,7 +5,6 @@ import com.grabtutor.grabtutor.dto.response.ChatRoomResponse;
 import com.grabtutor.grabtutor.dto.response.LoadChatRoomsResponse;
 import com.grabtutor.grabtutor.dto.response.LoadMessagesResponse;
 import com.grabtutor.grabtutor.dto.response.MessageResponse;
-import com.grabtutor.grabtutor.entity.ChatRoom;
 import com.grabtutor.grabtutor.entity.User;
 import com.grabtutor.grabtutor.enums.MessageType;
 import com.grabtutor.grabtutor.enums.PostStatus;
@@ -17,6 +16,7 @@ import com.grabtutor.grabtutor.mapper.ChatRoomMapper;
 import com.grabtutor.grabtutor.mapper.MessageMapper;
 import com.grabtutor.grabtutor.repository.*;
 import com.grabtutor.grabtutor.service.ChatRoomService;
+import com.grabtutor.grabtutor.service.worker.ServiceJob;
 import com.grabtutor.grabtutor.websocket.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +44,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     UserTransactionRepository userTransactionRepository;
     AccountBalanceRepository  accountBalanceRepository;
     NotificationService notificationService;
+    ServiceJob serviceJob;
 
     @Override
     public MessageResponse saveMessage(MessageRequest request) {
@@ -179,10 +180,14 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     public void submitSolution(String roomId) {
         var room = chatRoomRepository.findById(roomId)
                 .orElseThrow(()-> new AppException(ErrorCode.CHAT_ROOM_NOT_FOUND));
+
         if(!room.getStatus().equals(RoomStatus.IN_PROGRESS)) throw new AppException(ErrorCode.FORBIDDEN);
         room.setStatus(RoomStatus.SUBMITTED);
         chatRoomRepository.save(room);
-        notificationService.sendSignal(roomId, MessageType.SUBMIT, "Solution submitted", "");
+
+        notificationService.sendSignal(roomId, MessageType.UPDATE, "Solution submitted", "");
+
+        serviceJob.addCheckRoomConfirmed(room.getId(), room.getCreatedAt());
     }
 
     @PreAuthorize("hasRole('USER')")
@@ -205,7 +210,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         accountBalanceRepository.save(tutor.getAccountBalance());
         userTransactionRepository.save(transaction);
-        notificationService.sendSignal(roomId, MessageType.CONFIRM, "Solution confirmed", "");
+
+        notificationService.sendSignal(roomId, MessageType.UPDATE, "Solution confirmed", "Problem solved!");
         notificationService.sendNotification(tutor.getId(),"Account balance", "+"+transaction.getAmount());
     }
 
@@ -221,7 +227,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         chatRoomRepository.save(room);
         //ADMIN thực hiện kiểm tra tin nhắn
 
-        notificationService.sendSignal(roomId, MessageType.DISPUTE
+        notificationService.sendSignal(roomId, MessageType.UPDATE
                 , "ChatRoom is in dispute"
                 , "Admin is checking the solution, please wait.");
     }
@@ -253,7 +259,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         accountBalanceRepository.save(receiver.getAccountBalance());
         userTransactionRepository.save(transaction);
 
-        notificationService.sendSignal(roomId, MessageType.RESOLVE
+        notificationService.sendSignal(roomId, MessageType.UPDATE
                 , "ChatRoom resolved"
                 , "The report has been reviewed. "+receiver.getEmail() +" were found to be in the right.");
         notificationService.sendNotification(receiver.getId(),"Account balance", "+"+transaction.getAmount());

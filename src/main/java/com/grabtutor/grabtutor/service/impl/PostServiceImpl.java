@@ -10,6 +10,7 @@ import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.PostMapper;
 import com.grabtutor.grabtutor.repository.*;
 import com.grabtutor.grabtutor.service.PostService;
+import com.grabtutor.grabtutor.service.worker.ServiceJob;
 import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,7 @@ public class PostServiceImpl implements PostService {
     PostMapper postMapper;
     UserRepository userRepository;
     SubjectRepository subjectRepository;
-    RedisTemplate<String, String> redisTemplate;
+    ServiceJob serviceJob;
 
     @PreAuthorize("hasRole('USER')")
     @Override
@@ -63,13 +64,10 @@ public class PostServiceImpl implements PostService {
         post.setSubject(subject);
         post.setStatus(PostStatus.OPEN);
         postRepository.save(post);
-        //Add vào queue -> tự động xóa bài sau 6 giờ
+        //Add vào queue -> tự động xóa bài sau 30 phút
         //Lúc này worker sẽ phải gửi thông báo cho user -> post đã được gỡ rồi
-//        redisTemplate.opsForZSet().add("post:expire", post.getId(),
-//                post.getCreatedAt()
-//                    .atZone(ZoneId.systemDefault())
-//                    .toInstant()
-//                    .toEpochMilli() + 3600000*6);
+        serviceJob.addCheckPost(post.getId(), post.getCreatedAt());
+
         return postMapper.toPostResponse(post);
     }
 
