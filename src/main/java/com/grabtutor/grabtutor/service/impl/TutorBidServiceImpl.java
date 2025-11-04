@@ -10,6 +10,7 @@ import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.TutorBidMapper;
 import com.grabtutor.grabtutor.repository.*;
 import com.grabtutor.grabtutor.service.TutorBidService;
+import com.grabtutor.grabtutor.service.worker.ServiceJob;
 import com.grabtutor.grabtutor.websocket.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -44,7 +44,7 @@ public class TutorBidServiceImpl implements TutorBidService {
     UserRepository userRepository;
     TutorBidMapper tutorBidMapper;
     NotificationService notificationService;
-    RedisTemplate<String, String> redisTemplate;
+    ServiceJob serviceJob;
 
 
     @Override
@@ -175,11 +175,9 @@ public class TutorBidServiceImpl implements TutorBidService {
         notificationService.sendNotification(receiver.getId()
                 , "Post " + post.getId()
                 , "User "+ sender.getEmail() +" has accepted your offer.");
-//        redisTemplate.opsForZSet().add("chatroom:submit", room.getId(),
-//        room.getCreatedAt()
-//        .atZone(ZoneId.systemDefault())
-//        .toInstant()
-//        .toEpochMilli() + 60000*30);
+
+        //Set job để đẩy thông báo timeout lên FE
+        serviceJob.addCheckRoomTimeout(room.getId(), room.getCreatedAt());
     }
 
     @Override
@@ -195,6 +193,7 @@ public class TutorBidServiceImpl implements TutorBidService {
         if(!bid.getStatus().equals(BiddingStatus.PENDING)) throw new AppException(ErrorCode.BID_NOT_PENDING);
         bid.setStatus(BiddingStatus.CANCELED);
         tutorBidRepository.save(bid);
+
         notificationService.sendNotification(bid.getUser().getId()
                 , "Post" + bid.getPost().getId()
                 , "User "+ bid.getUser().getEmail() +" has cancel their offer.");

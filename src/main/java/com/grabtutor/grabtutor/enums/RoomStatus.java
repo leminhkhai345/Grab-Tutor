@@ -6,5 +6,6 @@ public enum RoomStatus {
     CONFIRMED,
     DISPUTED,
     RESOLVED_REFUND,
-    RESOLVED_NORMAL
+    RESOLVED_NORMAL,
+    TIMEOUT
 }
