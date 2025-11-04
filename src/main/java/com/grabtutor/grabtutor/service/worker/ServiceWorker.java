@@ -85,8 +85,11 @@ public class ServiceWorker {
                 var room =  chatRoomRepository.findById(job.toString())
                         .orElseThrow(()->new AppException(ErrorCode.CHAT_ROOM_NOT_FOUND));
                 if(room.getStatus().equals(RoomStatus.IN_PROGRESS)){
+
                     room.setStatus(RoomStatus.TIMEOUT);
-                    chatRoomRepository.save(room);
+                    room.getPost().setStatus(PostStatus.CLOSED);
+
+                    postRepository.save(room.getPost());
                     notificationService.sendSignal(room.getId()
                         , MessageType.UPDATE
                         , "Submit timeout"
