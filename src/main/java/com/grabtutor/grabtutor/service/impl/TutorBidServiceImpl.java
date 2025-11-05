@@ -170,14 +170,14 @@ public class TutorBidServiceImpl implements TutorBidService {
         room.setPost(post);
         transaction.setPost(post);
 
-        postRepository.save(post);
+        post = postRepository.save(post);
 
         notificationService.sendNotification(receiver.getId()
                 , "Post " + post.getId()
                 , "User "+ sender.getEmail() +" has accepted your offer.");
 
         //Set job để đẩy thông báo timeout lên FE
-        serviceJob.addCheckRoomTimeout(room.getId(), room.getCreatedAt());
+        serviceJob.addCheckRoomTimeout(post.getChatRoom().getId(), post.getChatRoom().getCreatedAt());
     }
 
     @Override
