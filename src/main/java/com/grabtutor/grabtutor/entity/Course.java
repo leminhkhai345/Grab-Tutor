@@ -24,7 +24,7 @@ public class Course extends BaseEntity {
     double price;
     String imageUrl; // anh dai dien khoa hoc
     @Builder.Default
-    boolean isPublished = false;
+    boolean isPublished = true;
     @Builder.Default
     int totalLessons = 0;
     @ManyToMany
@@ -52,4 +52,7 @@ public class Course extends BaseEntity {
     )
     @JsonBackReference
     Set<User> enrolledUsers;
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<VirtualTransaction> transactions;
 }

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -71,6 +72,16 @@ public class CourseController {
         courseService.deleteCourse(courseId);
         return ApiResponse.builder()
                 .message("Course deleted successfully")
+                .build();
+    }
+
+    @PutMapping("/publish/{courseId}")
+    public ApiResponse<?> changePublishCourse(
+            @PathVariable String courseId,
+            @RequestParam boolean isPublished) {
+        return ApiResponse.builder()
+                .message("Course publish status changed successfully")
+                .data(courseService.changePublishCourse(courseId, isPublished))
                 .build();
     }
 

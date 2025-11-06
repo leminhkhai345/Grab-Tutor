@@ -19,10 +19,12 @@ import java.time.LocalDateTime;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class VirtualTransactionResponse {
-    String userId;
+    String accountBalanceId;
     TransactionStatus status;
     TransactionType type;
     LocalDateTime transactionDate;
     LocalDateTime completedAt;
     Double amount;
+    String courseId;
+    String postId;
 }

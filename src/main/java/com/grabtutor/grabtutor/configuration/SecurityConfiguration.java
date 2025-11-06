@@ -24,8 +24,12 @@ import org.springframework.web.filter.CorsFilter;
 @RequiredArgsConstructor
 public class SecurityConfiguration {
     private final String[] PUBLIC_ENDPOINTS = {
-            "/users", "/users/sendmail", "/upload","/auth/**", "/users/addTutor",
+            "/users/sendmail", "/upload","/auth/**", "/users/addTutor",
+            "/users/tutorInfo/{userId}", "users",
             "/transaction/vnpay-payment-return"
+    };
+    private final String[] authenticatedEndpoints = {
+            "/users/{userId}", "/users/myInfo",
     };
     private CustomJwtDecoder customJwtDecoder;
 
@@ -39,7 +43,8 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/posts/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/reviews/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/subjects/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/users/**")
+                        .requestMatchers(HttpMethod.GET, authenticatedEndpoints).authenticated()
+                        .requestMatchers(HttpMethod.GET, "/users/")
                         .hasAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated());
 

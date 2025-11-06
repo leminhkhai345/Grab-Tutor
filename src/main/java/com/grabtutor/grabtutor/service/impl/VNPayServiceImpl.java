@@ -152,7 +152,7 @@ public class VNPayServiceImpl implements VNPayService {
                 .completedAt(LocalDateTime.now())
                 .status(TransactionStatus.SUCCESS)
                 .amount(addAmount)
-                .user(user)
+                .accountBalance(user.getAccountBalance())
                 .build();
         accountBalanceRepository.save(accountBalance);
         transaction = virtualTransactionRepository.save(transaction);

@@ -29,7 +29,27 @@ public interface VirtualTransactionMapper {
     }
 
 
-    VirtualTransactionResponse toVirtualTransactionResponse(VirtualTransaction virtualTransaction);
+    default VirtualTransactionResponse toVirtualTransactionResponse(VirtualTransaction virtualTransaction) {
+        if ( virtualTransaction == null ) {
+            return null;
+        }
+
+        VirtualTransactionResponse.VirtualTransactionResponseBuilder virtualTransactionResponse = VirtualTransactionResponse.builder();
+        virtualTransactionResponse.accountBalanceId( virtualTransaction.getAccountBalance().getId() );
+        virtualTransactionResponse.status( virtualTransaction.getStatus() );
+        virtualTransactionResponse.type( virtualTransaction.getType() );
+        virtualTransactionResponse.transactionDate( virtualTransaction.getTransactionDate() );
+        virtualTransactionResponse.completedAt( virtualTransaction.getCompletedAt() );
+        virtualTransactionResponse.amount( virtualTransaction.getAmount() );
+        if ( virtualTransaction.getCourse() != null ) {
+            virtualTransactionResponse.courseId( virtualTransaction.getCourse().getId() );
+        }
+        if ( virtualTransaction.getPost() != null ) {
+            virtualTransactionResponse.postId( virtualTransaction.getPost().getId() );
+        }
+
+        return virtualTransactionResponse.build();
+    }
 
     default TransactionResponse toTransactionResponse(VirtualTransaction virtualTransaction){
         return TransactionResponse.builder()
@@ -39,7 +59,7 @@ public interface VirtualTransactionMapper {
                 .type(virtualTransaction.getType())
                 .amount(virtualTransaction.getAmount())
                 .status(virtualTransaction.getStatus())
-                .userId(virtualTransaction.getUser().getId())
+                .userId(virtualTransaction.getAccountBalance().getUser().getId())
                 .createdAt(virtualTransaction.getCreatedAt())
                 .updatedAt(virtualTransaction.getUpdatedAt())
                 .build();
