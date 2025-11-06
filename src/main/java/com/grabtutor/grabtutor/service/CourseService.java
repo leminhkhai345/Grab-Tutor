@@ -13,6 +13,7 @@ public interface CourseService {
     CourseResponse getCourseByCourseId(String courseId);
     CourseResponse updateCourse(String courseId, CourseRequest request, Set<String> subjectIds);
     void deleteCourse(String courseId);
+    CourseResponse changePublishCourse(String courseId, boolean isPublished);
     List<CourseResponse> getAllCoursesByTutorId(String tutorId, int pageNo, int pageSize, String... sorts);
     VirtualTransactionResponse enrollCourse(String courseId);
     PageResponse<?> getMyEnrolledCourses(int pageNo, int pageSize, String... sorts);

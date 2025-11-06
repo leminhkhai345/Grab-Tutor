@@ -54,9 +54,7 @@ public class UserController {
     @GetMapping("/all")
     public ApiResponse<?> getALlUsers(@RequestParam(defaultValue = "0") int pageNo,
                                       @RequestParam(defaultValue = "10") int pageSize, String... sorts){
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        log.info("Username: {}", authentication.getName());
-        authentication.getAuthorities().forEach(authority -> log.info(authority.getAuthority()));
+
 
         return ApiResponse.builder()
                 .message("get all users simple successfully")
@@ -143,6 +141,16 @@ public class UserController {
                 .success(true)
                 .data(userService.withdrawMoney(withdrawAmount))
                 .message("Withdraw request created successfully")
+                .build();
+    }
+
+    @GetMapping("/myVirtualTransactions")
+    public ApiResponse<?> getMyVirtualTransactions(@RequestParam (defaultValue = "0") int pageNo,
+                                                  @RequestParam (defaultValue = "10") int pageSize, String... sorts) {
+        return ApiResponse.builder()
+                .success(true)
+                .data(userService.getMyVirtualTransactions(pageNo, pageSize, sorts))
+                .message("Get my virtual transactions successfully")
                 .build();
     }
 

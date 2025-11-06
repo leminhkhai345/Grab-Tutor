@@ -20,5 +20,23 @@ public interface PostMapper {
         }
     }
 
-    PostResponse toPostResponse(Post post);
+    default PostResponse toPostResponse(Post post) {
+        if (post == null) {
+            return null;
+        } else {
+            PostResponse.PostResponseBuilder postResponse = PostResponse.builder();
+            postResponse.id(post.getId());
+            postResponse.imageUrl(post.getImageUrl());
+            postResponse.description(post.getDescription());
+            if (post.getStatus() != null) {
+                postResponse.status(post.getStatus().name());
+            }
+            postResponse.userId(post.getUser().getId());
+            postResponse.subjectId(post.getSubject().getId());
+            postResponse.isDeleted(post.isDeleted());
+            postResponse.createdAt(post.getCreatedAt());
+            postResponse.updatedAt(post.getUpdatedAt());
+            return postResponse.build();
+        }
+    }
 }

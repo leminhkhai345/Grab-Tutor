@@ -48,4 +48,7 @@ public class Post extends BaseEntity {
 
     @OneToMany(mappedBy = "post")
     List<TutorBid> tutorBids;
+
+    @OneToMany(mappedBy = "post")
+    List<VirtualTransaction> virtualTransactions;
 }

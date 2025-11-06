@@ -14,8 +14,10 @@ public class PostResponse {
     String id;
     String imageUrl;
     String description;
+    String status;
+    String userId;
+    String subjectId;
     boolean isDeleted;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
-    String status;
 }

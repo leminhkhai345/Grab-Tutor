@@ -133,6 +133,24 @@ public class CourseServiceImpl implements CourseService {
         courseRepository.save(course);
     }
 
+    @PreAuthorize("hasRole('TUTOR')")
+    @Override
+    public CourseResponse changePublishCourse(String courseId, boolean isPublished) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String tutorId = jwt.getClaimAsString("userId");
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+        if(course.isDeleted()) {
+            throw new AppException(ErrorCode.COURSE_NOT_FOUND);
+        }
+        if(!course.getTutor().getId().equals(tutorId)) {
+            throw new AppException(ErrorCode.FORBIDDEN);
+        }
+        course.setPublished(isPublished);
+        return courseMapper.toCourseResponse(courseRepository.save(course));
+    }
+
     @Override
     public List<CourseResponse> getAllCoursesByTutorId(String tutorId, int pageNo, int pageSize, String... sorts) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sorts));
@@ -167,12 +185,13 @@ public class CourseServiceImpl implements CourseService {
         }
 
         VirtualTransaction enrollment = virtualTransactionMapper.toVirtualTransaction(courseId);
-        enrollment.setUser(user);
+        enrollment.setAccountBalance(user.getAccountBalance());
         enrollment.setAmount(course.getPrice());
         accountBalance.setBalance(accountBalance.getBalance() - course.getPrice());
         enrollment.setCompletedAt(LocalDateTime.now());
         enrollment.setStatus(TransactionStatus.SUCCESS);
         enrollment.setType(TransactionType.ENROLLMENT);
+        enrollment.setCourse(course);
 
         virtualTransactionRepository.save(enrollment);
         user.getEnrolledCourses().add(course);
@@ -181,7 +200,8 @@ public class CourseServiceImpl implements CourseService {
         courseRepository.save(course);
 
         return VirtualTransactionResponse.builder()
-                .userId(userId)
+                .accountBalanceId(user.getAccountBalance().getId())
+                .courseId(course.getId())
                 .amount(course.getPrice())
                 .status(enrollment.getStatus())
                 .type(enrollment.getType())

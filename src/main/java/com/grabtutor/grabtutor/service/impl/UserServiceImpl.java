@@ -338,7 +338,7 @@ public class UserServiceImpl implements UserService {
             throw new AppException(ErrorCode.ACCOUNT_DONT_HAVE_ENOUGH_MONEY);
         }
         VirtualTransaction withdrawTransaction = virtualTransactionMapper.toVirtualTransaction(withdrawAmount);
-        withdrawTransaction.setUser(user);
+        withdrawTransaction.setAccountBalance(user.getAccountBalance());
         withdrawTransaction.setAmount(withdrawAmount);
         withdrawTransaction.setType(TransactionType.WITHDRAW);
         withdrawTransaction.setStatus(TransactionStatus.SUCCESS);
@@ -346,7 +346,7 @@ public class UserServiceImpl implements UserService {
         user.getAccountBalance().setBalance(user.getAccountBalance().getBalance() - withdrawAmount);
         virtualTransactionRepository.save(withdrawTransaction);
         return VirtualTransactionResponse.builder()
-                .userId(userId)
+                .accountBalanceId(user.getAccountBalance().getId())
                 .amount(withdrawAmount)
                 .type(withdrawTransaction.getType())
                 .status(withdrawTransaction.getStatus())
@@ -354,4 +354,38 @@ public class UserServiceImpl implements UserService {
                 .completedAt(withdrawTransaction.getCompletedAt())
                 .build();
     }
+
+    @Override
+    public PageResponse<?> getMyVirtualTransactions(int pageNo, int pageSize, String... sorts) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String userId = jwt.getClaimAsString("userId");
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        List<Sort.Order> orders = new ArrayList<>();
+        for(String sortBy : sorts){
+            // firstname:asc|desc
+            Pattern pattern = Pattern.compile("(\\w+?)(:)(.*)");
+            Matcher matcher = pattern.matcher(sortBy);
+            if(matcher.find()){
+                if(matcher.group(3).equalsIgnoreCase("asc")){
+                    orders.add(new Sort.Order(Sort.Direction.ASC, matcher.group(1)));
+                } else {
+                    orders.add(new Sort.Order(Sort.Direction.DESC, matcher.group(1)));
+                }
+            }
+        }
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(orders));
+        Page<VirtualTransaction> users = virtualTransactionRepository
+                .findAllByAccountBalanceId(user.getAccountBalance().getId(), pageable);
+
+        return PageResponse.builder()
+                .pageNo(pageNo)
+                .pageSize(pageSize)
+                .totalPages(users.getTotalPages())
+                .items(users.stream().map(virtualTransactionMapper::toVirtualTransactionResponse).toList())
+                .build();
+    }
+
 }

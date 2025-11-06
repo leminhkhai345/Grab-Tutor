@@ -150,6 +150,7 @@ public class ReportServiceImpl implements ReportService {
         }
         if(accept) {
             report.setStatus(ReportStatus.ACCEPTED);
+
         }
         else {
             report.setStatus(ReportStatus.REJECTED);

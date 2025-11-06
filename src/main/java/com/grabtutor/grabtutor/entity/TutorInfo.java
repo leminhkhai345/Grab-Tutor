@@ -11,9 +11,10 @@ import java.time.LocalDate;
 @Table(name = "tutor_info")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @SuperBuilder
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded  = true)
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 public class TutorInfo extends BaseEntity{
     @Column(unique = true)
