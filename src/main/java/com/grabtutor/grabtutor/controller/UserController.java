@@ -114,7 +114,7 @@ public class UserController {
     @GetMapping("/requests")
     public ApiResponse<?> getAllRequests(@RequestParam(defaultValue = "0") int pageNo,
                                          @RequestParam(defaultValue = "10") int pageSize,
-                                         @RequestParam(defaultValue = "createdAt|desc") String... sorts){
+                                         @RequestParam(defaultValue = "createdAt:desc") String... sorts){
         return ApiResponse.builder()
                 .success(true)
                 .data(userService.getRequests(pageNo, pageSize, sorts))
@@ -159,7 +159,7 @@ public class UserController {
     @GetMapping("/myVirtualTransactions")
     public ApiResponse<?> getMyVirtualTransactions(@RequestParam (defaultValue = "0") int pageNo,
                                                   @RequestParam (defaultValue = "10") int pageSize,
-                                                  @RequestParam (defaultValue = "createdAt|desc") String... sorts) {
+                                                  @RequestParam (defaultValue = "createdAt:desc") String... sorts) {
         return ApiResponse.builder()
                 .success(true)
                 .data(userService.getMyVirtualTransactions(pageNo, pageSize, sorts))
@@ -170,7 +170,7 @@ public class UserController {
     @GetMapping("/allVirtualTransactions")
     public ApiResponse<?> getAllVirtualTransactions(@RequestParam (defaultValue = "0") int pageNo,
                                                   @RequestParam (defaultValue = "10") int pageSize,
-                                                  @RequestParam (defaultValue = "createdAt|desc") String... sorts) {
+                                                  @RequestParam (defaultValue = "createdAt:desc") String... sorts) {
         return ApiResponse.builder()
                 .success(true)
                 .data(userService.getAllVirtualTransactions(pageNo, pageSize, sorts))

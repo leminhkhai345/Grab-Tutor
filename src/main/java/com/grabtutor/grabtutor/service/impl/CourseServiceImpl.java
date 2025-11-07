@@ -186,8 +186,8 @@ public class CourseServiceImpl implements CourseService {
                 .setBalance(course.getTutor().getAccountBalance().getBalance() + course.getPrice());
 
         UserTransaction enrollment = UserTransaction.builder()
-                .sender(user)
-                .receiver(course.getTutor())
+                .sender(accountBalance)
+                .receiver(course.getTutor().getAccountBalance())
                 .course(course)
                 .amount(course.getPrice())
                 .transactionType(UserTransactionType.COURSE_ENROLLMENT)

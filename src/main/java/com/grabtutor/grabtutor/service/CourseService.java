@@ -3,7 +3,6 @@ package com.grabtutor.grabtutor.service;
 import com.grabtutor.grabtutor.dto.request.CourseRequest;
 import com.grabtutor.grabtutor.dto.response.PageResponse;
 import com.grabtutor.grabtutor.dto.response.UserTransactionResponse;
-import com.grabtutor.grabtutor.dto.response.VirtualTransactionResponse;
 import com.grabtutor.grabtutor.dto.response.CourseResponse;
 
 import java.util.List;

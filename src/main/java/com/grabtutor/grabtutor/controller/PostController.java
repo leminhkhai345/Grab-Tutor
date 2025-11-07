@@ -156,7 +156,7 @@ public class PostController {
     public ApiResponse<?> searchPostsByName(@RequestParam String keyword,
                                            @RequestParam(defaultValue = "0") int pageNo,
                                            @RequestParam(defaultValue = "10") int pageSize,
-                                           @RequestParam(defaultValue = "createdAt|desc") String... sorts) {
+                                           @RequestParam(defaultValue = "createdAt:desc") String... sorts) {
         return ApiResponse.builder()
                 .message("search posts by name")
                 .data(postService.searchPostsByName(keyword, pageNo, pageSize, sorts))
