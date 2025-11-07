@@ -54,6 +54,7 @@ public enum ErrorCode {
     VERIFICATION_REQUEST_NOT_FOUND(12001, "Verification request not found", HttpStatus.NOT_FOUND),
     INVALID_EMAIL_OR_PASSWORD(12002, "Invalid email or password", HttpStatus.UNAUTHORIZED),
     LESSON_NOT_ACCESSIBLE(12003, "Lesson not accessible", HttpStatus.FORBIDDEN),
+    ALREADY_HAVE_PENDING_REQUEST(12004, "Already have pending request", HttpStatus.CONFLICT),
 
     TUTOR_BID_NOT_FOUND(13001, "Tutor bid not found", HttpStatus.NOT_FOUND),
     BID_NOT_PENDING(13002, "Cant accept non pending tutor bid", HttpStatus.BAD_REQUEST),

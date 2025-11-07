@@ -1,7 +1,7 @@
 package com.grabtutor.grabtutor.controller;
 
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
-import com.grabtutor.grabtutor.websocket.NotificationService;
+import com.grabtutor.grabtutor.socket.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;

@@ -1,6 +1,7 @@
 package com.grabtutor.grabtutor.controller;
 
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
+import com.grabtutor.grabtutor.service.TransactionService;
 import com.grabtutor.grabtutor.service.impl.VNPayServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TransactionController {
     VNPayServiceImpl vnPayService;
+    TransactionService transactionService;
 
     @PostMapping
     public ApiResponse<?> addFund(@RequestParam("amount") int orderTotal,HttpServletRequest request){
@@ -34,4 +36,23 @@ public class TransactionController {
                 .data(vnPayService.transactionReturn(request))
                 .build();
     }
+    @GetMapping("/myUserTransaction")
+    public ApiResponse<?> getMyUserTransactions(@RequestParam(defaultValue = "0") int pageNo,
+                                                @RequestParam(defaultValue = "10") int pageSize,
+                                                String... sorts){
+        return ApiResponse.builder()
+                .message("get account user transactions successfully")
+                .data(transactionService.getMyUserTransactions(pageNo, pageSize, sorts))
+                .build();
+    }
+    @GetMapping("/getAllUserTransaction")
+    public ApiResponse<?> getAllUserTransactions(@RequestParam(defaultValue = "0") int pageNo,
+                                                 @RequestParam(defaultValue = "10") int pageSize,
+                                                 String... sorts){
+        return ApiResponse.builder()
+                .message("get all user transactions successfully")
+                .data(transactionService.getAllUserTransactions(pageNo, pageSize, sorts))
+                .build();
+    }
+
 }

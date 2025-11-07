@@ -1,6 +1,5 @@
 package com.grabtutor.grabtutor.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.grabtutor.grabtutor.enums.TransactionStatus;
 import com.grabtutor.grabtutor.enums.UserTransactionType;
 import lombok.*;
@@ -13,14 +12,13 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserTransactionResponse {
     String id;
     double amount;
-    UserTransactionType transactionType;
-    TransactionStatus status;
-    String postId;
     String courseId;
+    String postId;
+    UserTransactionType type;
+    TransactionStatus status;
     String senderId;
     String receiverId;
     LocalDateTime createdAt;

@@ -12,7 +12,7 @@ import com.grabtutor.grabtutor.repository.UserRepository;
 import com.grabtutor.grabtutor.repository.VirtualTransactionRepository;
 import com.grabtutor.grabtutor.service.VNPayService;
 import com.grabtutor.grabtutor.service.config.VNPayConfig;
-import com.grabtutor.grabtutor.websocket.NotificationService;
+import com.grabtutor.grabtutor.socket.NotificationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;

@@ -17,10 +17,12 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class UserTransaction extends BaseEntity {
     double amount;
-    @Builder.Default
-    UserTransactionType transactionType =  UserTransactionType.ANSWER_COMPLETED;
+
     @Builder.Default
     TransactionStatus status = TransactionStatus.PENDING;
+
+    @Builder.Default
+    UserTransactionType type = UserTransactionType.ANSWER_COMPLETED;
 
     @OneToOne(mappedBy = "userTransaction")
     Post post;
@@ -31,9 +33,9 @@ public class UserTransaction extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "senderId")
-    User sender;
+    AccountBalance sender;
 
     @ManyToOne
     @JoinColumn(name = "receiverId")
-    User receiver;
+    AccountBalance receiver;
 }

@@ -5,7 +5,9 @@ import com.grabtutor.grabtutor.dto.response.ChatRoomResponse;
 import com.grabtutor.grabtutor.dto.response.LoadChatRoomsResponse;
 import com.grabtutor.grabtutor.dto.response.LoadMessagesResponse;
 import com.grabtutor.grabtutor.dto.response.MessageResponse;
+import com.grabtutor.grabtutor.entity.AccountBalance;
 import com.grabtutor.grabtutor.entity.User;
+import com.grabtutor.grabtutor.entity.UserTransaction;
 import com.grabtutor.grabtutor.enums.MessageType;
 import com.grabtutor.grabtutor.enums.PostStatus;
 import com.grabtutor.grabtutor.enums.RoomStatus;
@@ -17,7 +19,7 @@ import com.grabtutor.grabtutor.mapper.MessageMapper;
 import com.grabtutor.grabtutor.repository.*;
 import com.grabtutor.grabtutor.service.ChatRoomService;
 import com.grabtutor.grabtutor.service.worker.ServiceJob;
-import com.grabtutor.grabtutor.websocket.NotificationService;
+import com.grabtutor.grabtutor.socket.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -64,11 +66,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         var room = chatRoomRepository.findById(roomId)
                 .orElseThrow(()-> new AppException(ErrorCode.CHAT_ROOM_NOT_FOUND));
-        boolean valid = false;
+        boolean valid = Objects.equals(role, "ROLE_ADMIN");
 
-        if(Objects.equals(role, "ROLE_ADMIN")){
-            valid = true;
-        }
         for(User user : room.getUsers() ){
             if(user.getId().equals(userId)){
                 valid = true;
@@ -204,15 +203,15 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         postRepository.save(post);
 
         var transaction = room.getPost().getUserTransaction();
-        var tutor = transaction.getReceiver();
+        var tutorBalance = transaction.getReceiver();
         transaction.setStatus(TransactionStatus.SUCCESS);
-        tutor.getAccountBalance().setBalance(tutor.getAccountBalance().getBalance() + transaction.getAmount());
+        tutorBalance.setBalance(tutorBalance.getBalance() + transaction.getAmount());
 
-        accountBalanceRepository.save(tutor.getAccountBalance());
+        accountBalanceRepository.save(tutorBalance);
         userTransactionRepository.save(transaction);
 
         notificationService.sendSignal(roomId, MessageType.UPDATE, "Solution confirmed", "Problem solved!");
-        notificationService.sendNotification(tutor.getId(),"Account balance", "+"+transaction.getAmount());
+        notificationService.sendNotification(tutorBalance.getUser().getId(),"Account balance", "+"+transaction.getAmount());
     }
 
 
@@ -246,23 +245,23 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         postRepository.save(post);
 
         var transaction = room.getPost().getUserTransaction();
-        User receiver;
+        AccountBalance receiverBalance;
         if(isNormal){
-            receiver = transaction.getReceiver();
+            receiverBalance = transaction.getReceiver();
             transaction.setStatus(TransactionStatus.SUCCESS);
         } else{
-            receiver = transaction.getSender();
+            receiverBalance = transaction.getSender();
             transaction.setStatus(TransactionStatus.FAILED);
         }
-        receiver.getAccountBalance().setBalance(receiver.getAccountBalance().getBalance() + transaction.getAmount());
+        receiverBalance.setBalance(receiverBalance.getBalance() + transaction.getAmount());
 
-        accountBalanceRepository.save(receiver.getAccountBalance());
+        accountBalanceRepository.save(receiverBalance);
         userTransactionRepository.save(transaction);
 
         notificationService.sendSignal(roomId, MessageType.UPDATE
                 , "ChatRoom resolved"
-                , "The report has been reviewed. "+receiver.getEmail() +" were found to be in the right.");
-        notificationService.sendNotification(receiver.getId(),"Account balance", "+"+transaction.getAmount());
+                , "The report has been reviewed. "+receiverBalance.getUser().getEmail() +" were found to be in the right.");
+        notificationService.sendNotification(receiverBalance.getUser().getId(),"Account balance", "+"+transaction.getAmount());
 
     }
 }

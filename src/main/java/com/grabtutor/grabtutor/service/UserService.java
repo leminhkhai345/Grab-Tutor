@@ -33,6 +33,8 @@ public interface UserService {
 
     PageResponse<?> getRequests(int pageNo, int pageSize,String... sorts);
 
+    void resendVerificationRequest();
+
     VirtualTransactionResponse withdrawMoney(double withdrawAmount);
 
     PageResponse<?> getMyVirtualTransactions(int pageNo, int pageSize, String... sorts);
