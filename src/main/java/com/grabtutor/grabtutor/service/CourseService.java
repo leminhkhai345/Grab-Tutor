@@ -2,6 +2,7 @@ package com.grabtutor.grabtutor.service;
 
 import com.grabtutor.grabtutor.dto.request.CourseRequest;
 import com.grabtutor.grabtutor.dto.response.PageResponse;
+import com.grabtutor.grabtutor.dto.response.UserTransactionResponse;
 import com.grabtutor.grabtutor.dto.response.VirtualTransactionResponse;
 import com.grabtutor.grabtutor.dto.response.CourseResponse;
 
@@ -15,6 +16,6 @@ public interface CourseService {
     void deleteCourse(String courseId);
     CourseResponse changePublishCourse(String courseId, boolean isPublished);
     List<CourseResponse> getAllCoursesByTutorId(String tutorId, int pageNo, int pageSize, String... sorts);
-    VirtualTransactionResponse enrollCourse(String courseId);
+    UserTransactionResponse enrollCourse(String courseId);
     PageResponse<?> getMyEnrolledCourses(int pageNo, int pageSize, String... sorts);
 }

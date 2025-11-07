@@ -85,18 +85,23 @@ public class PostController {
     }
 
     @GetMapping("/user/{userId}")
-    public ApiResponse<?> getPostsByUserId(@PathVariable String userId) {
+    public ApiResponse<?> getPostsByUserId(@PathVariable String userId,
+                                           @RequestParam(defaultValue = "0") int pageNo,
+                                           @RequestParam(defaultValue = "10") int pageSize,
+                                           @RequestParam String... sorts){
         return ApiResponse.builder()
                 .message("get posts by userid")
-                .data(postService.getPostByUserId(userId))
+                .data(postService.getPostByUserId(userId, pageNo, pageSize, sorts))
                 .build();
     }
 
     @GetMapping("/myPosts")
-    public ApiResponse<?> getMyPosts(){
+    public ApiResponse<?> getMyPosts(@RequestParam(defaultValue = "0") int pageNo,
+                                     @RequestParam(defaultValue = "10") int pageSize,
+                                     @RequestParam String... sorts){
         return ApiResponse.builder()
                 .message("get my posts")
-                .data(postService.getPostMyPost())
+                .data(postService.getPostMyPost(pageNo, pageSize, sorts))
                 .build();
     }
 
@@ -109,8 +114,8 @@ public class PostController {
                 .data(postService.getAllPosts(pageNo, pageSize, sorts))
                 .build();
         }
-    @PutMapping("/acceptTutor")
-    public ApiResponse<?> acceptTutor(@RequestParam String tutorBidId){
+    @PutMapping("/acceptTutor/{tutorBidId}")
+    public ApiResponse<?> acceptTutor(@PathVariable String tutorBidId){
         tutorBidService.acceptTutor(tutorBidId);
         return ApiResponse.builder()
                 .message("accept post successfully")
@@ -123,8 +128,8 @@ public class PostController {
                 .message("add tutor bid successfully")
                 .build();
     }
-    @GetMapping("/tutorBid")
-    public ApiResponse<?> getAllTutorBid(@RequestParam String postId){
+    @GetMapping("/tutorBid/{postId}")
+    public ApiResponse<?> getAllTutorBid(@PathVariable String postId){
         return ApiResponse.builder()
                 .data(tutorBidService.getAllTutorBid(postId))
                 .message("get all tutor bid successfully")
@@ -144,6 +149,17 @@ public class PostController {
         tutorBidService.cancelTutorBid(tutorBidId);
         return ApiResponse.builder()
                 .message("Cancel tutor bid successfully")
+                .build();
+    }
+
+    @GetMapping("/search")
+    public ApiResponse<?> searchPostsByName(@RequestParam String keyword,
+                                           @RequestParam(defaultValue = "0") int pageNo,
+                                           @RequestParam(defaultValue = "10") int pageSize,
+                                           @RequestParam(defaultValue = "createdAt|desc") String... sorts) {
+        return ApiResponse.builder()
+                .message("search posts by name")
+                .data(postService.searchPostsByName(keyword, pageNo, pageSize, sorts))
                 .build();
     }
 }

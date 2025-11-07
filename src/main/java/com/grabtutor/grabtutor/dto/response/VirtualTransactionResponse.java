@@ -25,6 +25,5 @@ public class VirtualTransactionResponse {
     LocalDateTime transactionDate;
     LocalDateTime completedAt;
     Double amount;
-    String courseId;
     String postId;
 }

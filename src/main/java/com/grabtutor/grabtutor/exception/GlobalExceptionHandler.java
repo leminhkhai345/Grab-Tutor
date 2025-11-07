@@ -3,6 +3,7 @@ package com.grabtutor.grabtutor.exception;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
 import jakarta.validation.ConstraintViolation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.UnsatisfiedDependencyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

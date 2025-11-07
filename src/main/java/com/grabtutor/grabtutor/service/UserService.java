@@ -38,4 +38,6 @@ public interface UserService {
     VirtualTransactionResponse withdrawMoney(double withdrawAmount);
 
     PageResponse<?> getMyVirtualTransactions(int pageNo, int pageSize, String... sorts);
+
+    PageResponse<?> getAllVirtualTransactions(int pageNo, int pageSize, String... sorts);
 }

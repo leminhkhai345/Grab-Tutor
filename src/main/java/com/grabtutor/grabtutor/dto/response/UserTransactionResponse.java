@@ -1,6 +1,7 @@
 package com.grabtutor.grabtutor.dto.response;
 
 import com.grabtutor.grabtutor.enums.TransactionStatus;
+import com.grabtutor.grabtutor.enums.UserTransactionType;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -13,11 +14,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class UserTransactionResponse {
     String id;
-    String postId;
     double amount;
+    String courseId;
+    String postId;
+    UserTransactionType type;
     TransactionStatus status;
     String senderId;
     String receiverId;
-    LocalDateTime creationAt;
-    LocalDateTime updatedAt;
+    LocalDateTime createdAt;
+
 }

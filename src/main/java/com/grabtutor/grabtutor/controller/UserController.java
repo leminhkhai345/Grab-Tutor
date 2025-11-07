@@ -54,7 +54,8 @@ public class UserController {
 
     @GetMapping("/all")
     public ApiResponse<?> getALlUsers(@RequestParam(defaultValue = "0") int pageNo,
-                                      @RequestParam(defaultValue = "10") int pageSize, String... sorts){
+                                      @RequestParam(defaultValue = "10") int pageSize,
+                                      @RequestParam String... sorts){
 
 
         return ApiResponse.builder()
@@ -73,7 +74,8 @@ public class UserController {
     }
 
     @PostMapping("active/{userId}")
-    public ApiResponse<?> changeActive(@PathVariable String userId, @RequestParam boolean active){
+    public ApiResponse<?> changeActive(@PathVariable String userId,
+                                       @RequestParam boolean active){
 
         String message = active ? "activated" : "deactivated";
         return ApiResponse.builder()
@@ -111,7 +113,8 @@ public class UserController {
 
     @GetMapping("/requests")
     public ApiResponse<?> getAllRequests(@RequestParam(defaultValue = "0") int pageNo,
-                                         @RequestParam(defaultValue = "10") int pageSize, String... sorts){
+                                         @RequestParam(defaultValue = "10") int pageSize,
+                                         @RequestParam(defaultValue = "createdAt|desc") String... sorts){
         return ApiResponse.builder()
                 .success(true)
                 .data(userService.getRequests(pageNo, pageSize, sorts))
@@ -155,11 +158,23 @@ public class UserController {
 
     @GetMapping("/myVirtualTransactions")
     public ApiResponse<?> getMyVirtualTransactions(@RequestParam (defaultValue = "0") int pageNo,
-                                                  @RequestParam (defaultValue = "10") int pageSize, String... sorts) {
+                                                  @RequestParam (defaultValue = "10") int pageSize,
+                                                  @RequestParam (defaultValue = "createdAt|desc") String... sorts) {
         return ApiResponse.builder()
                 .success(true)
                 .data(userService.getMyVirtualTransactions(pageNo, pageSize, sorts))
                 .message("Get my virtual transactions successfully")
+                .build();
+    }
+
+    @GetMapping("/allVirtualTransactions")
+    public ApiResponse<?> getAllVirtualTransactions(@RequestParam (defaultValue = "0") int pageNo,
+                                                  @RequestParam (defaultValue = "10") int pageSize,
+                                                  @RequestParam (defaultValue = "createdAt|desc") String... sorts) {
+        return ApiResponse.builder()
+                .success(true)
+                .data(userService.getAllVirtualTransactions(pageNo, pageSize, sorts))
+                .message("Get all virtual transactions successfully")
                 .build();
     }
 
