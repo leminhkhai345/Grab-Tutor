@@ -26,6 +26,10 @@ public class UserTransaction extends BaseEntity {
     Post post;
 
     @ManyToOne
+    @JoinColumn(name = "courseId")
+    Course course;
+
+    @ManyToOne
     @JoinColumn(name = "senderId")
     User sender;
 

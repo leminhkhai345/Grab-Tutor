@@ -2,22 +2,16 @@ package com.grabtutor.grabtutor.service.impl;
 
 import com.grabtutor.grabtutor.dto.request.CourseRequest;
 import com.grabtutor.grabtutor.dto.response.PageResponse;
-import com.grabtutor.grabtutor.dto.response.VirtualTransactionResponse;
+import com.grabtutor.grabtutor.dto.response.UserTransactionResponse;
 import com.grabtutor.grabtutor.dto.response.CourseResponse;
-import com.grabtutor.grabtutor.entity.Course;
-import com.grabtutor.grabtutor.entity.Subject;
-import com.grabtutor.grabtutor.entity.User;
-import com.grabtutor.grabtutor.entity.VirtualTransaction;
+import com.grabtutor.grabtutor.entity.*;
 import com.grabtutor.grabtutor.enums.TransactionStatus;
-import com.grabtutor.grabtutor.enums.TransactionType;
+import com.grabtutor.grabtutor.enums.UserTransactionType;
 import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.CourseMapper;
 import com.grabtutor.grabtutor.mapper.VirtualTransactionMapper;
-import com.grabtutor.grabtutor.repository.CourseRepository;
-import com.grabtutor.grabtutor.repository.SubjectRepository;
-import com.grabtutor.grabtutor.repository.UserRepository;
-import com.grabtutor.grabtutor.repository.VirtualTransactionRepository;
+import com.grabtutor.grabtutor.repository.*;
 import com.grabtutor.grabtutor.service.CourseService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -32,7 +26,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -51,6 +44,7 @@ public class CourseServiceImpl implements CourseService {
     SubjectRepository subjectRepository;
     VirtualTransactionRepository virtualTransactionRepository;
     VirtualTransactionMapper virtualTransactionMapper;
+    UserTransactionRepository userTransactionRepository;
 
     @PreAuthorize("hasRole('TUTOR')")
     @Override
@@ -115,6 +109,7 @@ public class CourseServiceImpl implements CourseService {
         response.setEnrolled(isEnrolled);
         return response;
     }
+
     @PreAuthorize("hasRole('TUTOR')")
     @Override
     public void deleteCourse(String courseId) {
@@ -164,7 +159,7 @@ public class CourseServiceImpl implements CourseService {
 
     @PreAuthorize("hasRole('USER')")
     @Override
-    public VirtualTransactionResponse enrollCourse(String courseId) {
+    public UserTransactionResponse enrollCourse(String courseId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) auth.getPrincipal();
         String userId = jwt.getClaimAsString("userId");
@@ -186,33 +181,35 @@ public class CourseServiceImpl implements CourseService {
             throw new AppException(ErrorCode.ACCOUNT_DONT_HAVE_ENOUGH_MONEY);
         }
 
-        VirtualTransaction enrollment = virtualTransactionMapper.toVirtualTransaction(courseId);
-        enrollment.setAccountBalance(user.getAccountBalance());
-        enrollment.setAmount(course.getPrice());
         accountBalance.setBalance(accountBalance.getBalance() - course.getPrice());
         course.getTutor().getAccountBalance()
                 .setBalance(course.getTutor().getAccountBalance().getBalance() + course.getPrice());
-        enrollment.setCompletedAt(LocalDateTime.now());
-        enrollment.setStatus(TransactionStatus.SUCCESS);
-        enrollment.setType(TransactionType.ENROLLMENT);
-        enrollment.setCourse(course);
 
-        virtualTransactionRepository.save(enrollment);
+        UserTransaction enrollment = UserTransaction.builder()
+                .sender(user)
+                .receiver(course.getTutor())
+                .course(course)
+                .amount(course.getPrice())
+                .transactionType(UserTransactionType.COURSE_ENROLLMENT)
+                .status(TransactionStatus.SUCCESS)
+                .build();
+
+        userTransactionRepository.save(enrollment);
         user.getEnrolledCourses().add(course);
         userRepository.save(user);
         course.getEnrolledUsers().add(user);
         courseRepository.save(course);
 
-        return VirtualTransactionResponse.builder()
-                .accountBalanceId(user.getAccountBalance().getId())
-                .courseId(course.getId())
-                .amount(course.getPrice())
+        return UserTransactionResponse.builder()
+                .id(enrollment.getId())
+                .amount(enrollment.getAmount())
+                .transactionType(enrollment.getTransactionType())
                 .status(enrollment.getStatus())
-                .type(enrollment.getType())
-                .transactionDate(enrollment.getTransactionDate())
-                .completedAt(enrollment.getCompletedAt())
+                .courseId(course.getId())
+                .senderId(user.getId())
+                .receiverId(course.getTutor().getId())
+                .createdAt(enrollment.getCreatedAt())
                 .build();
-
     }
     @PreAuthorize("hasRole('USER')")
     @Override
