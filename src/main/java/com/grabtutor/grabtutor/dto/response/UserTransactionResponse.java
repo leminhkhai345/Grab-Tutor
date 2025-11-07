@@ -17,7 +17,7 @@ public class UserTransactionResponse {
     double amount;
     String courseId;
     String postId;
-    UserTransactionType type;
+    UserTransactionType transactionType;
     TransactionStatus status;
     String senderId;
     String receiverId;
