@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -33,7 +34,9 @@ public class ChatRoom extends BaseEntity{
             inverseJoinColumns = @JoinColumn(name = "userId"), // khóa ngoại đến User
             joinColumns = @JoinColumn(name = "roomId") // khóa ngoại đến Group
     )
-    List<User> users;
+    @Builder.Default
+    List<User> users = new ArrayList<>();
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<Message> messages;
+    @Builder.Default
+    List<Message> messages = new ArrayList<>();
 }

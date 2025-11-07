@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -35,8 +36,9 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "subject_id", nullable = false)
     Subject subject;
 
+    @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<Report> reports;
+    List<Report> reports = new ArrayList<>();
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "chatRoomId")
@@ -47,8 +49,10 @@ public class Post extends BaseEntity {
     UserTransaction userTransaction;
 
     @OneToMany(mappedBy = "post")
-    List<TutorBid> tutorBids;
+    @Builder.Default
+    List<TutorBid> tutorBids = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
-    List<VirtualTransaction> virtualTransactions;
+    @Builder.Default
+    List<VirtualTransaction> virtualTransactions = new ArrayList<>();
 }

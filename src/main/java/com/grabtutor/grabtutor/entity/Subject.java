@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -25,7 +26,8 @@ public class Subject extends BaseEntity {
     @ManyToMany(mappedBy = "subjects", fetch = FetchType.LAZY)
     Set<Course> relatedCourses;
 
+    @Builder.Default
     @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<Post> posts;
+    List<Post> posts = new ArrayList<>();
 
 }
