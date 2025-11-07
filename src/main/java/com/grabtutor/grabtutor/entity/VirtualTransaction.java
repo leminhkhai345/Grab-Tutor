@@ -38,9 +38,6 @@ public class VirtualTransaction extends BaseEntity {
 
     LocalDateTime completedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "course_id")
-    Course course;
 
     @ManyToOne
     @JoinColumn(name = "post_id")

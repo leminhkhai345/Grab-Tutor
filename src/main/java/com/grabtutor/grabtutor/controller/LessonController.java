@@ -68,6 +68,16 @@ public class LessonController {
                 .build();
     }
 
+    @GetMapping("/course/{courseId}")
+    public ApiResponse<?> getAllLessonsByCourseId(@PathVariable String courseId,
+                                                  @RequestParam(defaultValue = "0") int pageNo,
+                                                  @RequestParam(defaultValue = "10") int pageSize) {
+        return ApiResponse.builder()
+                .message("Lessons fetched successfully")
+                .data(lessonService.getAllLessonsByCourseId(courseId, pageNo, pageSize))
+                .build();
+    }
+
     @DeleteMapping("/{lessonId}")
     public ApiResponse<?> deleteLesson(@PathVariable String lessonId) {
         lessonService.deleteLesson(lessonId);

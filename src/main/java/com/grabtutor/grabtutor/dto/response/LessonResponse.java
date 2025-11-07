@@ -1,6 +1,6 @@
 package com.grabtutor.grabtutor.dto.response;
 
-import com.grabtutor.grabtutor.entity.Course;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -10,11 +10,13 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LessonResponse {
+    String id;
     int lessonNumber;
     String title;
     String content;
     String videoUrl;
     String imageUrl;
     boolean isPublished;
+    boolean isPreview;
     String courseId;
 }

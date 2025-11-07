@@ -20,14 +20,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -129,20 +127,61 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostResponse> getPostByUserId(String userId) {
-        List<Post> posts = postRepository.findByUserId(userId);
-        posts.removeIf(Post::isDeleted);
-        return posts.stream().map(postMapper::toPostResponse).toList();
+    public PageResponse<?> getPostByUserId(String userId, int pageNo, int pageSize, String... sorts) {
+        List<Sort.Order> orders = new ArrayList<>();
+        for(String sortBy : sorts){
+            // firstname:asc|desc
+            Pattern pattern = Pattern.compile("(\\w+?)*(:)(.*)");
+            Matcher matcher = pattern.matcher(sortBy);
+            if(matcher.find()){
+                if(matcher.group(3).equalsIgnoreCase("desc")){
+                    orders.add(new Sort.Order(Sort.Direction.DESC, matcher.group(1)));
+                } else {
+                    orders.add(new Sort.Order(Sort.Direction.ASC, matcher.group(1)));
+                }
+            }
+
+        }
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(orders));
+        Page<Post> posts = postRepository.findByUserId(userId, pageable);
+
+        return PageResponse.builder()
+                .pageNo(pageNo)
+                .pageSize(pageSize)
+                .totalPages(posts.getTotalPages())
+                .items(posts.stream().map(postMapper::toPostResponse).toList())
+                .build();
     }
 
+    @PreAuthorize("hasRole('USER')")
     @Override
-    public List<PostResponse> getPostMyPost() {
+    public PageResponse<?> getPostMyPost(int pageNo, int pageSize, String... sorts) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) auth.getPrincipal();
         String userId = jwt.getClaimAsString("userId");
-        List<Post> posts = postRepository.findByUserId(userId);
-        posts.removeIf(Post::isDeleted);
-        return posts.stream().map(postMapper::toPostResponse).toList();
+        List<Sort.Order> orders = new ArrayList<>();
+        for(String sortBy : sorts){
+            // firstname:asc|desc
+            Pattern pattern = Pattern.compile("(\\w+?)*(:)(.*)");
+            Matcher matcher = pattern.matcher(sortBy);
+            if(matcher.find()){
+                if(matcher.group(3).equalsIgnoreCase("desc")){
+                    orders.add(new Sort.Order(Sort.Direction.DESC, matcher.group(1)));
+                } else {
+                    orders.add(new Sort.Order(Sort.Direction.ASC, matcher.group(1)));
+                }
+            }
+
+        }
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(orders));
+        Page<Post> posts = postRepository.findByUserId(userId, pageable);
+
+        return PageResponse.builder()
+                .pageNo(pageNo)
+                .pageSize(pageSize)
+                .totalPages(posts.getTotalPages())
+                .items(posts.stream().map(postMapper::toPostResponse).toList())
+                .build();
     }
 
 
@@ -171,7 +210,33 @@ public class PostServiceImpl implements PostService {
                 .totalPages(posts.getTotalPages())
                 .items(posts.stream().map(postMapper::toPostResponse).toList())
                 .build();
+    }
 
+    @Override
+    public PageResponse<?> searchPostsByName(String keyword, int pageNo, int pageSize, String... sorts) {
+        List<Sort.Order> orders = new ArrayList<>();
+        for(String sortBy : sorts){
+            // firstname:asc|desc
+            Pattern pattern = Pattern.compile("(\\w+?)*(:)(.*)");
+            Matcher matcher = pattern.matcher(sortBy);
+            if(matcher.find()){
+                if(matcher.group(3).equalsIgnoreCase("desc")){
+                    orders.add(new Sort.Order(Sort.Direction.DESC, matcher.group(1)));
+                } else {
+                    orders.add(new Sort.Order(Sort.Direction.ASC, matcher.group(1)));
+                }
+            }
+
+        }
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(orders));
+        Page<Post> posts = postRepository.searchDescription(keyword, pageable);
+
+        return PageResponse.builder()
+                .pageNo(pageNo)
+                .pageSize(pageSize)
+                .totalPages(posts.getTotalPages())
+                .items(posts.stream().map(postMapper::toPostResponse).toList())
+                .build();
     }
 
 }

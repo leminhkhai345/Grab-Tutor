@@ -25,6 +25,7 @@ public class Lesson extends BaseEntity {
     String imageUrl; // anh dai dien bai hoc
     @Builder.Default
     boolean isPublished = true;
+    boolean isPreview;
 
 
     @ManyToOne

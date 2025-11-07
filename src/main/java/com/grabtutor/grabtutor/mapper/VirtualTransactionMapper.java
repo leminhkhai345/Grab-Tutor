@@ -41,9 +41,6 @@ public interface VirtualTransactionMapper {
         virtualTransactionResponse.transactionDate( virtualTransaction.getTransactionDate() );
         virtualTransactionResponse.completedAt( virtualTransaction.getCompletedAt() );
         virtualTransactionResponse.amount( virtualTransaction.getAmount() );
-        if ( virtualTransaction.getCourse() != null ) {
-            virtualTransactionResponse.courseId( virtualTransaction.getCourse().getId() );
-        }
         if ( virtualTransaction.getPost() != null ) {
             virtualTransactionResponse.postId( virtualTransaction.getPost().getId() );
         }

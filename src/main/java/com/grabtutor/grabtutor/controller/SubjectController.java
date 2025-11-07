@@ -26,7 +26,7 @@ public class SubjectController {
     }
 
 
-    @PostMapping("{id}")
+    @PostMapping("/{id}")
     public ApiResponse<?> updateSubject(@PathVariable String id,
                                         @RequestBody @Valid SubjectRequest subjectRequest) {
         return ApiResponse.builder()
@@ -36,7 +36,7 @@ public class SubjectController {
     }
 
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ApiResponse<?> getSubjectById(@PathVariable String id) {
         return ApiResponse.builder()
                 .data(subjectService.getSubjectById(id))
@@ -44,7 +44,7 @@ public class SubjectController {
                 .build();
     }
 
-    @GetMapping("name/{name}")
+    @GetMapping("/name/{name}")
     public ApiResponse<?> getSubjectByName(@PathVariable String name) {
         return ApiResponse.builder()
                 .data(subjectService.getSubjectByName(name))
@@ -62,7 +62,7 @@ public class SubjectController {
                 .message("Subjects fetched successfully")
                 .build();
     }
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public ApiResponse<?> deleteSubject(@PathVariable String id) {
         subjectService.deleteSubject(id);
         return ApiResponse.builder()

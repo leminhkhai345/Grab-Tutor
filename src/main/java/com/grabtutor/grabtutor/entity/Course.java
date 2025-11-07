@@ -54,5 +54,7 @@ public class Course extends BaseEntity {
     Set<User> enrolledUsers;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<VirtualTransaction> transactions;
+    List<UserTransaction> transactions;
+
+
 }

@@ -1,6 +1,7 @@
 package com.grabtutor.grabtutor.service.impl;
 
 import com.grabtutor.grabtutor.dto.request.ReviewRequest;
+import com.grabtutor.grabtutor.dto.response.PageResponse;
 import com.grabtutor.grabtutor.dto.response.ReviewResponse;
 import com.grabtutor.grabtutor.entity.Post;
 import com.grabtutor.grabtutor.entity.Review;
@@ -18,14 +19,20 @@ import com.grabtutor.grabtutor.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @Slf4j
@@ -66,7 +73,6 @@ public class ReviewServiceImpl implements ReviewService{
             throw new AppException(ErrorCode.FORBIDDEN);
         }
 
-        // Kiểm tra đã review chưa
         if(reviewRepository.existsByPostIdAndSenderIdAndIsDeletedFalse(postId, userId)){
             throw new AppException(ErrorCode.REVIEW_ALREADY_EXISTS);
         }
@@ -139,30 +145,110 @@ public class ReviewServiceImpl implements ReviewService{
 
 
     @Override
-    public List<ReviewResponse> getReviewsByPostId(String postId) {
-        var reviews = reviewRepository.findByPostIdAndIsDeletedFalse(postId);
-        return reviews.stream().map(reviewMapper::toReviewResponse).toList();
+    public PageResponse<?> getReviewsByPostId(String postId, int pageNo, int pageSize, String... sorts) {
+        List<Sort.Order> orders = new ArrayList<>();
+        for(String sortBy : sorts){
+            Pattern pattern = Pattern.compile("(\\w+?)*(:)(.*)");
+            Matcher matcher = pattern.matcher(sortBy);
+            if(matcher.find()){
+                if(matcher.group(3).equalsIgnoreCase("desc")){
+                    orders.add(new Sort.Order(Sort.Direction.DESC, matcher.group(1)));
+                } else {
+                    orders.add(new Sort.Order(Sort.Direction.ASC, matcher.group(1)));
+                }
+            }
+
+        }
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(orders));
+        Page<Review> reviews = reviewRepository.findByPostIdAndIsDeletedFalse(postId, pageable);
+
+        return PageResponse.builder()
+                .pageNo(pageNo)
+                .pageSize(pageSize)
+                .totalPages(reviews.getTotalPages())
+                .items(reviews.stream().map(reviewMapper::toReviewResponse).toList())
+                .build();
     }
 
     @Override
-    public List<ReviewResponse> getReviewsBySenderId(String userId) {
-        var reviews = reviewRepository.findBySenderIdAndIsDeletedFalse(userId);
-        return reviews.stream().map(reviewMapper::toReviewResponse).toList();
+    public PageResponse<?> getReviewsBySenderId(String senderId, int pageNo, int pageSize, String... sorts) {
+        List<Sort.Order> orders = new ArrayList<>();
+        for(String sortBy : sorts){
+            Pattern pattern = Pattern.compile("(\\w+?)*(:)(.*)");
+            Matcher matcher = pattern.matcher(sortBy);
+            if(matcher.find()){
+                if(matcher.group(3).equalsIgnoreCase("desc")){
+                    orders.add(new Sort.Order(Sort.Direction.DESC, matcher.group(1)));
+                } else {
+                    orders.add(new Sort.Order(Sort.Direction.ASC, matcher.group(1)));
+                }
+            }
+
+        }
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(orders));
+        Page<Review> reviews = reviewRepository.findBySenderIdAndIsDeletedFalse(senderId, pageable);
+
+        return PageResponse.builder()
+                .pageNo(pageNo)
+                .pageSize(pageSize)
+                .totalPages(reviews.getTotalPages())
+                .items(reviews.stream().map(reviewMapper::toReviewResponse).toList())
+                .build();
     }
 
     @Override
-    public List<ReviewResponse> getReviewsByReceiverId(String userId) {
-        var reviews = reviewRepository.findByReceiverIdAndIsDeletedFalse(userId);
-        return reviews.stream().map(reviewMapper::toReviewResponse).toList();
+    public PageResponse<?> getReviewsByReceiverId(String receiverId, int pageNo, int pageSize, String... sorts) {
+        List<Sort.Order> orders = new ArrayList<>();
+        for(String sortBy : sorts){
+            Pattern pattern = Pattern.compile("(\\w+?)*(:)(.*)");
+            Matcher matcher = pattern.matcher(sortBy);
+            if(matcher.find()){
+                if(matcher.group(3).equalsIgnoreCase("desc")){
+                    orders.add(new Sort.Order(Sort.Direction.DESC, matcher.group(1)));
+                } else {
+                    orders.add(new Sort.Order(Sort.Direction.ASC, matcher.group(1)));
+                }
+            }
+
+        }
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(orders));
+        Page<Review> reviews = reviewRepository.findByReceiverIdAndIsDeletedFalse(receiverId, pageable);
+
+        return PageResponse.builder()
+                .pageNo(pageNo)
+                .pageSize(pageSize)
+                .totalPages(reviews.getTotalPages())
+                .items(reviews.stream().map(reviewMapper::toReviewResponse).toList())
+                .build();
     }
 
     @PreAuthorize("hasRole('TUTOR')")
     @Override
-    public List<ReviewResponse> getMyReviews() {
+    public PageResponse<?> getMyReviews(int pageNo, int pageSize, String... sorts) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) auth.getPrincipal();
         String userId = jwt.getClaimAsString("userId");
-        var reviews = reviewRepository.findBySenderIdAndIsDeletedFalse(userId);
-        return reviews.stream().map(reviewMapper::toReviewResponse).toList();
+        List<Sort.Order> orders = new ArrayList<>();
+        for(String sortBy : sorts){
+            Pattern pattern = Pattern.compile("(\\w+?)*(:)(.*)");
+            Matcher matcher = pattern.matcher(sortBy);
+            if(matcher.find()){
+                if(matcher.group(3).equalsIgnoreCase("desc")){
+                    orders.add(new Sort.Order(Sort.Direction.DESC, matcher.group(1)));
+                } else {
+                    orders.add(new Sort.Order(Sort.Direction.ASC, matcher.group(1)));
+                }
+            }
+
+        }
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(orders));
+        Page<Review> reviews = reviewRepository.findBySenderIdAndIsDeletedFalse(userId, pageable);
+
+        return PageResponse.builder()
+                .pageNo(pageNo)
+                .pageSize(pageSize)
+                .totalPages(reviews.getTotalPages())
+                .items(reviews.stream().map(reviewMapper::toReviewResponse).toList())
+                .build();
     }
 }

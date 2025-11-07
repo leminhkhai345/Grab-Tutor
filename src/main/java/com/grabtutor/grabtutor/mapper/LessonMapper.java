@@ -8,15 +8,34 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface LessonMapper {
-    Lesson toLesson(LessonRequest lessonRequest);
+    default Lesson toLesson(LessonRequest lessonRequest) {
+        if ( lessonRequest == null ) {
+            return null;
+        }
+
+        Lesson.LessonBuilder<?, ?> lesson = Lesson.builder();
+
+        if ( lessonRequest.getLessonNumber() != null ) {
+            lesson.lessonNumber( lessonRequest.getLessonNumber() );
+        }
+        lesson.title( lessonRequest.getTitle() );
+        lesson.content( lessonRequest.getContent() );
+        lesson.videoUrl( lessonRequest.getVideoUrl() );
+        lesson.imageUrl( lessonRequest.getImageUrl() );
+        lesson.isPreview(lessonRequest.isPreview());
+
+        return lesson.build();
+    }
     default LessonResponse toLessonResponse(Lesson lesson){
         return LessonResponse.builder()
+                .id(lesson.getId())
                 .lessonNumber(lesson.getLessonNumber())
                 .title(lesson.getTitle())
                 .content(lesson.getContent())
                 .videoUrl(lesson.getVideoUrl())
                 .imageUrl(lesson.getImageUrl())
                 .isPublished(lesson.isPublished())
+                .isPreview(lesson.isPreview())
                 .courseId(lesson.getCourse().getId())
                 .build();
     }
@@ -35,6 +54,9 @@ public interface LessonMapper {
         }
         if (lessonRequest.getImageUrl() != null && !lessonRequest.getImageUrl().isEmpty()) {
             lesson.setImageUrl(lessonRequest.getImageUrl());
+        }
+        if(lessonRequest.isPreview() != lesson.isPreview()) {
+            lesson.setPreview(lessonRequest.isPreview());
         }
     }
 }
