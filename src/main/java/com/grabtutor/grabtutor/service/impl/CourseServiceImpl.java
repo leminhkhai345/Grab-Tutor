@@ -160,6 +160,8 @@ public class CourseServiceImpl implements CourseService {
                 .toList();
     }
 
+
+
     @PreAuthorize("hasRole('USER')")
     @Override
     public VirtualTransactionResponse enrollCourse(String courseId) {
@@ -188,6 +190,8 @@ public class CourseServiceImpl implements CourseService {
         enrollment.setAccountBalance(user.getAccountBalance());
         enrollment.setAmount(course.getPrice());
         accountBalance.setBalance(accountBalance.getBalance() - course.getPrice());
+        course.getTutor().getAccountBalance()
+                .setBalance(course.getTutor().getAccountBalance().getBalance() + course.getPrice());
         enrollment.setCompletedAt(LocalDateTime.now());
         enrollment.setStatus(TransactionStatus.SUCCESS);
         enrollment.setType(TransactionType.ENROLLMENT);

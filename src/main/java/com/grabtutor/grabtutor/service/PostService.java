@@ -4,6 +4,8 @@ import com.grabtutor.grabtutor.dto.request.AcceptPostRequest;
 import com.grabtutor.grabtutor.dto.request.PostRequest;
 import com.grabtutor.grabtutor.dto.response.PageResponse;
 import com.grabtutor.grabtutor.dto.response.PostResponse;
+import com.grabtutor.grabtutor.entity.Post;
+import org.springframework.data.domain.Page;
 
 
 import java.io.IOException;
@@ -14,8 +16,9 @@ public interface PostService {
     PostResponse getPostByPostId(String postId);
     PostResponse updatePost(String postId, PostRequest postRequest, String subjectId) throws IOException;
     void deletePost(String postId);
-    List<PostResponse> getPostMyPost();
-    List<PostResponse> getPostByUserId(String userId);
+    PageResponse<?> getPostMyPost(int pageNo, int pageSize, String... sorts);
+    PageResponse<?> getPostByUserId(String userId, int pageNo, int pageSize, String... sorts);
     PageResponse<?> getAllPosts(int pageNo, int pageSize, String... sorts);
+    PageResponse<?> searchPostsByName(String keyword, int pageNo, int pageSize, String... sorts);
 
 }

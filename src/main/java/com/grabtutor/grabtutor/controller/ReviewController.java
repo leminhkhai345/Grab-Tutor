@@ -53,34 +53,45 @@ public class ReviewController {
     }
 
     @GetMapping("/post/{postId}")
-    public ApiResponse<?> getReviewsByPostId(@PathVariable String postId) {
+    public ApiResponse<?> getReviewsByPostId(@PathVariable String postId,
+                                             @RequestParam(defaultValue = "0") int pageNo,
+                                            @RequestParam(defaultValue = "10") int pageSize,
+                                            @RequestParam(defaultValue = "createdAt|desc") String... sorts) {
         return ApiResponse.builder()
                 .message("Reviews fetched successfully")
-                .data(reviewService.getReviewsByPostId(postId))
+                .data(reviewService.getReviewsByPostId(postId, pageNo, pageSize, sorts))
                 .build();
     }
 
     @GetMapping("/sender/{senderId}")
-    public ApiResponse<?> getReviewsBySenderId(@PathVariable String senderId) {
+    public ApiResponse<?> getReviewsBySenderId(@PathVariable String senderId,
+                                               @RequestParam(defaultValue = "0") int pageNo,
+                                               @RequestParam(defaultValue = "10") int pageSize,
+                                               @RequestParam(defaultValue = "createdAt|desc", required = false) String... sorts) {
         return ApiResponse.builder()
                 .message("Reviews fetched successfully")
-                .data(reviewService.getReviewsBySenderId(senderId))
+                .data(reviewService.getReviewsBySenderId(senderId, pageNo, pageSize, sorts))
                 .build();
     }
 
     @GetMapping("/receiver/{receiverId}")
-    public ApiResponse<?> getReviewsByReceiverId(@PathVariable String receiverId) {
+    public ApiResponse<?> getReviewsByReceiverId(@PathVariable String receiverId,
+                                                 @RequestParam(defaultValue = "0") int pageNo,
+                                                 @RequestParam(defaultValue = "10") int pageSize,
+                                                 @RequestParam(defaultValue = "createdAt|desc", required = false) String... sorts) {
         return ApiResponse.builder()
                 .message("Reviews fetched successfully")
-                .data(reviewService.getReviewsByReceiverId(receiverId))
+                .data(reviewService.getReviewsByReceiverId(receiverId, pageNo, pageSize, sorts))
                 .build();
     }
 
     @GetMapping("/me")
-    public ApiResponse<?> getMyReviews() {
+    public ApiResponse<?> getMyReviews(@RequestParam(defaultValue = "0") int pageNo,
+                                       @RequestParam(defaultValue = "10") int pageSize,
+                                       @RequestParam(defaultValue = "createdAt|desc", required = false) String... sorts) {
         return ApiResponse.builder()
                 .message("My reviews fetched successfully")
-                .data(reviewService.getMyReviews())
+                .data(reviewService.getMyReviews(pageNo, pageSize, sorts))
                 .build();
     }
 }

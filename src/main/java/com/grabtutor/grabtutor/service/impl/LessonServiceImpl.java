@@ -2,9 +2,11 @@ package com.grabtutor.grabtutor.service.impl;
 
 import com.grabtutor.grabtutor.dto.request.LessonRequest;
 import com.grabtutor.grabtutor.dto.response.LessonResponse;
+import com.grabtutor.grabtutor.dto.response.PageResponse;
 import com.grabtutor.grabtutor.entity.Course;
 import com.grabtutor.grabtutor.entity.Lesson;
 import com.grabtutor.grabtutor.entity.User;
+import com.grabtutor.grabtutor.enums.Role;
 import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.LessonMapper;
@@ -16,12 +18,18 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+
 
 @Service
 @RequiredArgsConstructor
@@ -82,27 +90,42 @@ public class LessonServiceImpl implements LessonService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         boolean isAccessible = false;
-        if(user.getRole().equals("ADMIN")){
+        if(user.getRole() == Role.ADMIN){
             isAccessible = true;
         }
-        else if(user.getRole().equals("TUTOR")){
+        else if(user.getRole() == Role.TUTOR){
             if(lesson.getCourse().getTutor().getId().equals(userId)){
                 isAccessible = true;
             }
         }
-        else if(user.getRole().equals("USER")){
+        else if(user.getRole() == Role.USER){
             if(lesson.getCourse().getEnrolledUsers().contains(user)){
                 isAccessible = true;
             }
         }
-        else{
-            isAccessible = false;
+        else if(lesson.isPreview()){
+            isAccessible = true;
         }
+
         if(!isAccessible){
             throw new AppException(ErrorCode.LESSON_NOT_ACCESSIBLE);
         }
         return lessonMapper.toLessonResponse(lesson);
     }
+
+    @Override
+    public PageResponse<?> getAllLessonsByCourseId(String courseId, int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by("lessonNumber").descending());
+        Page<Lesson> lessons = lessonRepository.findAllByCourseIdAndIsDeletedFalse(courseId, pageable);
+
+        return PageResponse.builder()
+                .pageNo(pageNo)
+                .pageSize(pageSize)
+                .totalPages(lessons.getTotalPages())
+                .items(lessons.stream().map(lessonMapper::toLessonResponse).toList())
+                .build();
+    }
+
 
     @PreAuthorize("hasRole('TUTOR')")
     @Transactional

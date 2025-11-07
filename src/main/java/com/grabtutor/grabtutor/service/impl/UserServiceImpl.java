@@ -364,7 +364,6 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         List<Sort.Order> orders = new ArrayList<>();
         for(String sortBy : sorts){
-            // firstname:asc|desc
             Pattern pattern = Pattern.compile("(\\w+?)(:)(.*)");
             Matcher matcher = pattern.matcher(sortBy);
             if(matcher.find()){
@@ -379,6 +378,34 @@ public class UserServiceImpl implements UserService {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(orders));
         Page<VirtualTransaction> users = virtualTransactionRepository
                 .findAllByAccountBalanceId(user.getAccountBalance().getId(), pageable);
+
+        return PageResponse.builder()
+                .pageNo(pageNo)
+                .pageSize(pageSize)
+                .totalPages(users.getTotalPages())
+                .items(users.stream().map(virtualTransactionMapper::toVirtualTransactionResponse).toList())
+                .build();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Override
+    public PageResponse<?> getAllVirtualTransactions(int pageNo, int pageSize, String... sorts) {
+        List<Sort.Order> orders = new ArrayList<>();
+        for(String sortBy : sorts){
+            Pattern pattern = Pattern.compile("(\\w+?)(:)(.*)");
+            Matcher matcher = pattern.matcher(sortBy);
+            if(matcher.find()){
+                if(matcher.group(3).equalsIgnoreCase("asc")){
+                    orders.add(new Sort.Order(Sort.Direction.ASC, matcher.group(1)));
+                } else {
+                    orders.add(new Sort.Order(Sort.Direction.DESC, matcher.group(1)));
+                }
+            }
+        }
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(orders));
+        Page<VirtualTransaction> users = virtualTransactionRepository
+                .findAll(pageable);
 
         return PageResponse.builder()
                 .pageNo(pageNo)
