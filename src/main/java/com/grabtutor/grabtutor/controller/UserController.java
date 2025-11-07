@@ -2,6 +2,7 @@ package com.grabtutor.grabtutor.controller;
 
 import com.grabtutor.grabtutor.dto.request.*;
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
+import com.grabtutor.grabtutor.entity.VerificationRequest;
 import com.grabtutor.grabtutor.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -115,6 +116,14 @@ public class UserController {
                 .success(true)
                 .data(userService.getRequests(pageNo, pageSize, sorts))
                 .message("Get all requests successfully")
+                .build();
+    }
+
+    @PostMapping("/resend")
+    public ApiResponse<?> resendVerificationRequest(){
+        userService.resendVerificationRequest();
+        return ApiResponse.builder()
+                .message("resend verification request successfully")
                 .build();
     }
 

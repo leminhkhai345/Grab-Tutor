@@ -15,6 +15,7 @@ import com.grabtutor.grabtutor.mapper.VerificationRequestMapper;
 import com.grabtutor.grabtutor.mapper.VirtualTransactionMapper;
 import com.grabtutor.grabtutor.repository.*;
 import com.grabtutor.grabtutor.service.UserService;
+import com.grabtutor.grabtutor.socket.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -54,6 +55,7 @@ public class UserServiceImpl implements UserService {
     VirtualTransactionMapper virtualTransactionMapper;
     VirtualTransactionRepository virtualTransactionRepository;
     AccountBalanceRepository accountBalanceRepository;
+    NotificationService notificationService;
 
     @Override
     public UserResponse addUser(UserRequest userRequest){
@@ -88,7 +90,6 @@ public class UserServiceImpl implements UserService {
         String userId = jwt.getClaimAsString("userId");
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-
         return userMapper.toUserResponse(user);
     }
 
@@ -150,7 +151,6 @@ public class UserServiceImpl implements UserService {
                     orders.add(new Sort.Order(Sort.Direction.ASC, matcher.group(1)));
                 }
             }
-
         }
 
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(orders));
@@ -179,19 +179,20 @@ public class UserServiceImpl implements UserService {
                 .balance(0)
                 .user(user)
                 .build();
-        user.setAccountBalance(balance);
 
         var info = tutorInfoMapper.toTutorInfo(request);
         if(tutorInfoRepository.existsByNationalId(info.getNationalId()))
             throw new AppException(ErrorCode.NATIONAL_ID_ALREADY_EXISTS);
-        user.setTutorInfo(info);
-        tutorInfoRepository.save(info);
-        userRepository.save(user);
 
         var newRequest = VerificationRequest.builder()
                 .user(user)
                 .build();
-        verificationRequestRepository.save(newRequest);
+
+        user.setAccountBalance(balance);
+        user.setTutorInfo(info);
+        user.getVerificationRequests().add(newRequest);
+
+        userRepository.save(user);
 
         return TutorResponse.builder()
                 .id(user.getId())
@@ -262,10 +263,14 @@ public class UserServiceImpl implements UserService {
         var req = verificationRequestRepository.findById(request.getRequestId())
                 .orElseThrow(() -> new AppException(ErrorCode.VERIFICATION_REQUEST_NOT_FOUND));
         req.setStatus(RequestStatus.APPROVED);
-        verificationRequestRepository.save(req);
         var user = req.getUser();
         user.setUserStatus(UserStatus.NORMAL);
         userRepository.save(user);
+
+        sendMail(user.getEmail(),
+                "ACCOUNT VERIFICATION SUCCESS",
+                "Your account has been approved, please login to check.");
+
         return ApproveResponse.builder()
                 .requestId(req.getId())
                 .build();
@@ -278,13 +283,13 @@ public class UserServiceImpl implements UserService {
         var req = verificationRequestRepository.findById(request.getRequestId())
                 .orElseThrow(() -> new AppException(ErrorCode.VERIFICATION_REQUEST_NOT_FOUND));
         req.setStatus(RequestStatus.REJECTED);
-        verificationRequestRepository.save(req);
         var user = req.getUser();
-        var email =  user.getEmail();
-        userRepository.removeUserById(user.getId());
-        sendMail(email,
+
+        userRepository.save(user);
+
+        sendMail(user.getEmail(),
         "ACCOUNT VERIFICATION FAILED",
-        "We have deleted your old account so you can now use this email to register new account on our website");
+        "Your account has been rejected by the administrator, please review your information and resend verification request.");
         return RejectResponse.builder()
                 .requestId(req.getId())
                 .build();
@@ -316,6 +321,35 @@ public class UserServiceImpl implements UserService {
                 .totalPages(requests.getTotalPages())
                 .items(requests.stream().map(verificationRequestMapper::toAccountVerificationResponse))
                 .build();
+    }
+
+    @Override
+    @PreAuthorize("hasRole('TUTOR')")
+    public void resendVerificationRequest() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String id = jwt.getClaimAsString("userId");
+
+        var tutor = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        VerificationRequest newRequest = VerificationRequest.builder()
+                .user(tutor)
+                .build();
+        boolean isValid = tutor.getVerificationRequests()
+                .stream()
+                .anyMatch(r -> r.getStatus().equals(RequestStatus.PENDING));
+        if(isValid){
+            throw new AppException(ErrorCode.ALREADY_HAVE_PENDING_REQUEST);
+        }
+         isValid = tutor.getVerificationRequests()
+            .stream()
+            .anyMatch(r -> r.getStatus().equals(RequestStatus.APPROVED));
+        if(isValid){
+            throw new AppException(ErrorCode.FORBIDDEN);
+        }
+        tutor.getVerificationRequests().add(newRequest);
+        userRepository.save(tutor);
+
     }
 
     public void sendMail(String to, String subject, String body) {

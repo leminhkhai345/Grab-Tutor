@@ -18,7 +18,7 @@ public class VerificationRequest extends BaseEntity{
     @Enumerated(EnumType.STRING)
     @Builder.Default
     RequestStatus status =  RequestStatus.PENDING;
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "senderId")
     User user;
 }

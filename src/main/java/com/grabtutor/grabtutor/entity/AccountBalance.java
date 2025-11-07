@@ -26,4 +26,13 @@ public class AccountBalance extends BaseEntity{
     @OneToMany(mappedBy = "accountBalance", cascade = CascadeType.ALL)
     @JsonIgnore
     List<VirtualTransaction> virtualTransactions;
+
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
+    @JsonIgnore
+    List<UserTransaction> sentTransactions;
+
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL)
+    @JsonIgnore
+    List<UserTransaction> receivedTransactions;
+
 }

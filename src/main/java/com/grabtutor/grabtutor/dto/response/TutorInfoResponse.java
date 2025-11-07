@@ -16,5 +16,4 @@ public class TutorInfoResponse {
     double averageStars;
     int problemSolved;
 
-
 }

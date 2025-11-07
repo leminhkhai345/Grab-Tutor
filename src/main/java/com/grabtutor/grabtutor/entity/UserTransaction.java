@@ -1,7 +1,6 @@
 package com.grabtutor.grabtutor.entity;
 
 import com.grabtutor.grabtutor.enums.TransactionStatus;
-import com.grabtutor.grabtutor.enums.UserTransactionType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -17,8 +16,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class UserTransaction extends BaseEntity {
     double amount;
-    @Builder.Default
-    UserTransactionType transactionType =  UserTransactionType.ANSWER_COMPLETED;
+
     @Builder.Default
     TransactionStatus status = TransactionStatus.PENDING;
 
@@ -27,9 +25,9 @@ public class UserTransaction extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "senderId")
-    User sender;
+    AccountBalance sender;
 
     @ManyToOne
     @JoinColumn(name = "receiverId")
-    User receiver;
+    AccountBalance receiver;
 }

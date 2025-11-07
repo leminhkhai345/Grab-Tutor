@@ -10,7 +10,7 @@ import com.grabtutor.grabtutor.repository.AccountBalanceRepository;
 import com.grabtutor.grabtutor.repository.ChatRoomRepository;
 import com.grabtutor.grabtutor.repository.PostRepository;
 import com.grabtutor.grabtutor.repository.UserTransactionRepository;
-import com.grabtutor.grabtutor.websocket.NotificationService;
+import com.grabtutor.grabtutor.socket.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -123,18 +123,18 @@ public class ServiceWorker {
                     postRepository.save(room.getPost());
 
                     var transaction = room.getPost().getUserTransaction();
-                    var tutor = transaction.getReceiver();
+                    var tutorBalance = transaction.getReceiver();
                     transaction.setStatus(TransactionStatus.SUCCESS);
-                    tutor.getAccountBalance().setBalance(tutor.getAccountBalance().getBalance() + transaction.getAmount());
+                    tutorBalance.setBalance(tutorBalance.getBalance() + transaction.getAmount());
 
-                    accountBalanceRepository.save(tutor.getAccountBalance());
+                    accountBalanceRepository.save(tutorBalance);
                     userTransactionRepository.save(transaction);
 
                     notificationService.sendSignal(room.getId()
                             , MessageType.UPDATE
                             , "Auto confirmed"
                             , "ChatRoom " + room.getId() +": Confirmed automatically because the time limit was exceeded");
-                    notificationService.sendNotification(tutor.getId(),"Account balance", "+"+transaction.getAmount());
+                    notificationService.sendNotification(tutorBalance.getUser().getId(),"Account balance", "+"+transaction.getAmount());
 
                 }
             } catch (Exception e) {

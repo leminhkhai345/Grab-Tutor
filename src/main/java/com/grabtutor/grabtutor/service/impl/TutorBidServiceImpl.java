@@ -11,7 +11,7 @@ import com.grabtutor.grabtutor.mapper.TutorBidMapper;
 import com.grabtutor.grabtutor.repository.*;
 import com.grabtutor.grabtutor.service.TutorBidService;
 import com.grabtutor.grabtutor.service.worker.ServiceJob;
-import com.grabtutor.grabtutor.websocket.NotificationService;
+import com.grabtutor.grabtutor.socket.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -161,8 +161,8 @@ public class TutorBidServiceImpl implements TutorBidService {
                 .build();
 
         var transaction = UserTransaction.builder()
-                .sender(sender)
-                .receiver(receiver)
+                .sender(sender.getAccountBalance())
+                .receiver(receiver.getAccountBalance())
                 .amount(bid.getProposedPrice())
                 .build();
         post.setChatRoom(room);
