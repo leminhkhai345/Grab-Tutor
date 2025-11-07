@@ -22,7 +22,7 @@ public class UserTransaction extends BaseEntity {
     TransactionStatus status = TransactionStatus.PENDING;
 
     @Builder.Default
-    UserTransactionType type = UserTransactionType.ANSWER_COMPLETED;
+    UserTransactionType transactionType = UserTransactionType.ANSWER_COMPLETED;
 
     @OneToOne(mappedBy = "userTransaction")
     Post post;

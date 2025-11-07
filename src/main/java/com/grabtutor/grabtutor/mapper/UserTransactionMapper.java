@@ -14,7 +14,7 @@ public interface UserTransactionMapper {
                 .id(userTransaction.getId())
                 .amount(userTransaction.getAmount())
                 .status(userTransaction.getStatus())
-                .type(userTransaction.getType())
+                .transactionType(userTransaction.getTransactionType())
                 .createdAt(userTransaction.getCreatedAt())
                 .postId(userTransaction.getPost() == null ? null : userTransaction.getPost().getId())
                 .courseId(userTransaction.getCourse() == null ? null : userTransaction.getCourse().getId())
