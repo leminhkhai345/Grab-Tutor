@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,9 +41,8 @@ public class Course extends BaseEntity {
     User tutor;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-
-    List<Lesson> lessons;
-
+    @Builder.Default
+    List<Lesson> lessons = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
@@ -54,7 +54,8 @@ public class Course extends BaseEntity {
     Set<User> enrolledUsers;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<UserTransaction> transactions;
+    @Builder.Default
+    List<UserTransaction> transactions = new ArrayList<>();
 
 
 }

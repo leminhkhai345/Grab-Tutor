@@ -37,20 +37,26 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     UserStatus userStatus = UserStatus.NORMAL;
+
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<Post> posts;
+    List<Post> posts = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<Report> reportsSent;
+    List<Report> reportsSent = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<Report> reportsReceived;
+    List<Report> reportsReceived = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<Review> reviewSent;
+    List<Review> reviewSent = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<Review> reviewReceived;
+    List<Review> reviewReceived = new ArrayList<>();
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "tutorInfoId")
@@ -60,20 +66,24 @@ public class User extends BaseEntity {
     @JoinColumn(name = "accountBalanceId")
     AccountBalance accountBalance;
 
+    @Builder.Default
     @ManyToMany(mappedBy = "users")
-    private List<ChatRoom> chatRooms;
+    List<ChatRoom> chatRooms = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Message> messages;
+    List<Message> messages = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade =  CascadeType.ALL)
-    List<TutorBid> tutorBids;
+    List<TutorBid> tutorBids = new ArrayList<>();
 
     @ManyToMany(mappedBy = "enrolledUsers")
     Set<Course> enrolledCourses;
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    List<Notification> notifications;
+    List<Notification> notifications = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @Builder.Default

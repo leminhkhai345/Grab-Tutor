@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -25,14 +26,17 @@ public class AccountBalance extends BaseEntity{
 
     @OneToMany(mappedBy = "accountBalance", cascade = CascadeType.ALL)
     @JsonIgnore
-    List<VirtualTransaction> virtualTransactions;
+    @Builder.Default
+    List<VirtualTransaction> virtualTransactions = new ArrayList<>();
 
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
     @JsonIgnore
-    List<UserTransaction> sentTransactions;
+    @Builder.Default
+    List<UserTransaction> sentTransactions = new ArrayList<>();
 
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL)
     @JsonIgnore
-    List<UserTransaction> receivedTransactions;
+    @Builder.Default
+    List<UserTransaction> receivedTransactions = new ArrayList<>();
 
 }

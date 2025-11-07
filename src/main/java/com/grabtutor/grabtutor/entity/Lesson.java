@@ -27,7 +27,6 @@ public class Lesson extends BaseEntity {
     boolean isPublished = true;
     boolean isPreview;
 
-
     @ManyToOne
     @JoinColumn(name = "course_id", nullable = false)
     Course course;
