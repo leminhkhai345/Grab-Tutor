@@ -59,6 +59,13 @@ public class ChatRoomController {
                 .message("Load rooms successfully")
                 .build();
     }
+    @GetMapping("/{roomId}")
+    public ApiResponse<?> getRoom(@PathVariable String roomId){
+        return ApiResponse.builder()
+                .data(chatRoomService.getChatRoom(roomId))
+                .message("Get room successfully")
+                .build();
+    }
     @PutMapping("/submit")
     public ApiResponse<?> submitSolution(@RequestParam String roomId){
         chatRoomService.submitSolution(roomId);

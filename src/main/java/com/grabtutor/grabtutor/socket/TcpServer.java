@@ -25,17 +25,12 @@ import java.util.concurrent.Executors;
 
 public class TcpServer {
 
-    @Value("${websocket.port:8888}")
-    private int port;
-    final TcpSessionRegistry registry;
-    final ObjectMapper objectMapper;
-    final ChatRoomService chatRoomService;
-    final CustomJwtDecoder jwtDecoder;
+    int port = 8888;
 
-    private final ApplicationContext applicationContext; // Để lấy prototype bean Handler
-    private ServerSocket serverSocket;
-    private final ExecutorService clientPool = Executors.newCachedThreadPool();
-    private volatile boolean isRunning = true;
+    final ApplicationContext applicationContext; // Để lấy prototype bean Handler
+    ServerSocket serverSocket;
+    final ExecutorService clientPool = Executors.newCachedThreadPool();
+    volatile boolean isRunning = true;
 
     @PostConstruct
     public void start() {
@@ -47,8 +42,7 @@ public class TcpServer {
                 while (isRunning) {
                     Socket clientSocket = serverSocket.accept();
                     // Lấy một Handler mới từ Spring Context cho mỗi kết nối
-                    ClientHandler handler = new ClientHandler(clientSocket
-                            , registry, objectMapper, chatRoomService, jwtDecoder);
+                    ClientHandler handler = applicationContext.getBean(ClientHandler.class, clientSocket);
                     clientPool.submit(handler);
                 }
             } catch (IOException e) {

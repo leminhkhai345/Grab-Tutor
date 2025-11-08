@@ -12,6 +12,7 @@ import jakarta.websocket.Session;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -19,11 +20,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-@Component
+@Component // <-- Đánh dấu là 1 Spring bean
+@Scope("prototype")
 @Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
-
 public class TcpSessionRegistry {
 
     Map<String, Set<SocketWrapper>> userSessions = new ConcurrentHashMap<>();
@@ -71,6 +72,7 @@ public class TcpSessionRegistry {
 
             sessions.forEach(s -> s.send(json));
         }
+        sendSignalToRoom(roomId, MessageType.NOTIFICATION, "HELLO", "TEST");
     }
 
     public void sendNotificationToUser(String userId, Notification notification) {

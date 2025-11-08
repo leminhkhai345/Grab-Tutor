@@ -91,7 +91,7 @@ public class ServiceWorker {
 
                     postRepository.save(room.getPost());
                     notificationService.sendSignal(room.getId()
-                        , MessageType.UPDATE
+                        , MessageType.TIMEOUT
                         , "Submit timeout"
                         , "ChatRoom " + room.getId() +" has been closed because the tutor failed to submit the solution within the allowed time.");
                 }
