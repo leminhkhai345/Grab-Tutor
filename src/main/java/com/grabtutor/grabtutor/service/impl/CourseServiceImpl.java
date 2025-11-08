@@ -10,7 +10,6 @@ import com.grabtutor.grabtutor.enums.UserTransactionType;
 import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.CourseMapper;
-import com.grabtutor.grabtutor.mapper.VirtualTransactionMapper;
 import com.grabtutor.grabtutor.repository.*;
 import com.grabtutor.grabtutor.service.CourseService;
 import lombok.RequiredArgsConstructor;
@@ -42,8 +41,6 @@ public class CourseServiceImpl implements CourseService {
     CourseMapper courseMapper;
     UserRepository userRepository;
     SubjectRepository subjectRepository;
-    VirtualTransactionRepository virtualTransactionRepository;
-    VirtualTransactionMapper virtualTransactionMapper;
     UserTransactionRepository userTransactionRepository;
 
     @PreAuthorize("hasRole('TUTOR')")
@@ -147,12 +144,34 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public List<CourseResponse> getAllCoursesByTutorId(String tutorId, int pageNo, int pageSize, String... sorts) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sorts));
+    public PageResponse<?> getAllCoursesByTutorId(String tutorId, int pageNo, int pageSize, String... sorts) {
+        User tutor = userRepository.findById(tutorId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        List<Sort.Order> orders = new ArrayList<>();
+        for(String sortBy : sorts){
+            // firstname:asc|desc
+            Pattern pattern = Pattern.compile("(\\w+?)(:)(.*)");
+            Matcher matcher = pattern.matcher(sortBy);
+            if(matcher.find()){
+                if(matcher.group(3).equalsIgnoreCase("desc")){
+                    orders.add(new Sort.Order(Sort.Direction.DESC, matcher.group(1)));
+                } else {
+                    orders.add(new Sort.Order(Sort.Direction.ASC, matcher.group(1)));
+                }
+            }
+
+        }
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(orders));
         Page<Course> courses = courseRepository.findByTutorIdAndIsDeletedFalse(tutorId, pageable);
-        return courses.stream()
-                .map(courseMapper::toCourseResponse)
-                .toList();
+        return PageResponse.builder()
+                .pageNo(pageNo)
+                .pageSize(pageSize)
+                .totalPages(courses.getTotalPages())
+                .items(courses.stream()
+                        .map(courseMapper::toCourseResponse)
+                        .toList())
+                .build();
+
     }
 
 
@@ -219,28 +238,19 @@ public class CourseServiceImpl implements CourseService {
         String userId = jwt.getClaimAsString("userId");
 
         List<Sort.Order> orders = new ArrayList<>();
-
-        if (sorts != null && sorts.length > 0) {
-            Pattern pattern = Pattern.compile("(\\w+?)(:)(asc|desc)", Pattern.CASE_INSENSITIVE);
-
-            for (String sortBy : sorts) {
-                Matcher matcher = pattern.matcher(sortBy);
-                if (matcher.matches()) {
-                    String direction = matcher.group(3);
-                    String field = matcher.group(1);
-
-                    if (direction.equalsIgnoreCase("desc")) {
-                        orders.add(Sort.Order.desc(field));
-                    } else {
-                        orders.add(Sort.Order.asc(field));
-                    }
+        for(String sortBy : sorts){
+            Pattern pattern = Pattern.compile("(\\w+?)(:)(.*)");
+            Matcher matcher = pattern.matcher(sortBy);
+            if(matcher.find()){
+                if(matcher.group(3).equalsIgnoreCase("desc")){
+                    orders.add(new Sort.Order(Sort.Direction.DESC, matcher.group(1)));
+                } else {
+                    orders.add(new Sort.Order(Sort.Direction.ASC, matcher.group(1)));
                 }
             }
-        }
 
-        Pageable pageable = orders.isEmpty()
-                ? PageRequest.of(pageNo, pageSize)
-                : PageRequest.of(pageNo, pageSize, Sort.by(orders));
+        }
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(orders));
 
         Page<Course> courses = courseRepository.findByEnrolledUsersIdAndIsDeletedFalse(userId, pageable);
 

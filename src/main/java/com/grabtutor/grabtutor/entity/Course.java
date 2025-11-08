@@ -28,7 +28,7 @@ public class Course extends BaseEntity {
     boolean isPublished = true;
     @Builder.Default
     int totalLessons = 0;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "course_subject",
             joinColumns = @JoinColumn(name = "course_id"),

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.util.List;
+import java.util.Set;
 
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -21,7 +22,7 @@ public class CourseResponse {
     String imageUrl;
     boolean isPublished;
     int totalLessons;
-    List<String> subjectIds;
+    Set<String> subjectIds;
     String tutorId;
     List<String> lessonIds;
     boolean isEnrolled;
