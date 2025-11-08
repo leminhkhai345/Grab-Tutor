@@ -148,7 +148,7 @@ public class ReviewServiceImpl implements ReviewService{
     public PageResponse<?> getReviewsByPostId(String postId, int pageNo, int pageSize, String... sorts) {
         List<Sort.Order> orders = new ArrayList<>();
         for(String sortBy : sorts){
-            Pattern pattern = Pattern.compile("(\\w+?)*(:)(.*)");
+            Pattern pattern = Pattern.compile("(\\w+?)(:)(.*)");
             Matcher matcher = pattern.matcher(sortBy);
             if(matcher.find()){
                 if(matcher.group(3).equalsIgnoreCase("desc")){
@@ -174,7 +174,7 @@ public class ReviewServiceImpl implements ReviewService{
     public PageResponse<?> getReviewsBySenderId(String senderId, int pageNo, int pageSize, String... sorts) {
         List<Sort.Order> orders = new ArrayList<>();
         for(String sortBy : sorts){
-            Pattern pattern = Pattern.compile("(\\w+?)*(:)(.*)");
+            Pattern pattern = Pattern.compile("(\\w+?)(:)(.*)");
             Matcher matcher = pattern.matcher(sortBy);
             if(matcher.find()){
                 if(matcher.group(3).equalsIgnoreCase("desc")){
@@ -200,7 +200,7 @@ public class ReviewServiceImpl implements ReviewService{
     public PageResponse<?> getReviewsByReceiverId(String receiverId, int pageNo, int pageSize, String... sorts) {
         List<Sort.Order> orders = new ArrayList<>();
         for(String sortBy : sorts){
-            Pattern pattern = Pattern.compile("(\\w+?)*(:)(.*)");
+            Pattern pattern = Pattern.compile("(\\w+?)(:)(.*)");
             Matcher matcher = pattern.matcher(sortBy);
             if(matcher.find()){
                 if(matcher.group(3).equalsIgnoreCase("desc")){
@@ -230,7 +230,7 @@ public class ReviewServiceImpl implements ReviewService{
         String userId = jwt.getClaimAsString("userId");
         List<Sort.Order> orders = new ArrayList<>();
         for(String sortBy : sorts){
-            Pattern pattern = Pattern.compile("(\\w+?)*(:)(.*)");
+            Pattern pattern = Pattern.compile("(\\w+?)(:)(.*)");
             Matcher matcher = pattern.matcher(sortBy);
             if(matcher.find()){
                 if(matcher.group(3).equalsIgnoreCase("desc")){

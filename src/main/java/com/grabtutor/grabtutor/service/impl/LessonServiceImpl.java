@@ -56,6 +56,8 @@ public class LessonServiceImpl implements LessonService {
 
         Lesson lesson = lessonMapper.toLesson(request);
         lesson.setCourse(course);
+        course.setTotalLessons(course.getTotalLessons() + 1);
+        courseRepository.save(course);
         return lessonMapper.toLessonResponse(lessonRepository.save(lesson));
     }
     @PreAuthorize("hasRole('TUTOR')")
@@ -141,6 +143,9 @@ public class LessonServiceImpl implements LessonService {
             throw new AppException(ErrorCode.TUTOR_NOT_AUTHORIZED);
         }
         lesson.setDeleted(true);
+        Course course = lesson.getCourse();
+        course.setTotalLessons(course.getTotalLessons() - 1);
+        courseRepository.save(course);
         lessonRepository.save(lesson);
     }
 }
