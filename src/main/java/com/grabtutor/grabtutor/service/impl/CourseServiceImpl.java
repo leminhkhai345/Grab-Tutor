@@ -88,23 +88,23 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public CourseResponse getCourseByCourseId(String courseId) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Jwt jwt = (Jwt) auth.getPrincipal();
-        String userId = jwt.getClaimAsString("userId");
-
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
         if(course.isDeleted()) {
             throw new AppException(ErrorCode.COURSE_NOT_FOUND);
         }
-        if(!course.getTutor().getId().equals(userId) && !course.isPublished()) {
-            throw new AppException(ErrorCode.FORBIDDEN);
+        if(!course.isPublished()) {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if(auth == null || !auth.isAuthenticated()) {
+                throw new AppException(ErrorCode.FORBIDDEN);
+            }
+            Jwt jwt = (Jwt) auth.getPrincipal();
+            String userId = jwt.getClaimAsString("userId");
+            if(!course.getTutor().getId().equals(userId)) {
+                throw new AppException(ErrorCode.FORBIDDEN);
+            }
         }
-        CourseResponse response = courseMapper.toCourseResponse(course);
-        boolean isEnrolled = course.getEnrolledUsers().stream()
-                .anyMatch(user -> user.getId().equals(userId));
-        response.setEnrolled(isEnrolled);
-        return response;
+        return courseMapper.toCourseResponse(course);
     }
 
     @PreAuthorize("hasRole('TUTOR')")
@@ -253,6 +253,61 @@ public class CourseServiceImpl implements CourseService {
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(orders));
 
         Page<Course> courses = courseRepository.findByEnrolledUsersIdAndIsDeletedFalse(userId, pageable);
+
+        return PageResponse.builder()
+                .pageNo(pageNo)
+                .pageSize(pageSize)
+                .totalPages(courses.getTotalPages())
+                .items(courses.stream().map(courseMapper::toCourseResponse).toList())
+                .build();
+    }
+
+    @Override
+    public PageResponse<?> searchCourse(String keyword, int pageNo, int pageSize, String... sorts) {
+
+        List<Sort.Order> orders = new ArrayList<>();
+        for(String sortBy : sorts){
+            Pattern pattern = Pattern.compile("(\\w+?)(:)(.*)");
+            Matcher matcher = pattern.matcher(sortBy);
+            if(matcher.find()){
+                if(matcher.group(3).equalsIgnoreCase("desc")){
+                    orders.add(new Sort.Order(Sort.Direction.DESC, matcher.group(1)));
+                } else {
+                    orders.add(new Sort.Order(Sort.Direction.ASC, matcher.group(1)));
+                }
+            }
+
+        }
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(orders));
+        Page<Course> courses = courseRepository.searchCoursesByName(keyword, pageable);
+
+        return PageResponse.builder()
+                .pageNo(pageNo)
+                .pageSize(pageSize)
+                .totalPages(courses.getTotalPages())
+                .items(courses.stream().map(courseMapper::toCourseResponse).toList())
+                .build();
+    }
+
+    @Override
+    public PageResponse<?> getAllCourse(int pageNo, int pageSize, String... sorts) {
+
+        List<Sort.Order> orders = new ArrayList<>();
+        for(String sortBy : sorts){
+            Pattern pattern = Pattern.compile("(\\w+?)(:)(.*)");
+            Matcher matcher = pattern.matcher(sortBy);
+            if(matcher.find()){
+                if(matcher.group(3).equalsIgnoreCase("desc")){
+                    orders.add(new Sort.Order(Sort.Direction.DESC, matcher.group(1)));
+                } else {
+                    orders.add(new Sort.Order(Sort.Direction.ASC, matcher.group(1)));
+                }
+            }
+
+        }
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(orders));
+
+        Page<Course> courses = courseRepository.findAllCourses(pageable);
 
         return PageResponse.builder()
                 .pageNo(pageNo)
