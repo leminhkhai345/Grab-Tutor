@@ -8,6 +8,8 @@ import com.grabtutor.grabtutor.service.ChatRoomService;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Component;
@@ -28,6 +30,7 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Component
 @Scope("prototype") // QUAN TRỌNG: Mỗi kết nối 1 instance
 @Slf4j
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
@@ -180,6 +183,8 @@ public class ClientHandler implements Runnable {
         try {
             Jwt jwt = jwtDecoder.decode(token);
             String userId = jwt.getClaimAsString("userId");
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
             if (userId != null) {
                 this.authenticatedUserId = userId; // Lưu lại userId
                 return true;
