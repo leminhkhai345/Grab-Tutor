@@ -115,4 +115,27 @@ public class CourseController {
                 .data(courseService.getMyEnrolledCourses(pageNo, pageSize, sorts))
                 .build();
     }
+
+    @GetMapping("/search")
+    public ApiResponse<?> searchCourse(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int pageNo,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(defaultValue = "createdAt") String... sorts) {
+        return ApiResponse.builder()
+                .message("Courses fetched successfully")
+                .data(courseService.searchCourse(keyword, pageNo, pageSize, sorts))
+                .build();
+    }
+
+    @GetMapping("/all")
+    public ApiResponse<?> getAllCourse(
+            @RequestParam(defaultValue = "0") int pageNo,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(defaultValue = "createdAt") String... sorts) {
+        return ApiResponse.builder()
+                .message("Courses fetched successfully")
+                .data(courseService.getAllCourse(pageNo, pageSize, sorts))
+                .build();
+    }
 }

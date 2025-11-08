@@ -15,8 +15,8 @@ import java.util.Set;
 @Table(name = "courses")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @SuperBuilder
+@EqualsAndHashCode(callSuper = true, exclude = {"subjects", "lessons", "enrolledUsers", "transactions"})
 @Data
-@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class Course extends BaseEntity {

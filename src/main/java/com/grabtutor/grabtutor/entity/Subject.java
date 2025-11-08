@@ -14,7 +14,8 @@ import java.util.Set;
 @Table(name = "subjects")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @SuperBuilder
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = {"relatedCourses", "posts"})
+
 @AllArgsConstructor
 @Data
 @NoArgsConstructor

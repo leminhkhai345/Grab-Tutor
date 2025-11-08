@@ -92,7 +92,11 @@ public class LessonServiceImpl implements LessonService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         boolean isAccessible = false;
-        if(user.getRole() == Role.ADMIN){
+        if(lesson.isPreview()){
+            isAccessible = true;
+        }
+
+        else if(user.getRole() == Role.ADMIN){
             isAccessible = true;
         }
         else if(user.getRole() == Role.TUTOR){
@@ -105,9 +109,7 @@ public class LessonServiceImpl implements LessonService {
                 isAccessible = true;
             }
         }
-        else if(lesson.isPreview()){
-            isAccessible = true;
-        }
+
 
         if(!isAccessible){
             throw new AppException(ErrorCode.LESSON_NOT_ACCESSIBLE);

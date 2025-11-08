@@ -5,7 +5,6 @@ import com.grabtutor.grabtutor.dto.response.PageResponse;
 import com.grabtutor.grabtutor.dto.response.UserTransactionResponse;
 import com.grabtutor.grabtutor.dto.response.CourseResponse;
 
-import java.util.List;
 import java.util.Set;
 
 public interface CourseService {
@@ -17,4 +16,6 @@ public interface CourseService {
     PageResponse<?> getAllCoursesByTutorId(String tutorId, int pageNo, int pageSize, String... sorts);
     UserTransactionResponse enrollCourse(String courseId);
     PageResponse<?> getMyEnrolledCourses(int pageNo, int pageSize, String... sorts);
+    PageResponse<?> searchCourse(String keyword, int pageNo, int pageSize, String... sorts);
+    PageResponse<?> getAllCourse(int pageNo, int pageSize, String... sorts);
 }

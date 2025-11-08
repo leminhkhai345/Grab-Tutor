@@ -25,7 +25,8 @@ import org.springframework.web.filter.CorsFilter;
 public class SecurityConfiguration {
     private final String[] PUBLIC_ENDPOINTS = {
             "/users/sendmail", "/upload","/auth/**", "/users/addTutor",
-            "/users/tutorInfo/{userId}", "users",
+            "/users/tutorInfo/{userId}", "users", "courses/{courseId}",
+            "courses/tutor/{tutorId}", "courses/search", "courses/all",
             "/transaction/vnpay-payment-return"
     };
     private final String[] authenticatedEndpoints = {

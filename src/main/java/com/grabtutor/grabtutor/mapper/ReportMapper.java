@@ -19,6 +19,7 @@ public interface ReportMapper {
                 .senderId(report.getSender() != null ? report.getSender().getId() : null)
                 .receiverId(report.getReceiver() != null ? report.getReceiver().getId() : null)
                 .postId(report.getPost() != null ? report.getPost().getId() : null)
+                .chatRoomId(report.getPost().getChatRoom() != null ? report.getPost().getChatRoom().getId() : null)
                 .createdAt(report.getCreatedAt())
                 .updatedAt(report.getUpdatedAt())
                 .isDeleted(report.isDeleted())
