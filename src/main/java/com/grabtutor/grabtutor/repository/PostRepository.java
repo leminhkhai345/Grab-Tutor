@@ -1,6 +1,7 @@
 package com.grabtutor.grabtutor.repository;
 
 import com.grabtutor.grabtutor.entity.Post;
+import com.grabtutor.grabtutor.entity.Subject;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,4 +18,5 @@ public interface PostRepository extends JpaRepository<Post, String> {
     Page<Post> searchDescription(@Param("keyword") String keyword, Pageable pageable);
     Optional<Post> findByChatRoomId(String roomId);
     Page<Post> findByUserId(String userId, Pageable pageable);
+    Page<Post> findBySubjectAndIsDeletedFalse(Subject subject, Pageable pageable);
 }

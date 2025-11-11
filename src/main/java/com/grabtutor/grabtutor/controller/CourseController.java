@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -136,6 +135,17 @@ public class CourseController {
         return ApiResponse.builder()
                 .message("Courses fetched successfully")
                 .data(courseService.getAllCourse(pageNo, pageSize, sorts))
+                .build();
+    }
+    @GetMapping("/subject/{subjectId}")
+    public ApiResponse<?> getCoursesBySubjectId(
+            @PathVariable String subjectId,
+            @RequestParam(defaultValue = "0") int pageNo,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(defaultValue = "createdAt") String... sorts) {
+        return ApiResponse.builder()
+                .message("Courses fetched successfully")
+                .data(courseService.getCoursesBySubjectId(subjectId, pageNo, pageSize, sorts))
                 .build();
     }
 }
