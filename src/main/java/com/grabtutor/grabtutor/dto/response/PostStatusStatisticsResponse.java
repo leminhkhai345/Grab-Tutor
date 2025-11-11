@@ -1,0 +1,12 @@
+package com.grabtutor.grabtutor.dto.response;
+
+import lombok.Builder;
+import lombok.Data;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
+@Data
+@Builder
+public class PostStatusStatisticsResponse {
+    int OPEN, CLOSED, SOLVED, REPORTED;
+}

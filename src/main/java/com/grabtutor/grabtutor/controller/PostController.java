@@ -162,4 +162,15 @@ public class PostController {
                 .data(postService.searchPostsByName(keyword, pageNo, pageSize, sorts))
                 .build();
     }
+
+    @GetMapping("/subject/{subjectId}")
+    public ApiResponse<?> getPostsBySubjectId(@PathVariable String subjectId,
+                                              @RequestParam(defaultValue = "0") int pageNo,
+                                              @RequestParam(defaultValue = "10") int pageSize,
+                                              @RequestParam(defaultValue = "createdAt:desc") String... sorts) {
+        return ApiResponse.builder()
+                .message("get posts by subjectId")
+                .data(postService.getPostBySubjectId(subjectId, pageNo, pageSize, sorts))
+                .build();
+    }
 }

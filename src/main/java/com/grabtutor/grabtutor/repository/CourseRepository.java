@@ -1,7 +1,6 @@
 package com.grabtutor.grabtutor.repository;
 
 import com.grabtutor.grabtutor.entity.Course;
-import com.grabtutor.grabtutor.entity.Post;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,5 +22,6 @@ public interface CourseRepository extends JpaRepository<Course, String> {
 
     @Query("SELECT c FROM Course c WHERE c.isDeleted = false AND c.name LIKE CONCAT('%', :keyword, '%')")
     Page<Course> searchCoursesByName(@Param("keyword") String keyword, Pageable pageable);
+    Page<Course> findBySubjects_Id(String subjectId, Pageable pageable);
 
 }

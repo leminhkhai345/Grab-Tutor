@@ -20,5 +20,5 @@ public interface PostService {
     PageResponse<?> getPostByUserId(String userId, int pageNo, int pageSize, String... sorts);
     PageResponse<?> getAllPosts(int pageNo, int pageSize, String... sorts);
     PageResponse<?> searchPostsByName(String keyword, int pageNo, int pageSize, String... sorts);
-
+    PageResponse<?> getPostBySubjectId(String subjectId, int pageNo, int pageSize, String... sorts);
 }
