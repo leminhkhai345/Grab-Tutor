@@ -55,8 +55,8 @@ public class ReviewController {
     @GetMapping("/post/{postId}")
     public ApiResponse<?> getReviewsByPostId(@PathVariable String postId,
                                              @RequestParam(defaultValue = "0") int pageNo,
-                                            @RequestParam(defaultValue = "10") int pageSize,
-                                            @RequestParam(defaultValue = "createdAt|desc") String... sorts) {
+                                             @RequestParam(defaultValue = "10") int pageSize,
+                                             @RequestParam(defaultValue = "createdAt:desc") String... sorts) {
         return ApiResponse.builder()
                 .message("Reviews fetched successfully")
                 .data(reviewService.getReviewsByPostId(postId, pageNo, pageSize, sorts))
@@ -67,7 +67,7 @@ public class ReviewController {
     public ApiResponse<?> getReviewsBySenderId(@PathVariable String senderId,
                                                @RequestParam(defaultValue = "0") int pageNo,
                                                @RequestParam(defaultValue = "10") int pageSize,
-                                               @RequestParam(defaultValue = "createdAt|desc", required = false) String... sorts) {
+                                               @RequestParam(defaultValue = "createdAt:desc", required = false) String... sorts) {
         return ApiResponse.builder()
                 .message("Reviews fetched successfully")
                 .data(reviewService.getReviewsBySenderId(senderId, pageNo, pageSize, sorts))
@@ -78,7 +78,7 @@ public class ReviewController {
     public ApiResponse<?> getReviewsByReceiverId(@PathVariable String receiverId,
                                                  @RequestParam(defaultValue = "0") int pageNo,
                                                  @RequestParam(defaultValue = "10") int pageSize,
-                                                 @RequestParam(defaultValue = "createdAt|desc", required = false) String... sorts) {
+                                                 @RequestParam(defaultValue = "createdAt:desc", required = false) String... sorts) {
         return ApiResponse.builder()
                 .message("Reviews fetched successfully")
                 .data(reviewService.getReviewsByReceiverId(receiverId, pageNo, pageSize, sorts))
@@ -88,7 +88,7 @@ public class ReviewController {
     @GetMapping("/me")
     public ApiResponse<?> getMyReviews(@RequestParam(defaultValue = "0") int pageNo,
                                        @RequestParam(defaultValue = "10") int pageSize,
-                                       @RequestParam(defaultValue = "createdAt|desc", required = false) String... sorts) {
+                                       @RequestParam(defaultValue = "createdAt:desc", required = false) String... sorts) {
         return ApiResponse.builder()
                 .message("My reviews fetched successfully")
                 .data(reviewService.getMyReviews(pageNo, pageSize, sorts))

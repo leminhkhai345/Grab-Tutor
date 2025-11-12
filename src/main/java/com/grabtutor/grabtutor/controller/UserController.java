@@ -55,7 +55,7 @@ public class UserController {
     @GetMapping("/all")
     public ApiResponse<?> getALlUsers(@RequestParam(defaultValue = "0") int pageNo,
                                       @RequestParam(defaultValue = "10") int pageSize,
-                                      @RequestParam String... sorts){
+                                      @RequestParam(defaultValue = "createdAt:desc") String... sorts){
 
 
         return ApiResponse.builder()

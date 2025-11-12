@@ -89,7 +89,7 @@ public class CourseController {
             @PathVariable String tutorId,
             @RequestParam(defaultValue = "0") int pageNo,
             @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(defaultValue = "createdAt") String... sorts) {
+            @RequestParam(defaultValue = "createdAt:desc") String... sorts) {
         return ApiResponse.builder()
                 .message("Courses fetched successfully")
                 .data(courseService.getAllCoursesByTutorId(tutorId, pageNo, pageSize, sorts))
@@ -108,7 +108,7 @@ public class CourseController {
     public ApiResponse<?> getMyEnrolledCourses(
             @RequestParam(defaultValue = "0") int pageNo,
             @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(defaultValue = "createdAt") String... sorts) {
+            @RequestParam(defaultValue = "createdAt:desc") String... sorts) {
         return ApiResponse.builder()
                 .message("Enrolled courses fetched successfully")
                 .data(courseService.getMyEnrolledCourses(pageNo, pageSize, sorts))
@@ -120,7 +120,7 @@ public class CourseController {
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int pageNo,
             @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(defaultValue = "createdAt") String... sorts) {
+            @RequestParam(defaultValue = "createdAt:desc") String... sorts) {
         return ApiResponse.builder()
                 .message("Courses fetched successfully")
                 .data(courseService.searchCourse(keyword, pageNo, pageSize, sorts))
@@ -131,7 +131,7 @@ public class CourseController {
     public ApiResponse<?> getAllCourse(
             @RequestParam(defaultValue = "0") int pageNo,
             @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(defaultValue = "createdAt") String... sorts) {
+            @RequestParam(defaultValue = "createdAt:desc") String... sorts) {
         return ApiResponse.builder()
                 .message("Courses fetched successfully")
                 .data(courseService.getAllCourse(pageNo, pageSize, sorts))
@@ -142,7 +142,7 @@ public class CourseController {
             @PathVariable String subjectId,
             @RequestParam(defaultValue = "0") int pageNo,
             @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(defaultValue = "createdAt") String... sorts) {
+            @RequestParam(defaultValue = "createdAt:desc") String... sorts) {
         return ApiResponse.builder()
                 .message("Courses fetched successfully")
                 .data(courseService.getCoursesBySubjectId(subjectId, pageNo, pageSize, sorts))

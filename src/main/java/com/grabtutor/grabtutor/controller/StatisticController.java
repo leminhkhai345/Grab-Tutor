@@ -1,14 +1,13 @@
 package com.grabtutor.grabtutor.controller;
 
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
+import com.grabtutor.grabtutor.enums.Role;
 import com.grabtutor.grabtutor.service.StatisticService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/statistic")
@@ -33,4 +32,30 @@ public class StatisticController {
                 .message("Review star statistics retrieved successfully")
                 .build();
     }
+
+    @GetMapping("/user-totals")
+    public ApiResponse<?> getUserTotalStatistics(){
+        return ApiResponse.builder()
+                .data(statisticService.getUserTotalStatistics())
+                .message("User total statistics retrieved successfully")
+                .build();
+    }
+
+    @GetMapping("/user-status")
+    public ApiResponse<?> getUserStatusStatistics(@RequestParam String role) {
+        Role rol;
+        try {
+            rol = Role.valueOf(role.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return ApiResponse.builder()
+                    .message("Invalid role parameter")
+                    .build();
+        }
+        return ApiResponse.builder()
+                .data(statisticService.userStatusStatistics(rol))
+                .message("User status statistics retrieved successfully")
+                .build();
+    }
+
+
 }

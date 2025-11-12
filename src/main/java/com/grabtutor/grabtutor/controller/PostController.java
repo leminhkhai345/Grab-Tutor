@@ -88,7 +88,7 @@ public class PostController {
     public ApiResponse<?> getPostsByUserId(@PathVariable String userId,
                                            @RequestParam(defaultValue = "0") int pageNo,
                                            @RequestParam(defaultValue = "10") int pageSize,
-                                           @RequestParam String... sorts){
+                                           @RequestParam(defaultValue = "createdAt:desc") String... sorts){
         return ApiResponse.builder()
                 .message("get posts by userid")
                 .data(postService.getPostByUserId(userId, pageNo, pageSize, sorts))
@@ -98,7 +98,7 @@ public class PostController {
     @GetMapping("/myPosts")
     public ApiResponse<?> getMyPosts(@RequestParam(defaultValue = "0") int pageNo,
                                      @RequestParam(defaultValue = "10") int pageSize,
-                                     @RequestParam String... sorts){
+                                     @RequestParam(defaultValue = "createdAt:desc") String... sorts){
         return ApiResponse.builder()
                 .message("get my posts")
                 .data(postService.getPostMyPost(pageNo, pageSize, sorts))
@@ -108,7 +108,7 @@ public class PostController {
     @GetMapping("/all")
     public ApiResponse<?> getALlPosts(@RequestParam(defaultValue = "0") int pageNo,
                                       @RequestParam(defaultValue = "10") int pageSize,
-                                      @RequestParam String... sorts){
+                                      @RequestParam(defaultValue = "createdAt:desc") String... sorts){
         return ApiResponse.builder()
                 .message("get all posts")
                 .data(postService.getAllPosts(pageNo, pageSize, sorts))
@@ -138,7 +138,7 @@ public class PostController {
     @GetMapping("/myTutorBids")
     public ApiResponse<?> getMyTutorBids(@RequestParam(defaultValue = "0") int pageNo,
                                          @RequestParam(defaultValue = "10") int pageSize,
-                                         @RequestParam String... sorts){
+                                         @RequestParam(defaultValue = "createdAt:desc") String... sorts){
         return ApiResponse.builder()
                 .message("Get all my tutor bids successfully")
                 .data(tutorBidService.getMyTutorBid(pageNo,pageSize, sorts))

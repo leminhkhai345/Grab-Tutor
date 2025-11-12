@@ -39,7 +39,7 @@ public class TransactionController {
     @GetMapping("/myUserTransaction")
     public ApiResponse<?> getMyUserTransactions(@RequestParam(defaultValue = "0") int pageNo,
                                                 @RequestParam(defaultValue = "10") int pageSize,
-                                                String... sorts){
+                                                @RequestParam(defaultValue = "createdAt:desc") String... sorts){
         return ApiResponse.builder()
                 .message("get account user transactions successfully")
                 .data(transactionService.getMyUserTransactions(pageNo, pageSize, sorts))
@@ -48,7 +48,7 @@ public class TransactionController {
     @GetMapping("/getAllUserTransaction")
     public ApiResponse<?> getAllUserTransactions(@RequestParam(defaultValue = "0") int pageNo,
                                                  @RequestParam(defaultValue = "10") int pageSize,
-                                                 String... sorts){
+                                                 @RequestParam(defaultValue = "createdAt:desc") String... sorts){
         return ApiResponse.builder()
                 .message("get all user transactions successfully")
                 .data(transactionService.getAllUserTransactions(pageNo, pageSize, sorts))
