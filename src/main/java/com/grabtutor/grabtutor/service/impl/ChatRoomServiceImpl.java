@@ -6,6 +6,7 @@ import com.grabtutor.grabtutor.dto.response.LoadChatRoomsResponse;
 import com.grabtutor.grabtutor.dto.response.LoadMessagesResponse;
 import com.grabtutor.grabtutor.dto.response.MessageResponse;
 import com.grabtutor.grabtutor.entity.AccountBalance;
+import com.grabtutor.grabtutor.entity.ChatRoom;
 import com.grabtutor.grabtutor.entity.User;
 import com.grabtutor.grabtutor.entity.UserTransaction;
 import com.grabtutor.grabtutor.enums.MessageType;
@@ -30,6 +31,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.Objects;
 
 @Service
@@ -78,7 +80,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
             throw new AppException(ErrorCode.FORBIDDEN);
         }
 
-        var messages = messageRepository.findByChatRoomId(roomId);
+        var messages = messageRepository.findByChatRoomIdOrderByCreatedAtAsc(roomId);
         return LoadMessagesResponse.builder()
                 .messages(messages.stream().map(messageMapper::ToMessageResponse).toList())
                 .build();
@@ -94,7 +96,9 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         return LoadChatRoomsResponse.builder()
-                .rooms(user.getChatRooms().stream().map(chatRoomMapper::toChatRoomResponse).toList())
+                .rooms(user.getChatRooms().stream()
+                        .sorted(Comparator.comparing(ChatRoom::getCreatedAt).reversed())
+                        .map(chatRoomMapper::toChatRoomResponse).toList())
                 .build();
     }
 
