@@ -2,8 +2,10 @@ package com.grabtutor.grabtutor.service.impl;
 
 import com.grabtutor.grabtutor.dto.response.PostStatusStatisticsResponse;
 import com.grabtutor.grabtutor.dto.response.ReviewStarStatisticResponse;
+import com.grabtutor.grabtutor.dto.response.UserStatusStatistic;
+import com.grabtutor.grabtutor.dto.response.UserTotalStatisticResponse;
 import com.grabtutor.grabtutor.entity.Post;
-import com.grabtutor.grabtutor.enums.PostStatus;
+import com.grabtutor.grabtutor.enums.Role;
 import com.grabtutor.grabtutor.repository.PostRepository;
 import com.grabtutor.grabtutor.repository.ReviewRepository;
 import com.grabtutor.grabtutor.repository.UserRepository;
@@ -72,6 +74,53 @@ public class StatisticServiceImpl implements StatisticService {
                 .three(three)
                 .four(four)
                 .five(five)
+                .build();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Override
+    public UserTotalStatisticResponse getUserTotalStatistics(){
+        var users = userRepository.findAllByIsDeletedFalseAndIsActiveTrue();
+        int totalUsers = users.size();
+        int tutors = 0, students = 0, admins = 0;
+        for(var user : users){
+            switch(user.getRole()){
+                case TUTOR -> tutors++;
+                case USER -> students++;
+                case ADMIN -> admins++;
+            }
+        }
+        return UserTotalStatisticResponse.builder()
+                .totalUsers(totalUsers)
+                .tutors(tutors)
+                .students(students)
+                .admins(admins)
+                .build();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Override
+    public UserStatusStatistic userStatusStatistics(Role role){
+        var users = userRepository.findAll();
+        int total = 0;
+        int pending = 0, normal = 0, warning = 0, banned = 0;
+        for(var user : users){
+            if(user.getRole().equals(role)){
+                total++;
+                switch (user.getUserStatus()){
+                    case PENDING -> pending++;
+                    case NORMAL -> normal++;
+                    case WARNING -> warning++;
+                    case BANNED -> banned++;
+                }
+            }
+        }
+        return UserStatusStatistic.builder()
+                .total(total)
+                .PENDING(pending)
+                .NORMAL(normal)
+                .WARNING(warning)
+                .BANNED(banned)
                 .build();
     }
 

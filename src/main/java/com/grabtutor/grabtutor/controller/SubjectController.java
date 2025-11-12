@@ -56,7 +56,7 @@ public class SubjectController {
     public ApiResponse<?> getAllSubjects(
             @RequestParam(defaultValue = "0") int pageNo,
             @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(required = false) String... sorts) {
+            @RequestParam(defaultValue = "createdAt:desc") String... sorts) {
         return ApiResponse.builder()
                 .data(subjectService.getAllSubjects(pageNo, pageSize, sorts))
                 .message("Subjects fetched successfully")

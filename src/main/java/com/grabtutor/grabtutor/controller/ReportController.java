@@ -36,9 +36,9 @@ public class ReportController {
 
     @GetMapping("/user/receiver/{receiverId}")
     public ApiResponse<?> getReportByReceivedId(@PathVariable String receiverId,
-                                            @RequestParam(defaultValue = "0") int pageNo,
-                                            @RequestParam(defaultValue = "10") int pageSize,
-                                            @RequestParam(defaultValue = "createdAt:desc") String... sortBy){
+                                                @RequestParam(defaultValue = "0") int pageNo,
+                                                @RequestParam(defaultValue = "10") int pageSize,
+                                                @RequestParam(defaultValue = "createdAt:desc") String... sortBy){
         return  ApiResponse.builder()
                 .message("Reports fetched successfully")
                 .data(reportService.getReportByReceiverId(receiverId, pageNo, pageSize, sortBy))
@@ -47,9 +47,9 @@ public class ReportController {
 
     @GetMapping("/user/sender/{senderId}")
     public ApiResponse<?> getReportBSentId(@PathVariable String senderId,
-                                            @RequestParam(defaultValue = "0") int pageNo,
-                                            @RequestParam(defaultValue = "10") int pageSize,
-                                            @RequestParam(defaultValue = "createdAt:desc") String... sortBy){
+                                           @RequestParam(defaultValue = "0") int pageNo,
+                                           @RequestParam(defaultValue = "10") int pageSize,
+                                           @RequestParam(defaultValue = "createdAt:desc") String... sortBy){
         return  ApiResponse.builder()
                 .message("Reports fetched successfully")
                 .data(reportService.getReportBySenderId(senderId, pageNo, pageSize, sortBy))
