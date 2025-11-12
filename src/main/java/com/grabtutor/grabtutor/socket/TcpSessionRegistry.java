@@ -1,6 +1,7 @@
 package com.grabtutor.grabtutor.socket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.grabtutor.grabtutor.configuration.CustomJwtDecoder;
 import com.grabtutor.grabtutor.dto.request.MessageRequest;
 import com.grabtutor.grabtutor.dto.response.MessageResponse;
 import com.grabtutor.grabtutor.dto.response.SignalResponse;
@@ -8,6 +9,7 @@ import com.grabtutor.grabtutor.entity.Notification;
 import com.grabtutor.grabtutor.enums.MessageType;
 import com.grabtutor.grabtutor.mapper.MessageMapper;
 import com.grabtutor.grabtutor.mapper.NotificationMapper;
+import com.grabtutor.grabtutor.service.ChatRoomService;
 import jakarta.websocket.Session;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,8 +22,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-@Component // <-- Đánh dấu là 1 Spring bean
-@Scope("prototype")
+@Component
 @Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)

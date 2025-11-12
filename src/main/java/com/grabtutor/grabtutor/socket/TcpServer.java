@@ -8,7 +8,6 @@ import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +31,11 @@ public class TcpServer {
     final ExecutorService clientPool = Executors.newCachedThreadPool();
     volatile boolean isRunning = true;
 
+    final TcpSessionRegistry registry;
+    final ObjectMapper objectMapper;
+    final ChatRoomService chatRoomService;
+    final CustomJwtDecoder jwtDecoder;
+
     @PostConstruct
     public void start() {
         new Thread(() -> {
@@ -42,7 +46,7 @@ public class TcpServer {
                 while (isRunning) {
                     Socket clientSocket = serverSocket.accept();
                     // Lấy một Handler mới từ Spring Context cho mỗi kết nối
-                    ClientHandler handler = applicationContext.getBean(ClientHandler.class, clientSocket);
+                    ClientHandler handler = new ClientHandler(clientSocket, registry, objectMapper, chatRoomService, jwtDecoder);
                     clientPool.submit(handler);
                 }
             } catch (IOException e) {
