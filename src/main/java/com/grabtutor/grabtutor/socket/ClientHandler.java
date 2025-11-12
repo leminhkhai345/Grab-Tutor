@@ -30,8 +30,6 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Component
-@Scope("prototype") // QUAN TRỌNG: Mỗi kết nối 1 instance
 @Slf4j
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class ClientHandler implements Runnable {
