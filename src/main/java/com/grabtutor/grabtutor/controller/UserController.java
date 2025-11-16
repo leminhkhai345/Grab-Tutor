@@ -177,5 +177,11 @@ public class UserController {
                 .message("Get all virtual transactions successfully")
                 .build();
     }
-
+    @GetMapping("/myBalance")
+    public ApiResponse<?> getMyAccountBalance() {
+        return ApiResponse.builder()
+                .data(userService.getMyAccountBalance())
+                .message("Get account balance successfully")
+                .build();
+    }
 }

@@ -8,7 +8,6 @@ import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -24,9 +23,8 @@ import java.util.concurrent.Executors;
 
 public class TcpServer {
 
-    int port = 8888;
+    final int port = 8888;
 
-    final ApplicationContext applicationContext; // Để lấy prototype bean Handler
     ServerSocket serverSocket;
     final ExecutorService clientPool = Executors.newCachedThreadPool();
     volatile boolean isRunning = true;
@@ -45,7 +43,6 @@ public class TcpServer {
 
                 while (isRunning) {
                     Socket clientSocket = serverSocket.accept();
-                    // Lấy một Handler mới từ Spring Context cho mỗi kết nối
                     ClientHandler handler = new ClientHandler(clientSocket, registry, objectMapper, chatRoomService, jwtDecoder);
                     clientPool.submit(handler);
                 }
@@ -58,7 +55,7 @@ public class TcpServer {
     @PreDestroy
     public void stop() {
         isRunning = false;
-        try { if (serverSocket != null) serverSocket.close(); } catch (IOException e) {}
+        try { if (serverSocket != null) serverSocket.close(); } catch (IOException ignored) {}
         clientPool.shutdownNow();
     }
 }
