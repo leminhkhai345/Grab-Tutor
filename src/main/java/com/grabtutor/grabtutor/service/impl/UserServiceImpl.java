@@ -449,4 +449,18 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
+    @Override
+    public AccountBalanceResponse getMyAccountBalance() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String userId = jwt.getClaimAsString("userId");
+        String role =  jwt.getClaimAsString("scope");
+        AccountBalance balance = accountBalanceRepository.findByUserId(userId)
+                .orElseThrow(()-> new AppException(ErrorCode.ACCOUNT_BALANCE_NOT_FOUND));
+        return AccountBalanceResponse.builder()
+                .id(balance.getId())
+                .balance(balance.getBalance())
+                .userId(balance.getUser().getId())
+                .build();
+    }
 }

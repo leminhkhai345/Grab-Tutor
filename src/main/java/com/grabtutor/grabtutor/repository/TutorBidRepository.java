@@ -10,6 +10,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface TutorBidRepository extends JpaRepository<TutorBid, String> {
-    List<TutorBid> findByPostId(String postId);
+    List<TutorBid> findByPostIdOrderByCreatedAtDesc(String postId);
     Page<TutorBid> findAllByIsDeletedFalseAndUserId(String userId,Pageable pageable);
 }

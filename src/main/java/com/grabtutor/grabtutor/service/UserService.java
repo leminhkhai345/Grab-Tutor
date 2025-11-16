@@ -40,4 +40,6 @@ public interface UserService {
     PageResponse<?> getMyVirtualTransactions(int pageNo, int pageSize, String... sorts);
 
     PageResponse<?> getAllVirtualTransactions(int pageNo, int pageSize, String... sorts);
+
+    AccountBalanceResponse getMyAccountBalance();
 }

@@ -82,7 +82,7 @@ public class TutorBidServiceImpl implements TutorBidService {
 
     @Override
     public List<TutorBidResponse> getAllTutorBid(String postId) {
-        return tutorBidRepository.findByPostId(postId)
+        return tutorBidRepository.findByPostIdOrderByCreatedAtDesc(postId)
                 .stream().map(tutorBidMapper::toTutorBidResponse).toList();
     }
     @Override
