@@ -11,5 +11,6 @@ public interface ReportService {
     PageResponse<?> getReportBySenderId(String senderId, int pageNo, int pageSize, String... sortBy);
     ReportResponse resolveReport(String id, boolean accept);
     void deleteReport(String id);
+    PageResponse<?> getAllReports(int pageNo, int pageSize, String... sorts);
 
 }
