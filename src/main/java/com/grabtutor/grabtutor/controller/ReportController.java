@@ -64,4 +64,22 @@ public class ReportController {
                 .build();
     }
 
+    @GetMapping("/all")
+    public ApiResponse<?> getAllReports(@RequestParam(defaultValue = "0") int pageNo,
+                                       @RequestParam(defaultValue = "10") int pageSize,
+                                       @RequestParam(defaultValue = "createdAt:desc") String... sorts){
+        return  ApiResponse.builder()
+                .message("Reports fetched successfully")
+                .data(reportService.getAllReports(pageNo, pageSize, sorts))
+                .build();
+    }
+
+    @PutMapping("/resolve/{id}")
+    public ApiResponse<?> resolveReport(@PathVariable String id,
+                                       @RequestParam boolean accept) {
+        return ApiResponse.builder()
+                .message("Report resolved successfully")
+                .data(reportService.resolveReport(id, accept))
+                .build();
+    }
 }
