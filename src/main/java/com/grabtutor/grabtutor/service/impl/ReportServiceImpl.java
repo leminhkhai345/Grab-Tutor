@@ -3,14 +3,17 @@ package com.grabtutor.grabtutor.service.impl;
 import com.grabtutor.grabtutor.dto.request.ReportRequest;
 import com.grabtutor.grabtutor.dto.response.PageResponse;
 import com.grabtutor.grabtutor.dto.response.ReportResponse;
+import com.grabtutor.grabtutor.entity.ChatRoom;
 import com.grabtutor.grabtutor.entity.Post;
 import com.grabtutor.grabtutor.entity.Report;
 import com.grabtutor.grabtutor.entity.User;
 import com.grabtutor.grabtutor.enums.PostStatus;
 import com.grabtutor.grabtutor.enums.ReportStatus;
+import com.grabtutor.grabtutor.enums.RoomStatus;
 import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.ReportMapper;
+import com.grabtutor.grabtutor.repository.ChatRoomRepository;
 import com.grabtutor.grabtutor.repository.PostRepository;
 import com.grabtutor.grabtutor.repository.ReportRepository;
 import com.grabtutor.grabtutor.repository.UserRepository;
@@ -42,6 +45,7 @@ public class ReportServiceImpl implements ReportService {
     ReportMapper reportMapper;
     UserRepository userRepository;
     PostRepository postRepository;
+    ChatRoomRepository chatRoomRepository;
 
     @PreAuthorize("hasRole('USER')")
     @Override
@@ -54,11 +58,16 @@ public class ReportServiceImpl implements ReportService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXIST));
+        ChatRoom chatRoom = post.getChatRoom();
+        chatRoom.setStatus(RoomStatus.DISPUTED);
+
         post.setStatus(PostStatus.REPORTED);
         report.setSender(user);
         report.setReceiver(post.getUser());
         report.setPost(post);
         report.setStatus(ReportStatus.PENDING);
+
+        chatRoomRepository.save(chatRoom);
         return reportMapper.toReportResponse(reportRepository.save(report));
     }
 
@@ -150,19 +159,22 @@ public class ReportServiceImpl implements ReportService {
         }
         if(accept) {
             report.setStatus(ReportStatus.ACCEPTED);
-
         }
         else {
             report.setStatus(ReportStatus.REJECTED);
         }
         reportRepository.save(report);
         Post post = report.getPost();
+        ChatRoom chatRoom = post.getChatRoom();
         if(accept) {
             post.setStatus(PostStatus.CLOSED);
+            chatRoom.setStatus(RoomStatus.RESOLVED_REFUND);
         }
         else {
             post.setStatus(PostStatus.SOLVED);
+            chatRoom.setStatus(RoomStatus.RESOLVED_NORMAL);
         }
+        chatRoomRepository.save(chatRoom);
         postRepository.save(post);
         return reportMapper.toReportResponse(report);
     }
@@ -173,6 +185,9 @@ public class ReportServiceImpl implements ReportService {
                 .orElseThrow(() -> new AppException(ErrorCode.REPORT_NOT_EXIST));
         if (report.isDeleted()) {
             throw new AppException(ErrorCode.REPORT_NOT_EXIST);
+        }
+        if(report.getStatus() != ReportStatus.PENDING){
+            throw new AppException(ErrorCode.REPORT_ALREADY_RESOLVED);
         }
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) auth.getPrincipal();
