@@ -5,14 +5,8 @@ import com.grabtutor.grabtutor.dto.response.ChatRoomResponse;
 import com.grabtutor.grabtutor.dto.response.LoadChatRoomsResponse;
 import com.grabtutor.grabtutor.dto.response.LoadMessagesResponse;
 import com.grabtutor.grabtutor.dto.response.MessageResponse;
-import com.grabtutor.grabtutor.entity.AccountBalance;
-import com.grabtutor.grabtutor.entity.ChatRoom;
-import com.grabtutor.grabtutor.entity.User;
-import com.grabtutor.grabtutor.entity.UserTransaction;
-import com.grabtutor.grabtutor.enums.MessageType;
-import com.grabtutor.grabtutor.enums.PostStatus;
-import com.grabtutor.grabtutor.enums.RoomStatus;
-import com.grabtutor.grabtutor.enums.TransactionStatus;
+import com.grabtutor.grabtutor.entity.*;
+import com.grabtutor.grabtutor.enums.*;
 import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.ChatRoomMapper;
@@ -241,6 +235,9 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     public void resolveSolution(String roomId, boolean isNormal) {
         var post = postRepository.findByChatRoomId(roomId).orElseThrow(()-> new AppException(ErrorCode.POST_NOT_EXIST));
         var room = post.getChatRoom();
+        var reportList = post.getReports().stream()
+                .filter(report -> report.getStatus().equals(ReportStatus.PENDING))
+                .toList();
 
         if(!room.getStatus().equals(RoomStatus.DISPUTED)) throw new AppException(ErrorCode.CHAT_ROOM_NOT_IN_DISPUTED);
         RoomStatus status = isNormal ? RoomStatus.RESOLVED_NORMAL :  RoomStatus.RESOLVED_REFUND;
@@ -253,9 +250,15 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         if(isNormal){
             receiverBalance = transaction.getReceiver();
             transaction.setStatus(TransactionStatus.SUCCESS);
+            for (Report report : reportList) {
+                report.setStatus(ReportStatus.REJECTED);
+            }
         } else{
             receiverBalance = transaction.getSender();
             transaction.setStatus(TransactionStatus.FAILED);
+            for (Report report : reportList) {
+                report.setStatus(ReportStatus.ACCEPTED);
+            }
         }
         receiverBalance.setBalance(receiverBalance.getBalance() + transaction.getAmount());
 
