@@ -106,9 +106,16 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     @Override
     public void deleteUser(String id){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) auth.getPrincipal();
+        String adminId = jwt.getClaimAsString("userId");
+        if(adminId.equals(id)){
+            throw new AppException(ErrorCode.CANNOT_DELETE_OWN_ACCOUNT);
+        }
         User user = getUser(id);
         AccountBalance accountBalance = user.getAccountBalance();
         if(accountBalance != null) {
