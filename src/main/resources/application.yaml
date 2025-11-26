@@ -51,3 +51,8 @@ cloudinary:
   api_secret: ${CLOUDINARY_API_SECRET:bRSqau7RN7Ji8TUo_nYilGk7pK0}
 
 
+gemini:
+  api:
+    key: ${GEMINI_API_KEY:}
+    model:
+      name: gemini-2.5-flash
