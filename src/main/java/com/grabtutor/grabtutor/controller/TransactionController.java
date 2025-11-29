@@ -45,7 +45,7 @@ public class TransactionController {
                 .data(transactionService.getMyUserTransactions(pageNo, pageSize, sorts))
                 .build();
     }
-    @GetMapping("/getAllUserTransaction")
+    @GetMapping("/userTransaction")
     public ApiResponse<?> getAllUserTransactions(@RequestParam(defaultValue = "0") int pageNo,
                                                  @RequestParam(defaultValue = "10") int pageSize,
                                                  @RequestParam(defaultValue = "createdAt:desc") String... sorts){
