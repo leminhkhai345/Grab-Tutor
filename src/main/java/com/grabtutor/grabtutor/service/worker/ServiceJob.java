@@ -1,43 +1,44 @@
 package com.grabtutor.grabtutor.service.worker;
 
-import lombok.AccessLevel;
+import com.grabtutor.grabtutor.entity.Job;
+import com.grabtutor.grabtutor.enums.JobType;
+import com.grabtutor.grabtutor.repository.JobRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 @Component
 @RequiredArgsConstructor
-@Slf4j
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ServiceJob {
 
-    RedisTemplate<String, Object> redisTemplate;
-    public void addCheckPost(String postId, LocalDateTime createdTime){
-        redisTemplate.opsForZSet().add("post:expire", postId,
-                createdTime
-                        .atZone(ZoneId.systemDefault())
-                        .toInstant()
-                        .toEpochMilli() + 60000*30);
-    }
-    public void addCheckRoomTimeout(String roomId, LocalDateTime createdTime){
-        redisTemplate.opsForZSet().add("chatroom:timeout", roomId,
-                createdTime
-                        .atZone(ZoneId.systemDefault())
-                        .toInstant()
-                        .toEpochMilli() + 60000*15);
-    }
-    public void addCheckRoomConfirmed(String roomId, LocalDateTime createdTime){
-        redisTemplate.opsForZSet().add("chatroom:confirmed", roomId,
-                createdTime
-                        .atZone(ZoneId.systemDefault())
-                        .toInstant()
-                        .toEpochMilli() + 60000*15);
+    private final JobRepository jobRepository;
+
+    @Transactional
+    public void addCheckPost(String postId, LocalDateTime createdTime) {
+        upsert(JobType.POST_EXPIRE, postId, createdTime.plusMinutes(30));
     }
 
+    @Transactional
+    public void addCheckRoomTimeout(String roomId, LocalDateTime createdTime) {
+        upsert(JobType.CHATROOM_TIMEOUT, roomId, createdTime.plusMinutes(15));
+    }
 
+    @Transactional
+    public void addCheckRoomConfirmed(String roomId, LocalDateTime createdTime) {
+        upsert(JobType.CHATROOM_CONFIRMED, roomId, createdTime.plusMinutes(15));
+    }
+
+    private void upsert(JobType type, String refId, LocalDateTime runAt) {
+        Job job = jobRepository.findByIsDeletedFalseAndJobTypeAndRefId(type, refId)
+                .orElseGet(() -> Job.builder()
+                        .jobType(type)
+                        .refId(refId)
+                        .build());
+
+        job.setRunAt(runAt);
+        job.setDeleted(false);
+        jobRepository.save(job);
+    }
 }
