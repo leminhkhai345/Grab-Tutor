@@ -243,26 +243,29 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         RoomStatus status = isNormal ? RoomStatus.RESOLVED_NORMAL :  RoomStatus.RESOLVED_REFUND;
         room.setStatus(status);
         room.setChatEnabled(false);
-        postRepository.save(post);
 
         var transaction = room.getPost().getUserTransaction();
         AccountBalance receiverBalance;
         if(isNormal){
+            post.setStatus(PostStatus.SOLVED);
             receiverBalance = transaction.getReceiver();
             transaction.setStatus(TransactionStatus.SUCCESS);
             for (Report report : reportList) {
                 report.setStatus(ReportStatus.REJECTED);
             }
         } else{
+            post.setStatus(PostStatus.CLOSED);
             receiverBalance = transaction.getSender();
             transaction.setStatus(TransactionStatus.FAILED);
             for (Report report : reportList) {
                 report.setStatus(ReportStatus.ACCEPTED);
             }
         }
-        receiverBalance.setBalance(receiverBalance.getBalance() + transaction.getAmount());
+        postRepository.save(post);
 
+        receiverBalance.setBalance(receiverBalance.getBalance() + transaction.getAmount());
         accountBalanceRepository.save(receiverBalance);
+
         userTransactionRepository.save(transaction);
 
         notificationService.sendSignal(roomId, MessageType.UPDATE
