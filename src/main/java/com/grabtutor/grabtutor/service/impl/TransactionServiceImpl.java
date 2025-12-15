@@ -3,7 +3,6 @@ package com.grabtutor.grabtutor.service.impl;
 import com.grabtutor.grabtutor.dto.response.PageResponse;
 import com.grabtutor.grabtutor.entity.User;
 import com.grabtutor.grabtutor.entity.UserTransaction;
-import com.grabtutor.grabtutor.entity.VirtualTransaction;
 import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.UserTransactionMapper;

@@ -7,12 +7,10 @@ import com.grabtutor.grabtutor.enums.MessageType;
 import com.grabtutor.grabtutor.service.ChatRoomService;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtException;
-import org.springframework.stereotype.Component;
 
 import java.io.EOFException;
 import java.io.IOException;
