@@ -1,20 +1,14 @@
 package com.grabtutor.grabtutor.socket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.grabtutor.grabtutor.configuration.CustomJwtDecoder;
-import com.grabtutor.grabtutor.dto.request.MessageRequest;
 import com.grabtutor.grabtutor.dto.response.MessageResponse;
 import com.grabtutor.grabtutor.dto.response.SignalResponse;
 import com.grabtutor.grabtutor.entity.Notification;
 import com.grabtutor.grabtutor.enums.MessageType;
-import com.grabtutor.grabtutor.mapper.MessageMapper;
 import com.grabtutor.grabtutor.mapper.NotificationMapper;
-import com.grabtutor.grabtutor.service.ChatRoomService;
-import jakarta.websocket.Session;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
