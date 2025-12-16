@@ -1,14 +1,10 @@
 package com.grabtutor.grabtutor.service.impl;
 
-import com.grabtutor.grabtutor.dto.response.PostStatusStatisticsResponse;
-import com.grabtutor.grabtutor.dto.response.ReviewStarStatisticResponse;
-import com.grabtutor.grabtutor.dto.response.UserStatusStatistic;
-import com.grabtutor.grabtutor.dto.response.UserTotalStatisticResponse;
+import com.grabtutor.grabtutor.dto.response.*;
 import com.grabtutor.grabtutor.entity.Post;
 import com.grabtutor.grabtutor.enums.Role;
-import com.grabtutor.grabtutor.repository.PostRepository;
-import com.grabtutor.grabtutor.repository.ReviewRepository;
-import com.grabtutor.grabtutor.repository.UserRepository;
+import com.grabtutor.grabtutor.enums.TransactionType;
+import com.grabtutor.grabtutor.repository.*;
 import com.grabtutor.grabtutor.service.StatisticService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +12,13 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +28,10 @@ public class StatisticServiceImpl implements StatisticService {
     UserRepository userRepository;
     PostRepository postRepository;
     ReviewRepository reviewRepository;
+    VirtualTransactionRepository virtualTransactionRepository;
+
+    double revenueRate = 0.3;
+    double operationFeeRate = 0.2;
 
     @PreAuthorize("hasRole('ADMIN')")
     @Override
@@ -123,6 +130,37 @@ public class StatisticServiceImpl implements StatisticService {
                 .BANNED(banned)
                 .build();
     }
+    @PreAuthorize("hasRole('ADMIN')")
+    @Override
+    public RevenueProfitResponse revenueProfitMonthStatistics(int year){
+        List<RevenueProfitMonthlyResponse> revenueProfitMonthlyResponseList = new ArrayList<>();
 
+        LocalDateTime start = LocalDate.of(year, 1, 1).atStartOfDay();
+        LocalDateTime end = start.plusYears(1);
+        Map<Integer, Double> map = new HashMap<>();
 
+        for (Object[] row : virtualTransactionRepository.sumByMonth(start, end, TransactionType.ADD_FUND.name())) {
+            int m = ((Number) row[0]).intValue();     // 1 -> 12
+            Double total = (Double) row[1];
+            map.put(m, total);
+        }
+
+        List<RevenueProfitMonthlyResponse> result = new ArrayList<>();
+//        map.getOrDefault(m, 0.0)
+        for (int m = 1; m <= 12; m++) {
+            result.add( RevenueProfitMonthlyResponse.builder()
+                    .month(m)
+                    .revenue(map.getOrDefault(m, 0.0)*revenueRate)
+                    .profit(map.getOrDefault(m, 0.0)*revenueRate*operationFeeRate)
+                    .build());
+        }
+        Double totalRevenue = result.stream().mapToDouble(RevenueProfitMonthlyResponse::getRevenue).sum();
+        Double totalProfit = result.stream().mapToDouble(RevenueProfitMonthlyResponse::getProfit).sum();
+
+        return RevenueProfitResponse.builder()
+                .monthly(result)
+                .totalProfit(totalProfit)
+                .totalRevenue(totalRevenue)
+                .build();
+    }
 }

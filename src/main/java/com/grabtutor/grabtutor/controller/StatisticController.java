@@ -56,6 +56,13 @@ public class StatisticController {
                 .message("User status statistics retrieved successfully")
                 .build();
     }
+    @GetMapping("/revenue-profit")
+    public ApiResponse<?> getRevenueProfitStatistics(@RequestParam int year) {
+        return ApiResponse.builder()
+                .data(statisticService.revenueProfitMonthStatistics(year))
+                .message("Revenue and profit statistics retrieved successfully")
+                .build();
+    }
 
 
 }
