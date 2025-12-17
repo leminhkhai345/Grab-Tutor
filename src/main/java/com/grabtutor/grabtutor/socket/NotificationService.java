@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,7 +34,7 @@ public class NotificationService {
     NotificationMapper notificationMapper;
 
 
-    public void sendNotification(String userId, String title, String message) {
+    public void sendNotification(String userId, String title, String message, String refId) {
         // Xây dựng một DTO chuẩn cho thông báo
         Map<String, String> notificationDto = Map.of(
                 "type", "NOTIFICATION",
@@ -44,6 +45,7 @@ public class NotificationService {
                 .user(user)
                 .title(title)
                 .content(message)
+                .refId(refId)
                 .build();
         notificationRepository.save(notification);
         sessionRegistry.sendNotificationToUser(userId, notification);

@@ -14,6 +14,7 @@ public interface NotificationMapper {
                 .content(notification.getContent())
                 .userId(notification.getUser().getId())
                 .type(MessageType.NOTIFICATION)
+                .refId(notification.getRefId())
                 .createdAt(notification.getCreatedAt())
                 .updatedAt(notification.getUpdatedAt())
                 .build();

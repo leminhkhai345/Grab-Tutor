@@ -43,6 +43,7 @@ public class JobHandler {
                 post.getUser().getId(),
                 "Removing Post",
                 "Post " + post.getId() + " has been removed because no one offer to solve"
+                , post.getId()
         );
     }
 
@@ -94,7 +95,8 @@ public class JobHandler {
         notificationService.sendNotification(
                 tutorBalance.getUser().getId(),
                 "Account balance",
-                "+" + transaction.getAmount()
+                "+" + transaction.getAmount(),
+                tutorBalance.getId()
         );
     }
 }
