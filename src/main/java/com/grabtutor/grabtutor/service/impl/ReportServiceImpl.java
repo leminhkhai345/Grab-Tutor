@@ -7,6 +7,7 @@ import com.grabtutor.grabtutor.entity.ChatRoom;
 import com.grabtutor.grabtutor.entity.Post;
 import com.grabtutor.grabtutor.entity.Report;
 import com.grabtutor.grabtutor.entity.User;
+import com.grabtutor.grabtutor.enums.BiddingStatus;
 import com.grabtutor.grabtutor.enums.PostStatus;
 import com.grabtutor.grabtutor.enums.ReportStatus;
 import com.grabtutor.grabtutor.enums.RoomStatus;
@@ -63,7 +64,14 @@ public class ReportServiceImpl implements ReportService {
 
         post.setStatus(PostStatus.REPORTED);
         report.setSender(user);
-        report.setReceiver(post.getUser());
+        var tutorBid = post.getTutorBids();
+        for(var tutor : tutorBid) {
+            if(tutor.getStatus() == BiddingStatus.ACCEPTED) {
+                report.setReceiver(tutor.getUser());
+                break;
+            }
+        }
+
         report.setPost(post);
         report.setStatus(ReportStatus.PENDING);
 
