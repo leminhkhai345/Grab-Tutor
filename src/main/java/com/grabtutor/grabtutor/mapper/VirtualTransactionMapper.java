@@ -44,6 +44,8 @@ public interface VirtualTransactionMapper {
         if ( virtualTransaction.getPost() != null ) {
             virtualTransactionResponse.postId( virtualTransaction.getPost().getId() );
         }
+        virtualTransactionResponse.name( virtualTransaction.getAccountBalance().getUser().getFullName() );
+        virtualTransactionResponse.email( virtualTransaction.getAccountBalance().getUser().getEmail() );
 
         return virtualTransactionResponse.build();
     }
