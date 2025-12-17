@@ -147,36 +147,6 @@ public class UserController {
                 .build();
     }
 
-    @PostMapping("/withdraw")
-    public ApiResponse<?> withdrawMoney(@RequestParam double withdrawAmount){
-        return ApiResponse.builder()
-                .success(true)
-                .data(userService.withdrawMoney(withdrawAmount))
-                .message("Withdraw request created successfully")
-                .build();
-    }
-
-    @GetMapping("/myVirtualTransactions")
-    public ApiResponse<?> getMyVirtualTransactions(@RequestParam (defaultValue = "0") int pageNo,
-                                                  @RequestParam (defaultValue = "10") int pageSize,
-                                                  @RequestParam (defaultValue = "createdAt:desc") String... sorts) {
-        return ApiResponse.builder()
-                .success(true)
-                .data(userService.getMyVirtualTransactions(pageNo, pageSize, sorts))
-                .message("Get my virtual transactions successfully")
-                .build();
-    }
-
-    @GetMapping("/allVirtualTransactions")
-    public ApiResponse<?> getAllVirtualTransactions(@RequestParam (defaultValue = "0") int pageNo,
-                                                  @RequestParam (defaultValue = "10") int pageSize,
-                                                  @RequestParam (defaultValue = "createdAt:desc") String... sorts) {
-        return ApiResponse.builder()
-                .success(true)
-                .data(userService.getAllVirtualTransactions(pageNo, pageSize, sorts))
-                .message("Get all virtual transactions successfully")
-                .build();
-    }
     @GetMapping("/myBalance")
     public ApiResponse<?> getMyAccountBalance() {
         return ApiResponse.builder()

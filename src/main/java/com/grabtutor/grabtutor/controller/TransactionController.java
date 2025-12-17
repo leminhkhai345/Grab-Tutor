@@ -2,6 +2,7 @@ package com.grabtutor.grabtutor.controller;
 
 import com.grabtutor.grabtutor.dto.response.ApiResponse;
 import com.grabtutor.grabtutor.service.TransactionService;
+import com.grabtutor.grabtutor.service.UserService;
 import com.grabtutor.grabtutor.service.impl.VNPayServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class TransactionController {
     VNPayServiceImpl vnPayService;
     TransactionService transactionService;
+    UserService userService;
 
     @PostMapping
     public ApiResponse<?> addFund(@RequestParam("amount") int orderTotal,HttpServletRequest request){
@@ -52,6 +54,38 @@ public class TransactionController {
         return ApiResponse.builder()
                 .message("get all user transactions successfully")
                 .data(transactionService.getAllUserTransactions(pageNo, pageSize, sorts))
+                .build();
+    }
+
+
+    @PostMapping("/withdraw")
+    public ApiResponse<?> withdrawMoney(@RequestParam double withdrawAmount){
+        return ApiResponse.builder()
+                .success(true)
+                .data(userService.withdrawMoney(withdrawAmount))
+                .message("Withdraw request created successfully")
+                .build();
+    }
+
+    @GetMapping("/myVirtualTransactions")
+    public ApiResponse<?> getMyVirtualTransactions(@RequestParam (defaultValue = "0") int pageNo,
+                                                   @RequestParam (defaultValue = "10") int pageSize,
+                                                   @RequestParam (defaultValue = "createdAt:desc") String... sorts) {
+        return ApiResponse.builder()
+                .success(true)
+                .data(userService.getMyVirtualTransactions(pageNo, pageSize, sorts))
+                .message("Get my virtual transactions successfully")
+                .build();
+    }
+
+    @GetMapping("/allVirtualTransactions")
+    public ApiResponse<?> getAllVirtualTransactions(@RequestParam (defaultValue = "0") int pageNo,
+                                                    @RequestParam (defaultValue = "10") int pageSize,
+                                                    @RequestParam (defaultValue = "createdAt:desc") String... sorts) {
+        return ApiResponse.builder()
+                .success(true)
+                .data(userService.getAllVirtualTransactions(pageNo, pageSize, sorts))
+                .message("Get all virtual transactions successfully")
                 .build();
     }
 
