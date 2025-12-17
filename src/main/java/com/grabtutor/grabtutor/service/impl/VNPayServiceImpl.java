@@ -156,6 +156,8 @@ public class VNPayServiceImpl implements VNPayService {
         accountBalanceRepository.save(accountBalance);
         transaction = virtualTransactionRepository.save(transaction);
 
+        notificationService.sendNotification(user.getId(),"Account balance", "+"+transaction.getAmount());
+
         return virtualTransactionMapper.toTransactionResponse(transaction);
 
     }
