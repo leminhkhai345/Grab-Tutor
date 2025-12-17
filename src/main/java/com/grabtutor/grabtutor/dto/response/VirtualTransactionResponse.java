@@ -26,4 +26,6 @@ public class VirtualTransactionResponse {
     LocalDateTime completedAt;
     Double amount;
     String postId;
+    String name;
+    String email;
 }
