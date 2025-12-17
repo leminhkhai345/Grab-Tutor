@@ -260,7 +260,11 @@ public class UserServiceImpl implements UserService {
         if(info == null){
             throw new AppException(ErrorCode.TUTOR_INFO_NOT_FOUND);
         }
-        return tutorInfoMapper.toTutorInfoResponse(info);
+        TutorInfoResponse tutorInfoResponse = tutorInfoMapper.toTutorInfoResponse(info);
+        tutorInfoResponse.setFullName(user.getFullName());
+        tutorInfoResponse.setEmail(user.getEmail());
+        tutorInfoResponse.setPhoneNumber(user.getPhoneNumber());
+        return tutorInfoResponse;
     }
 
     @PreAuthorize("hasRole('ADMIN')")

@@ -67,9 +67,9 @@ public class ReportServiceImpl implements ReportService {
         post.setStatus(PostStatus.REPORTED);
         report.setSender(user);
         var tutorBid = post.getTutorBids();
-        for(var tutor : tutorBid) {
-            if(tutor.getStatus() == BiddingStatus.ACCEPTED) {
-                report.setReceiver(tutor.getUser());
+        for(var tutorbid : tutorBid) {
+            if(tutorbid.getStatus() == BiddingStatus.ACCEPTED) {
+                report.setReceiver(tutorbid.getUser());
                 break;
             }
         }
