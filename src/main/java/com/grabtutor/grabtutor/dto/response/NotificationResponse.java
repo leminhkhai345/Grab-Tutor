@@ -21,6 +21,7 @@ public class NotificationResponse extends BaseEntity {
     MessageType type;
     String title;
     String content;
+    String refId;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
 }

@@ -79,7 +79,7 @@ public class ReportServiceImpl implements ReportService {
 
         chatRoomRepository.save(chatRoom);
         var admin = userRepository.findByEmail("admin").orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        notificationService.sendNotification(admin.getId(),"New Report!", "Report: " + report.getId());
+        notificationService.sendNotification(admin.getId(),"New Report!", "Report: " + report.getId(), report.getId());
 
         return reportMapper.toReportResponse(reportRepository.save(report));
     }

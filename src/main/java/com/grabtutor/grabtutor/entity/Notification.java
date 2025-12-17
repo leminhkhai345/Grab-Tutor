@@ -18,6 +18,7 @@ import lombok.experimental.FieldDefaults;
 public class Notification extends BaseEntity{
     String title;
     String content;
+    String refId;
 
     @ManyToOne
     @JoinColumn(name = "receiverId", nullable = false)

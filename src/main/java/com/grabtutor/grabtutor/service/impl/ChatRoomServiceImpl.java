@@ -209,7 +209,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         userTransactionRepository.save(transaction);
 
         notificationService.sendSignal(roomId, MessageType.UPDATE, "Solution confirmed", "Problem solved!");
-        notificationService.sendNotification(tutorBalance.getUser().getId(),"Account balance", "+"+transaction.getAmount());
+        notificationService.sendNotification(tutorBalance.getUser().getId(),"Account balance", "+"+transaction.getAmount(), tutorBalance.getId());
     }
 
 
@@ -271,7 +271,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         notificationService.sendSignal(roomId, MessageType.UPDATE
                 , "ChatRoom resolved"
                 , "The report has been reviewed. "+receiverBalance.getUser().getEmail() +" were found to be in the right.");
-        notificationService.sendNotification(receiverBalance.getUser().getId(),"Account balance", "+"+transaction.getAmount());
+        notificationService.sendNotification(receiverBalance.getUser().getId(),"Account balance", "+"+transaction.getAmount(), receiverBalance.getId());
 
     }
 }

@@ -75,7 +75,8 @@ public class TutorBidServiceImpl implements TutorBidService {
 
         notificationService.sendNotification(post.getUser().getId()
                 , "Post" + post.getId()
-                , "User "+ sender.getEmail() +" just offered to solve your problem.");
+                , "User "+ sender.getEmail() +" just offered to solve your problem."
+                , post.getId());
 
         return tutorBidMapper.toTutorBidResponse(bid);
     }
@@ -173,7 +174,8 @@ public class TutorBidServiceImpl implements TutorBidService {
 
         notificationService.sendNotification(receiver.getId()
                 , "Post " + post.getId()
-                , "User "+ sender.getEmail() +" has accepted your offer.");
+                , "User "+ sender.getEmail() +" has accepted your offer."
+                , post.getId());
 
         //Set job để đẩy thông báo timeout lên FE
         serviceJob.addCheckRoomTimeout(post.getChatRoom().getId(), post.getChatRoom().getCreatedAt());
@@ -195,6 +197,7 @@ public class TutorBidServiceImpl implements TutorBidService {
 
         notificationService.sendNotification(bid.getUser().getId()
                 , "Post" + bid.getPost().getId()
-                , "User "+ bid.getUser().getEmail() +" has cancel their offer.");
+                , "User "+ bid.getUser().getEmail() +" has cancel their offer."
+                , bid.getPost().getId());
     }
 }
