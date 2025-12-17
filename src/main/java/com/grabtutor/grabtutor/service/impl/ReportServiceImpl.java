@@ -18,6 +18,7 @@ import com.grabtutor.grabtutor.repository.PostRepository;
 import com.grabtutor.grabtutor.repository.ReportRepository;
 import com.grabtutor.grabtutor.repository.UserRepository;
 import com.grabtutor.grabtutor.service.ReportService;
+import com.grabtutor.grabtutor.socket.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +47,7 @@ public class ReportServiceImpl implements ReportService {
     UserRepository userRepository;
     PostRepository postRepository;
     ChatRoomRepository chatRoomRepository;
+    NotificationService notificationService;
 
     @PreAuthorize("hasRole('USER')")
     @Override
@@ -68,6 +70,9 @@ public class ReportServiceImpl implements ReportService {
         report.setStatus(ReportStatus.PENDING);
 
         chatRoomRepository.save(chatRoom);
+        var admin = userRepository.findByEmail("admin").orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        notificationService.sendNotification(admin.getId(),"New Report!", "Report: " + report.getId());
+
         return reportMapper.toReportResponse(reportRepository.save(report));
     }
 
