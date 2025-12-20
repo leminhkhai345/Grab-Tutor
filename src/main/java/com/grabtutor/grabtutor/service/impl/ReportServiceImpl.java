@@ -3,21 +3,12 @@ package com.grabtutor.grabtutor.service.impl;
 import com.grabtutor.grabtutor.dto.request.ReportRequest;
 import com.grabtutor.grabtutor.dto.response.PageResponse;
 import com.grabtutor.grabtutor.dto.response.ReportResponse;
-import com.grabtutor.grabtutor.entity.ChatRoom;
-import com.grabtutor.grabtutor.entity.Post;
-import com.grabtutor.grabtutor.entity.Report;
-import com.grabtutor.grabtutor.entity.User;
-import com.grabtutor.grabtutor.enums.BiddingStatus;
-import com.grabtutor.grabtutor.enums.PostStatus;
-import com.grabtutor.grabtutor.enums.ReportStatus;
-import com.grabtutor.grabtutor.enums.RoomStatus;
+import com.grabtutor.grabtutor.entity.*;
+import com.grabtutor.grabtutor.enums.*;
 import com.grabtutor.grabtutor.exception.AppException;
 import com.grabtutor.grabtutor.exception.ErrorCode;
 import com.grabtutor.grabtutor.mapper.ReportMapper;
-import com.grabtutor.grabtutor.repository.ChatRoomRepository;
-import com.grabtutor.grabtutor.repository.PostRepository;
-import com.grabtutor.grabtutor.repository.ReportRepository;
-import com.grabtutor.grabtutor.repository.UserRepository;
+import com.grabtutor.grabtutor.repository.*;
 import com.grabtutor.grabtutor.service.ReportService;
 import com.grabtutor.grabtutor.socket.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +40,8 @@ public class ReportServiceImpl implements ReportService {
     PostRepository postRepository;
     ChatRoomRepository chatRoomRepository;
     NotificationService notificationService;
+    UserTransactionRepository userTransactionRepository;
+    private final AccountBalanceRepository accountBalanceRepository;
 
     @PreAuthorize("hasRole('USER')")
     @Override
@@ -170,25 +163,55 @@ public class ReportServiceImpl implements ReportService {
         if(report.getStatus() != ReportStatus.PENDING){
             throw new AppException(ErrorCode.REPORT_ALREADY_RESOLVED);
         }
+
+        Post post = report.getPost();
+        var reportList = post.getReports().stream()
+                .filter(rp -> rp.getStatus().equals(ReportStatus.PENDING))
+                .toList();
         if(accept) {
-            report.setStatus(ReportStatus.ACCEPTED);
+            for (Report rp : reportList) {
+                rp.setStatus(ReportStatus.ACCEPTED);
+            }
         }
         else {
-            report.setStatus(ReportStatus.REJECTED);
+            for (Report rp : reportList) {
+                rp.setStatus(ReportStatus.REJECTED);
+            }
         }
-        reportRepository.save(report);
-        Post post = report.getPost();
+
         ChatRoom chatRoom = post.getChatRoom();
+        UserTransaction transaction = post.getUserTransaction();
+        AccountBalance balance;
+
         if(accept) {
             post.setStatus(PostStatus.CLOSED);
             chatRoom.setStatus(RoomStatus.RESOLVED_REFUND);
+            transaction.setStatus(TransactionStatus.FAILED);
+            balance = report.getSender().getAccountBalance();
+            balance.setBalance(balance.getBalance() + transaction.getAmount());
         }
         else {
             post.setStatus(PostStatus.SOLVED);
             chatRoom.setStatus(RoomStatus.RESOLVED_NORMAL);
+            transaction.setStatus(TransactionStatus.SUCCESS);
+            balance = report.getReceiver().getAccountBalance();
+            balance.setBalance(balance.getBalance() + transaction.getAmount());
+
         }
+
         chatRoomRepository.save(chatRoom);
         postRepository.save(post);
+        accountBalanceRepository.save(balance);
+
+        notificationService.sendNotification(balance.getUser().getId()
+                ,"Account balance"
+                , "+"+post.getUserTransaction().getAmount()
+                ,balance.getUser().getAccountBalance().getId());
+
+        notificationService.sendSignal(chatRoom.getId(), MessageType.UPDATE
+                , "ChatRoom resolved"
+                , "");
+
         return reportMapper.toReportResponse(report);
     }
     @PreAuthorize("hasRole('USER')")
