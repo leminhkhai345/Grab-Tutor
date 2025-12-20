@@ -36,7 +36,7 @@ public class JobHandler {
         if (post.isDeleted()) return;
         if (!post.getTutorBids().isEmpty()) return;
 
-        post.setDeleted(true);
+        post.setStatus(PostStatus.CLOSED);
         postRepository.save(post);
 
         notificationService.sendNotification(
