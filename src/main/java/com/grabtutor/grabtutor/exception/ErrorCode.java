@@ -37,6 +37,7 @@ public enum ErrorCode {
     POST_ALREADY_ACCEPTED(6003, "Post already accepted", HttpStatus.CONFLICT),
     REPORT_ALREADY_RESOLVED(6002, "Report already resolved", HttpStatus.CONFLICT),
     POST_NOT_FOUND(6004, "Post not found", HttpStatus.NOT_FOUND),
+    CANNOT_DELETE_POST_WITH_ACCEPTED_BID(6005, "Cannot delete post with accepted bid", HttpStatus.BAD_REQUEST),
 
     REVIEW_NOT_EXIST(7001, "Review does not exist", HttpStatus.NOT_FOUND),
     COURSE_NOT_FOUND(8001, "Course not found", HttpStatus.NOT_FOUND),

@@ -97,6 +97,9 @@ public class PostServiceImpl implements PostService {
         if(!post.getUser().getId().equals(userId)){
             throw new AppException(ErrorCode.FORBIDDEN);
         }
+        if(post.isAccepted()) {
+            throw new AppException(ErrorCode.POST_ALREADY_ACCEPTED);
+        }
         postMapper.updatePostFromRequest(postRequest, post);
 
         if(subjectId != null && !subjectId.isEmpty()) {
@@ -121,6 +124,9 @@ public class PostServiceImpl implements PostService {
         String userId = jwt.getClaimAsString("userId");
         if(!post.getUser().getId().equals(userId)){
             throw new AppException(ErrorCode.FORBIDDEN);
+        }
+        if (post.isAccepted()) {
+            throw new AppException(ErrorCode.CANNOT_DELETE_POST_WITH_ACCEPTED_BID);
         }
         post.setDeleted(true);
         postRepository.save(post);
@@ -253,7 +259,6 @@ public class PostServiceImpl implements PostService {
                     orders.add(new Sort.Order(Sort.Direction.ASC, matcher.group(1)));
                 }
             }
-
         }
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(orders));
         Subject subject = subjectRepository.findById(subjectId)
