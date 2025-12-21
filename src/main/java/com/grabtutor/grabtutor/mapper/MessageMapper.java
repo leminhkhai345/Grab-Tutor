@@ -30,19 +30,4 @@ public interface MessageMapper {
     }
     Message ToMessage(MessageRequest message);
 
-    default MessageResponse ToMessageResponse(MessageRequest message){
-        if(message == null){
-            return null;
-        }
-        return MessageResponse.builder()
-                .roomId(message.getRoomId())
-                .userId(message.getUserId())
-                .message(message.getMessage())
-                .type(message.getType())
-                .fileName(message.getFileName())
-                .fileUrl(message.getFileUrl())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
-    }
 }
