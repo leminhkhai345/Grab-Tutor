@@ -43,7 +43,6 @@ public class VNPayServiceImpl implements VNPayService {
     VirtualTransactionMapper  virtualTransactionMapper;
     NotificationService notificationService;
 
-    double addFundRate = 0.1;
     @Override
     @PreAuthorize("hasRole('USER')")
     public String addFund(int total, String urlReturn){
@@ -144,7 +143,7 @@ public class VNPayServiceImpl implements VNPayService {
         String totalAmount = request.getParameter("vnp_Amount");
 
         var accountBalance = user.getAccountBalance();
-        var addAmount = Double.parseDouble(totalAmount)*addFundRate*0.01;
+        var addAmount = Double.parseDouble(totalAmount)*0.01;
         accountBalance.setBalance(accountBalance.getBalance() + addAmount);
         var transaction = VirtualTransaction.builder()
                 .type(TransactionType.ADD_FUND)

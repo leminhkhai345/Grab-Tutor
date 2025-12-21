@@ -67,7 +67,6 @@ public class TcpSessionRegistry {
 
             sessions.forEach(s -> s.send(json));
         }
-        sendSignalToRoom(roomId, MessageType.NOTIFICATION, "HELLO", "TEST");
     }
 
     public void sendNotificationToUser(String userId, Notification notification) {
