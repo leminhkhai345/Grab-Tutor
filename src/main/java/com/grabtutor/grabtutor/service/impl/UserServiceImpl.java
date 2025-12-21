@@ -264,6 +264,7 @@ public class UserServiceImpl implements UserService {
         tutorInfoResponse.setFullName(user.getFullName());
         tutorInfoResponse.setEmail(user.getEmail());
         tutorInfoResponse.setPhoneNumber(user.getPhoneNumber());
+        tutorInfoResponse.setUserStatus(user.getUserStatus());
         return tutorInfoResponse;
     }
 
