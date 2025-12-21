@@ -18,7 +18,7 @@ public class NotificationController {
     public ApiResponse<?> sendNotification(@RequestParam String userId,
                                            @RequestParam(defaultValue = "0") int pageNo,
                                            @RequestParam(defaultValue = "10") int pageSize,
-                                           @RequestParam(defaultValue = "createdAt:desc") String... sorts)
+                                           @RequestParam String... sorts)
     {
         return ApiResponse.builder()
                 .data(notificationService.getNotificationByUserId(userId, pageNo, pageSize, sorts))
