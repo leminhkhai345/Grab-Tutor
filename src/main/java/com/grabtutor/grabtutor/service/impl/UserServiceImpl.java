@@ -139,6 +139,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse changeActive(String id, boolean active){
         User user = getUser(id);
+        if(user.getRole().equals(Role.ADMIN)){
+            throw new AppException(ErrorCode.CANNOT_CHANGE_ADMIN_ACTIVE_STATUS);
+        }
         user.setActive(active);
         return userMapper.toUserResponse(userRepository.save(user));
     }
