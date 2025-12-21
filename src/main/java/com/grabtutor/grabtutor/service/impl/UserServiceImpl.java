@@ -161,7 +161,7 @@ public class UserServiceImpl implements UserService {
         }
 
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(orders));
-        Page<User> users = userRepository.findAllByIsDeletedFalseAndIsActiveTrue(pageable);
+        Page<User> users = userRepository.findAll(pageable);
 
         return PageResponse.builder()
                 .pageNo(pageNo)
