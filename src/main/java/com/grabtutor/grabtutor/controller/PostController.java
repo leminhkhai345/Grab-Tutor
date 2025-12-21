@@ -144,8 +144,8 @@ public class PostController {
                 .data(tutorBidService.getMyTutorBid(pageNo,pageSize, sorts))
                 .build();
     }
-    @PutMapping("/tutorBid")
-    public ApiResponse<?> cancelTutorBid(@RequestParam String tutorBidId){
+    @PutMapping("/tutorBid/{tutorBidId}")
+    public ApiResponse<?> cancelTutorBid(@PathVariable String tutorBidId){
         tutorBidService.cancelTutorBid(tutorBidId);
         return ApiResponse.builder()
                 .message("Cancel tutor bid successfully")

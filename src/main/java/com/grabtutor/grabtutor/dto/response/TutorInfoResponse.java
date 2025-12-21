@@ -1,6 +1,7 @@
 package com.grabtutor.grabtutor.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.grabtutor.grabtutor.enums.UserStatus;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -20,5 +21,5 @@ public class TutorInfoResponse {
     String fullName;
     String email;
     String phoneNumber;
-
+    UserStatus userStatus;
 }

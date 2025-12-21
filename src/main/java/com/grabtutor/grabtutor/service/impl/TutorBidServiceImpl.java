@@ -183,21 +183,21 @@ public class TutorBidServiceImpl implements TutorBidService {
 
     @Override
     @Transactional
-    @PreAuthorize("hasRole('TUTOR')")
+    @PreAuthorize("hasRole('USER')")
     public void cancelTutorBid(String tutorBidId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Jwt jwt = (Jwt) auth.getPrincipal();
         String userId = jwt.getClaimAsString("userId");
         var bid =  tutorBidRepository.findById(tutorBidId)
                 .orElseThrow(()-> new AppException(ErrorCode.TUTOR_BID_NOT_FOUND));
-        if(!bid.getUser().getId().equals(userId)) throw new AppException(ErrorCode.FORBIDDEN);
+        if(!bid.getPost().getUser().getId().equals(userId)) throw new AppException(ErrorCode.FORBIDDEN);
         if(!bid.getStatus().equals(BiddingStatus.PENDING)) throw new AppException(ErrorCode.BID_NOT_PENDING);
         bid.setStatus(BiddingStatus.CANCELED);
         tutorBidRepository.save(bid);
 
         notificationService.sendNotification(bid.getUser().getId()
                 , "Post" + bid.getPost().getId()
-                , "User "+ bid.getUser().getEmail() +" has cancel their offer."
+                , "User "+ bid.getUser().getEmail() +" has cancel your offer."
                 , bid.getPost().getId());
     }
 }
