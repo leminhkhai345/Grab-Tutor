@@ -69,9 +69,10 @@ public class ReportServiceImpl implements ReportService {
 
         report.setPost(post);
         report.setStatus(ReportStatus.PENDING);
+        reportRepository.save(report);
+        log.info("Report {} {} as been created", report.getId(), report.getDetail());
 
         chatRoomRepository.save(chatRoom);
-        report = reportRepository.save(report);
 
         var admin = userRepository.findByEmail("admin").orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         notificationService.sendNotification(admin.getId(),"New Report!", "Report: " + report.getId(), report.getId());
