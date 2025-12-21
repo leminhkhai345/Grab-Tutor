@@ -172,10 +172,10 @@ public class TutorBidServiceImpl implements TutorBidService {
 
         post = postRepository.save(post);
 
-        notificationService.sendNotification(receiver.getId()
-                , "Post " + post.getId()
+        notificationService.sendNotification(bid.getUser().getId()
+                , "Post (Id: " + bid.getPost().getId() + ")"
                 , "User "+ sender.getEmail() +" has accepted your offer."
-                , post.getId());
+                , room.getId());
 
         //Set job để đẩy thông báo timeout lên FE
         serviceJob.addCheckRoomTimeout(post.getChatRoom().getId(), post.getChatRoom().getCreatedAt());
@@ -196,7 +196,7 @@ public class TutorBidServiceImpl implements TutorBidService {
         tutorBidRepository.save(bid);
 
         notificationService.sendNotification(bid.getUser().getId()
-                , "Post" + bid.getPost().getId()
+                , "Post (Id: " + bid.getPost().getId() + ")"
                 , "User "+ bid.getUser().getEmail() +" has cancel your offer."
                 , bid.getPost().getId());
     }

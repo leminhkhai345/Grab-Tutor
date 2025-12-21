@@ -38,6 +38,7 @@ public enum ErrorCode {
     REPORT_ALREADY_RESOLVED(6002, "Report already resolved", HttpStatus.CONFLICT),
     POST_NOT_FOUND(6004, "Post not found", HttpStatus.NOT_FOUND),
     CANNOT_DELETE_POST_WITH_ACCEPTED_BID(6005, "Cannot delete post with accepted bid", HttpStatus.BAD_REQUEST),
+    CANNOT_CHANGE_ADMIN_ACTIVE_STATUS(6006, "Cannot change active status of admin account", HttpStatus.BAD_REQUEST),
 
     REVIEW_NOT_EXIST(7001, "Review does not exist", HttpStatus.NOT_FOUND),
     COURSE_NOT_FOUND(8001, "Course not found", HttpStatus.NOT_FOUND),
