@@ -64,5 +64,12 @@ public class StatisticController {
                 .build();
     }
 
+    @GetMapping("/report-status")
+    public ApiResponse<?> getReportStatusStatistics() {
+        return ApiResponse.builder()
+                .data(statisticService.getReportStatusStatistics())
+                .message("Report status statistics retrieved successfully")
+                .build();
+    }
 
 }
