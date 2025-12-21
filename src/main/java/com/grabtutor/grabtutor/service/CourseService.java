@@ -19,4 +19,5 @@ public interface CourseService {
     PageResponse<?> searchCourse(String keyword, int pageNo, int pageSize, String... sorts);
     PageResponse<?> getAllCourse(int pageNo, int pageSize, String... sorts);
     PageResponse<?> getCoursesBySubjectId(String subjectId, int pageNo, int pageSize, String... sorts);
+    int numberOfEnrolledUsers(String courseId);
 }
