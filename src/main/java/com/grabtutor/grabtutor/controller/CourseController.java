@@ -148,4 +148,12 @@ public class CourseController {
                 .data(courseService.getCoursesBySubjectId(subjectId, pageNo, pageSize, sorts))
                 .build();
     }
+
+        @GetMapping("/enrolledCount/{courseId}")
+    public ApiResponse<?> numberOfEnrolledUsers(@PathVariable String courseId) {
+        return ApiResponse.builder()
+                .message("Number of enrolled users fetched successfully")
+                .data(courseService.numberOfEnrolledUsers(courseId))
+                .build();
+    }
 }

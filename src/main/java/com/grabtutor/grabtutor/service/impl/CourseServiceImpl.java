@@ -227,6 +227,15 @@ public class CourseServiceImpl implements CourseService {
                 .createdAt(enrollment.getCreatedAt())
                 .build();
     }
+
+    @Override
+    public int numberOfEnrolledUsers(String courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+        return course.getEnrolledUsers().size();
+    }
+
+
     @PreAuthorize("hasRole('USER')")
     @Override
     public PageResponse<?> getMyEnrolledCourses(int pageNo, int pageSize, String... sorts) {
