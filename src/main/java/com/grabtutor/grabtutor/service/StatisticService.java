@@ -9,4 +9,5 @@ public interface StatisticService {
     UserTotalStatisticResponse getUserTotalStatistics();
     UserStatusStatistic userStatusStatistics(Role role);
     RevenueProfitResponse revenueProfitMonthStatistics(int year);
+    ReportStatusResponse getReportStatusStatistics();
 }

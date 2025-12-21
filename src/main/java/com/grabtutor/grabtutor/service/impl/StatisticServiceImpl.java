@@ -29,6 +29,7 @@ public class StatisticServiceImpl implements StatisticService {
     PostRepository postRepository;
     ReviewRepository reviewRepository;
     VirtualTransactionRepository virtualTransactionRepository;
+    ReportRepository reportRepository;
 
     double revenueRate = 0.3;
     double operationFeeRate = 0.2;
@@ -161,6 +162,30 @@ public class StatisticServiceImpl implements StatisticService {
                 .monthly(result)
                 .totalProfit(totalProfit)
                 .totalRevenue(totalRevenue)
+                .build();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Override
+    public ReportStatusResponse getReportStatusStatistics() {
+        var reports = reportRepository.findAll();
+        int totalReports = 0;
+        int pending = 0;
+        int rejected = 0;
+        int accepted = 0;
+        for (var report : reports) {
+            totalReports++;
+            switch (report.getStatus()) {
+                case PENDING -> pending++;
+                case REJECTED -> rejected++;
+                case ACCEPTED -> accepted++;
+            }
+        }
+        return ReportStatusResponse.builder()
+                .totalReports(totalReports)
+                .pending(pending)
+                .rejected(rejected)
+                .accepted(accepted)
                 .build();
     }
 }
