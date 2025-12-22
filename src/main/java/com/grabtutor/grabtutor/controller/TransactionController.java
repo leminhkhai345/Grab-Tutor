@@ -23,7 +23,7 @@ public class TransactionController {
 
     @PostMapping
     public ApiResponse<?> addFund(@RequestParam("amount") int orderTotal,HttpServletRequest request){
-        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() +"/grabtutor/vnpay/vnpay-payment-return";
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() +"/grabtutor/vnpay";
 
         String vnpayUrl = vnPayService.addFund(orderTotal, baseUrl);
         return ApiResponse.builder()
