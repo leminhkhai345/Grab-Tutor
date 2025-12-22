@@ -38,12 +38,10 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
 
-
 jwt:
   signer-key: "Qk9WeWZxa0xEaEpUdWxzRk1sR1h5ZWlMV0RuY3NaRktyZ0tLY3VzaEZtQnhJckN1a2MzS1A3UjA9"
   valid-duration: 3600 # in second
   refreshable-duration: 36000 # in seconds
-
 
 cloudinary:
   cloud_name: dk3pmg0tr

@@ -5,5 +5,5 @@ import jakarta.servlet.http.HttpServletRequest;
 
 public interface VNPayService {
     String addFund(int total, String urlReturn);
-    TransactionResponse transactionReturn(HttpServletRequest request);
+    void transactionReturn(HttpServletRequest request);
 }
