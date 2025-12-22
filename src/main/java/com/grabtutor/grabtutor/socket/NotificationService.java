@@ -33,13 +33,7 @@ public class NotificationService {
     NotificationRepository notificationRepository;
     NotificationMapper notificationMapper;
 
-
     public void sendNotification(String userId, String title, String message, String refId) {
-        // Xây dựng một DTO chuẩn cho thông báo
-        Map<String, String> notificationDto = Map.of(
-                "type", "NOTIFICATION",
-                "content", message
-        );
         var user = userRepository.findById(userId).orElseThrow(()->new AppException(ErrorCode.USER_NOT_FOUND));
         var notification = Notification.builder()
                 .user(user)

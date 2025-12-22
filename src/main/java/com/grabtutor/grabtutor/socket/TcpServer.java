@@ -39,7 +39,7 @@ public class TcpServer {
         new Thread(() -> {
             try {
                 serverSocket = new ServerSocket(port);
-                log.info("Custom WebSocket Server started on port {}", port);
+                log.info("WebSocket Server started on port {}", port);
 
                 while (isRunning) {
                     Socket clientSocket = serverSocket.accept();
