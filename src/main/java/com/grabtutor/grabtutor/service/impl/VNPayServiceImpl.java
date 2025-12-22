@@ -135,7 +135,7 @@ public class VNPayServiceImpl implements VNPayService {
 
         var user = userRepository.findById(userId).orElseThrow(()->new AppException(ErrorCode.USER_NOT_FOUND));
         var ts = virtualTransactionRepository.findById(newTransactionId).orElse(null);
-        if(ts == null) return;
+        if(ts != null) return;
 
         String vnp_SecureHash = request.getParameter("vnp_SecureHash");
         fields.remove("vnp_SecureHashType");
