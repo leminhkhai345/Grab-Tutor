@@ -27,7 +27,7 @@ public class SecurityConfiguration {
             "/users/sendmail", "/upload","/auth/**", "/users/addTutor",
             "/users/tutorInfo/{userId}", "users", "courses/{courseId}",
             "courses/tutor/{tutorId}", "courses/search", "courses/all",
-            "/transaction/vnpay-payment-return"
+            "/vnpay/vnpay-payment-return"
     };
     private final String[] authenticatedEndpoints = {
             "/users/{userId}", "/users/myInfo",
