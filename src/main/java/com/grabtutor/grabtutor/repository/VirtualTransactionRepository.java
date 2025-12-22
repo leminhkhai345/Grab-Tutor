@@ -14,7 +14,6 @@ import java.util.List;
 public interface VirtualTransactionRepository extends JpaRepository<VirtualTransaction, String> {
     Page<VirtualTransaction> findAllByAccountBalanceId(String userId, Pageable pageable);
     Page<VirtualTransaction> findAll(Pageable pageable);
-    List<VirtualTransaction>  findByCreatedAtGreaterThanEqualAndCreatedAtLessThanAndType(LocalDateTime start, LocalDateTime end, TransactionType type);
     @Query(value = """
       SELECT MONTH(created_at) AS m, COALESCE(SUM(amount),0) AS total
       FROM virtual_transaction

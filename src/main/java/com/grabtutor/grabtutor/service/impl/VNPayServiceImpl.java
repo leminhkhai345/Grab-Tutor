@@ -50,6 +50,7 @@ public class VNPayServiceImpl implements VNPayService {
         Jwt jwt = (Jwt) auth.getPrincipal();
         String userId = jwt.getClaimAsString("userId");
         var user = userRepository.findById(userId).orElseThrow(()->new AppException(ErrorCode.USER_NOT_FOUND));
+        String newTransactionId = UUID.randomUUID().toString();
 
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
@@ -66,7 +67,7 @@ public class VNPayServiceImpl implements VNPayService {
         vnp_Params.put("vnp_CurrCode", "VND");
 
         vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
-        vnp_Params.put("vnp_OrderInfo", user.getId());
+        vnp_Params.put("vnp_OrderInfo", user.getId()+":"+newTransactionId);
         vnp_Params.put("vnp_OrderType", orderType);
 
         String locate = "vn";
@@ -116,7 +117,7 @@ public class VNPayServiceImpl implements VNPayService {
     }
     @Override
     @Transactional
-    public TransactionResponse transactionReturn(HttpServletRequest request){
+    public void transactionReturn(HttpServletRequest request){
 
         Map fields = new HashMap();
         for (Enumeration<String> params = request.getParameterNames(); params.hasMoreElements();) {
@@ -128,8 +129,13 @@ public class VNPayServiceImpl implements VNPayService {
                 fields.put(fieldName, fieldValue);
             }
         }
-        String userId = request.getParameter("vnp_OrderInfo");
+        String[] ids = request.getParameter("vnp_OrderInfo").split(":");
+        String userId = ids[0];
+        String newTransactionId = ids[1];
+
         var user = userRepository.findById(userId).orElseThrow(()->new AppException(ErrorCode.USER_NOT_FOUND));
+        var ts = virtualTransactionRepository.findById(newTransactionId).orElse(null);
+        if(ts == null) return;
 
         String vnp_SecureHash = request.getParameter("vnp_SecureHash");
         fields.remove("vnp_SecureHashType");
@@ -139,13 +145,13 @@ public class VNPayServiceImpl implements VNPayService {
         if (!signValue.equals(vnp_SecureHash)||!"00".equals(request.getParameter("vnp_TransactionStatus"))){
             throw new AppException(ErrorCode.TRANSACTION_FAILED);
         }
-
         String totalAmount = request.getParameter("vnp_Amount");
 
         var accountBalance = user.getAccountBalance();
         var addAmount = Double.parseDouble(totalAmount)*0.01;
         accountBalance.setBalance(accountBalance.getBalance() + addAmount);
         var transaction = VirtualTransaction.builder()
+                .id(newTransactionId)
                 .type(TransactionType.ADD_FUND)
                 .completedAt(LocalDateTime.now())
                 .status(TransactionStatus.SUCCESS)
@@ -156,9 +162,6 @@ public class VNPayServiceImpl implements VNPayService {
         transaction = virtualTransactionRepository.save(transaction);
 
         notificationService.sendNotification(user.getId(),"Account balance", "+"+transaction.getAmount(), user.getAccountBalance().getId());
-
-        return virtualTransactionMapper.toTransactionResponse(transaction);
-
     }
 
 }
