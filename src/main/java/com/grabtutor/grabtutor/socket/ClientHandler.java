@@ -32,20 +32,17 @@ import java.util.regex.Pattern;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class ClientHandler implements Runnable {
 
-    // Các service được inject (phải là final)
     final Socket socket;
     final TcpSessionRegistry registry;
     final ObjectMapper objectMapper;
     final ChatRoomService chatRoomService;
     final CustomJwtDecoder jwtDecoder;
 
-    // Các biến trạng thái của instance này
     InputStream in = null;
     OutputStream out = null;
     SocketWrapper wrapper = null;
     String authenticatedUserId = null; // Lưu userId sau khi xác thực
 
-    // Constructor này được gọi bởi ApplicationContext.getBean(...)
     public ClientHandler(Socket socket,
                          TcpSessionRegistry registry,
                          ObjectMapper objectMapper,
@@ -64,24 +61,23 @@ public class ClientHandler implements Runnable {
             in = socket.getInputStream();
             out = socket.getOutputStream();
 
-            // 1. Thực hiện bắt tay VÀ xác thực JWT
+            //Thực hiện bắt tay và xác thực JWT
             String path = doHandshakeAndAuth();
             if (path == null) {
-                // Handshake hoặc Auth thất bại, đóng kết nối
+                //Handshake hoặc xác thực thất bại -> đóng kết nối
                 log.warn("Handshake/Auth failed. Closing connection.");
                 close();
                 return;
             }
 
-            // 2. Khởi tạo Wrapper và đăng ký vào Registry
-            // (authenticatedUserId đã được set trong doHandshakeAndAuth)
+            //Khởi tạo Wrapper và đăng ký vào Registry với authenticatedUserId đã được set trong doHandshakeAndAuth
             wrapper = new SocketWrapper(socket, in, out);
             wrapper.setPath(path);
             registry.register(wrapper, authenticatedUserId);
 
             log.info("Handshake success. User: {}, Path: {}", authenticatedUserId, path);
 
-            // 3. Vòng lặp đọc tin nhắn
+            //Đọc tin nhắn
             while (socket.isConnected()) {
                 String message = readFrame();
                 if (message == null) break; // Client đóng kết nối
@@ -100,13 +96,8 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    /**
-     * Xử lý tin nhắn từ client (đã được xác thực)
-     */
     private void handleChatMessage(String json) throws IOException {
         MessageRequest request = objectMapper.readValue(json, MessageRequest.class);
-
-        // Xác thực đã được thực hiện ở handshake, không cần check lại
 
         switch (request.getType()) {
             case MessageType.JOIN:
@@ -122,24 +113,21 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    /**
-     * Thực hiện bắt tay WebSocket VÀ xác thực JWT từ query param
-     * @return Path (nếu thành công) hoặc null (nếu thất bại)
-     */
+    //bắt tay
     private String doHandshakeAndAuth() throws Exception {
         Scanner s = new Scanner(in, StandardCharsets.UTF_8.name());
         String data = s.useDelimiter("\\r\\n\\r\\n").next();
         Matcher getMatcher = Pattern.compile("^GET (\\S+) HTTP").matcher(data);
 
         if (getMatcher.find()) {
-            String fullPath = getMatcher.group(1); // Ví dụ: /ws/chat?token=xyz
+            String fullPath = getMatcher.group(1);
 
-            // --- BƯỚC 1: Tách Path và Query ---
+            //Tách Path và Query
             URI uri = URI.create(fullPath);
             String path = uri.getPath();
             Map<String, String> queryParams = parseQueryParams(uri.getQuery());
 
-            // --- BƯỚC 2: Xác thực Token ---
+            //Xác thực Token
             String token = queryParams.get("token");
             if (!authenticate(token)) {
                 log.warn("Authentication failed for {}. Token missing or invalid.", socket.getRemoteSocketAddress());
@@ -147,7 +135,7 @@ public class ClientHandler implements Runnable {
                 return null; // Thất bại
             }
 
-            // --- BƯỚC 3: Hoàn tất Handshake WebSocket ---
+            //Hoàn tất handshake WebSocket
             Matcher keyMatcher = Pattern.compile("Sec-WebSocket-Key: (.*)").matcher(data);
             if (keyMatcher.find()) {
                 String clientKey = keyMatcher.group(1).trim();
@@ -166,12 +154,10 @@ public class ClientHandler implements Runnable {
 
         // Yêu cầu không hợp lệ
         sendHttpResponse(400, "Bad Request");
-        return null; // Thất bại
+        return null;
     }
 
-    /**
-     * Xác thực token và lưu userId
-     */
+    //xác thực
     private boolean authenticate(String token) {
         if (token == null || token.isEmpty()) {
             return false;
@@ -211,9 +197,7 @@ public class ClientHandler implements Runnable {
         return params;
     }
 
-    /**
-     * Helper: Gửi phản hồi HTTP (cho trường hợp lỗi)
-     */
+    //Ni là trường hợp lỗi
     private void sendHttpResponse(int code, String reason) throws IOException {
         String response = "HTTP/1.1 " + code + " " + reason + "\r\n" +
                 "Content-Length: 0\r\n" +
@@ -222,9 +206,7 @@ public class ClientHandler implements Runnable {
         out.flush();
     }
 
-    /**
-     * Đọc và giải mã một WebSocket frame từ client
-     */
+    //đọc frame lấy message
     private String readFrame() throws IOException {
         int firstByte = in.read();
         if (firstByte == -1 || (firstByte & 0x0F) == 8) return null; // EOF or Close frame
@@ -254,9 +236,6 @@ public class ClientHandler implements Runnable {
         return new String(payload, StandardCharsets.UTF_8);
     }
 
-    /**
-     * Đóng socket an toàn
-     */
     private void close() {
         try { if (socket != null && !socket.isClosed()) socket.close(); } catch (IOException e) {}
     }

@@ -19,7 +19,7 @@ public class SocketWrapper {
     private final OutputStream out;
     private String userId;
     private String roomId;
-    private String path; // Lưu đường dẫn kết nối (ví dụ: /ws/chat)
+    private String path;
 
     public SocketWrapper(Socket socket, InputStream in, OutputStream out) {
         this.socket = socket;
@@ -27,9 +27,7 @@ public class SocketWrapper {
         this.out = out;
     }
 
-    /**
-     * Gửi tin nhắn văn bản (Text Frame - Opcode 0x1) cho Web Client
-     */
+    //Gửi về client
     public synchronized void send(String message) {
         if (socket.isClosed()) return;
         try {
@@ -65,6 +63,6 @@ public class SocketWrapper {
     public void close() {
         try {
             if (!socket.isClosed()) socket.close();
-        } catch (IOException e) { /* ignore */ }
+        } catch (IOException ignored) {}
     }
 }
